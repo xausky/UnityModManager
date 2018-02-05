@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">BH3ModManager</string>
+    <string name="btn_start_content">启动</string>
+    <string name="btn_apply_content">应用</string>
+</resources>

@@ -1,0 +1,26 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 26
+    defaultConfig {
+        applicationId "io.github.xausky.bh3modmanager"
+        minSdkVersion 15
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        ndk{
+            moduleName "zip"
+            abiFilters "armeabi-v7a","x86"
+        }
+    }
+    externalNativeBuild {
+        ndkBuild {
+            path file("jni/Android.mk")
+        }
+    }
+}
+
+dependencies {
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation project(':virtual-app')
+}
