@@ -7,9 +7,11 @@ package io.github.xausky.bh3modmanager;
 public class Mod {
     public String name;
     public boolean enable;
+    public String password;
 
-    public Mod(String name, boolean enable) {
+    public Mod(String name, boolean enable, String password) {
         this.name = name;
         this.enable = enable;
+        this.password = password;
     }
 }

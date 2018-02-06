@@ -1,7 +1,9 @@
 package io.github.xausky.bh3modmanager;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
@@ -10,6 +12,7 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.lody.virtual.client.core.VirtualCore;
@@ -40,7 +43,6 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class MainService implements CompoundButton.OnCheckedChangeListener {
     private static final String BH3_PACKAGE_NAME = "com.miHoYo.enterprise.NGHSoD";
-    private static final String RESOURCE_FILE_NAME_REGEX = "([a-z]|[0-9]){32}";
     private MainActivity context = null;
     private ModsAdapter adapter = null;
     private String appPath = null;
@@ -77,7 +79,7 @@ public class MainService implements CompoundButton.OnCheckedChangeListener {
         });
         for(File file: mods){
             String name = file.getName().substring(0,file.getName().length() - 4 );
-            adapter.getMods().add(new Mod(name, preferences.getBoolean(name, false)));
+            adapter.getMods().add(new Mod(name, preferences.getBoolean(name, false), preferences.getString(name + ":password", null)));
         }
         adapter.setListener(this);
     }
@@ -161,30 +163,56 @@ public class MainService implements CompoundButton.OnCheckedChangeListener {
                         backupDir.mkdir();
                     }
                     //开始解压模组文件
-                    SharedPreferences.Editor editor = preferences.edit();
+                    final SharedPreferences.Editor editor = preferences.edit();
                     for(final Mod mod : adapter.getMods()){
                         editor.putBoolean(mod.name, mod.enable);
+                        editor.putString(mod.name + ":password", mod.password);
                         if(mod.enable){
-                            try {
-                                final String name = unzipFileByRegex(storagePath + "/" + mod.name + ".zip", fusionDirPath, RESOURCE_FILE_NAME_REGEX);
-
-                                if(name != null){
+                            int result = ZipUtils.unzipFile(storagePath + "/" + mod.name + ".zip", fusionDirPath, mod.password);
+                            switch (result){
+                                case -1:
                                     launch.post(new Runnable() {
                                         @Override
                                         public void run() {
-                                            Toast.makeText(context,"安装模组文件冲突："+ mod.name + "!" + name, Toast.LENGTH_LONG).show();
+                                            Toast.makeText(context,"解压模组错误："+ mod.name , Toast.LENGTH_LONG).show();
                                         }
                                     });
                                     dialog.dismiss();
                                     return;
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                                case -2:
+                                    launch.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            final EditText editText = new EditText(context);
+                                            AlertDialog.Builder inputDialog =
+                                                    new AlertDialog.Builder(context);
+                                            inputDialog.setTitle("请输入模组密码:" + mod.name).setView(editText);
+                                            inputDialog.setPositiveButton("确定",
+                                                    new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            mod.password = editText.getText().toString();
+                                                            dialog.dismiss();
+                                                        }
+                                                    }).show();
+                                        }
+                                    });
+                                    dialog.dismiss();
+                                    return;
+                                case -3:
+                                    launch.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(context,"模组文件冲突："+ mod.name , Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                                    dialog.dismiss();
+                                    return;
                             }
                         }
                     }
                     editor.commit();
-                    if(FusionZip.patchZip(backupDirPath, fusionDirPath, "assets/bin/Data", virtualAppPath) != 0){
+                    if(ZipUtils.patchZip(backupDirPath, fusionDirPath, "assets/bin/Data", virtualAppPath) != 0){
                         launch.post(new Runnable() {
                             @Override
                             public void run() {
@@ -211,32 +239,6 @@ public class MainService implements CompoundButton.OnCheckedChangeListener {
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
         launch.setText(context.getText(R.string.btn_apply_content));
         isLaunch = false;
-    }
-    private static String unzipFileByRegex(String zipFile, String dir, String regex) throws IOException {
-        byte[] buffer = new byte[10240];
-        ZipFile inputFile = new ZipFile(zipFile);
-        Enumeration<? extends ZipEntry> entrys = inputFile.entries();
-        while (entrys.hasMoreElements()){
-                ZipEntry entry = entrys.nextElement();
-                String name = endSubstring(entry.getName(), 32);
-                if(!entry.isDirectory() && name.matches(regex)){
-                    File outputFile = new File(dir + "/" + name);
-                    if(outputFile.exists()){
-                        inputFile.close();
-                        return entry.getName();
-                    }
-                    FileOutputStream outputFileStream = new FileOutputStream(outputFile);
-                    InputStream inputStream = inputFile.getInputStream(entry);
-                    int len = 0;
-                    while((len = inputStream.read(buffer)) != -1){
-                        outputFileStream.write(buffer, 0, len);
-                    }
-                    outputFileStream.close();
-                    inputStream.close();
-                }
-        }
-        inputFile.close();
-        return null;
     }
 
     private static String endSubstring(String str, int len){
