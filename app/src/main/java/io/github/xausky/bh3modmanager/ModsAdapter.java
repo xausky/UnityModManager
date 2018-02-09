@@ -3,6 +3,7 @@ package io.github.xausky.bh3modmanager;
 import android.content.Context;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -20,9 +21,11 @@ public class ModsAdapter extends BaseAdapter {
     private Context context =  null;
     private List<Mod> mods = new ArrayList<>();
     private CompoundButton.OnCheckedChangeListener listener = null;
+    private LayoutInflater inflater;
 
     public ModsAdapter(Context context) {
         this.context = context;
+        this.inflater = LayoutInflater.from(context);
     }
 
     public List<Mod> getMods() {
@@ -54,13 +57,12 @@ public class ModsAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        Switch new_view = new Switch(context);
+        View item = inflater.inflate(R.layout.mods_list_item, null);
+        Switch aSwitch = item.findViewById(R.id.mods_list_item_switch);
         final Mod mod = (Mod) getItem(i);
-        new_view.setChecked(mod.enable);
-        new_view.setText(mod.name);
-        new_view.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
-        new_view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        new_view.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        aSwitch.setChecked(mod.enable);
+        aSwitch.setText(mod.name);
+        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 Log.d("BH3ModManager", compoundButton.getText() + ":" + b);
@@ -70,6 +72,6 @@ public class ModsAdapter extends BaseAdapter {
                 }
             }
         });
-        return new_view;
+        return item;
     }
 }
