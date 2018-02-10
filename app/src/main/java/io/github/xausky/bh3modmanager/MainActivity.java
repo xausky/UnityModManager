@@ -14,7 +14,8 @@ import android.widget.Button;
 import android.widget.ListView;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int CHOOSE_APK_REQUEST_CODE = 0x8848;
+    public static final int CHOOSE_APK_REQUEST_CODE = 0x8848;
+    public static final int CHOOSE_MOD_REQUEST_CODE = 0x8849;
     private MainService service;
     private ModsAdapter adapter = null;
     private Dialog dialog = null;
@@ -50,25 +51,40 @@ public class MainActivity extends AppCompatActivity {
             case R.id.main_menu_reinstall:
                 service.chooseInstall(true);
                 break;
+            case R.id.main_menu_import:
+                chooseFile(null, CHOOSE_MOD_REQUEST_CODE);
+                break;
+            case R.id.main_menu_about:
+                Intent intent = new Intent(this, AboutActivity.class);
+                startActivity(intent);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == Activity.RESULT_OK && requestCode == CHOOSE_APK_REQUEST_CODE) {
-            Uri uri = data.getData();
-            Log.d(service.LOG_TAG, "choose uri: " + uri + ", getPath:" + FileUtils.resolveFilePath(this, uri));
-            service.install(FileUtils.resolveFilePath(this, uri));
-            dialog.dismiss();
+        if(resultCode != Activity.RESULT_OK){
+            return;
+        }
+        String path = FileUtils.resolveFilePath(this, data.getData());
+        Log.d(MainService.LOG_TAG, "Choose Path:" + path);
+        switch (requestCode){
+            case CHOOSE_APK_REQUEST_CODE:
+                service.install(path);
+                dialog.dismiss();
+                break;
+            case CHOOSE_MOD_REQUEST_CODE:
+                service.importMod(path);
+                break;
         }
     }
 
-    public void chooseApk(Dialog dialog){
+    public void chooseFile(Dialog dialog, int requestCode){
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("*/*");//无类型限制
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        startActivityForResult(intent, CHOOSE_APK_REQUEST_CODE);
+        startActivityForResult(intent, requestCode);
         this.dialog = dialog;
     }
 }

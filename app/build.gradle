@@ -6,8 +6,8 @@ android {
         applicationId "io.github.xausky.bh3modmanager"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 3
-        versionName "v0.3-alpha"
+        versionCode 10
+        versionName "v1.0"
         ndk{
             moduleName "zip"
             abiFilters "armeabi-v7a","x86"

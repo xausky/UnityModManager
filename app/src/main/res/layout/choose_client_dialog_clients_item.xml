@@ -31,6 +31,5 @@
         android:layout_height="48sp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        app:srcCompat="@mipmap/ic_launcher" />
+        android:layout_alignParentTop="true"/>
 </RelativeLayout>

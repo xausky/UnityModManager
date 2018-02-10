@@ -25,6 +25,11 @@ import com.lody.virtual.remote.InstalledAppInfo;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -32,9 +37,10 @@ import static android.content.Context.MODE_PRIVATE;
  * Created by xausky on 2018/2/1.
  */
 
-public class MainService implements CompoundButton.OnCheckedChangeListener {
+public class MainService implements CompoundButton.OnCheckedChangeListener, AdapterView.OnItemLongClickListener {
     private static final String PACKAGE_NAME_PREFERENCES_KEY = "__INSTALLED_PACKAGE_NAME";
     public static final String LOG_TAG = "BH3ModManager";
+    private static final int COPY_BUFFER_SIZE = 10240;
     private String packageName = null;
     private MainActivity context = null;
     private ModsAdapter adapter = null;
@@ -75,7 +81,8 @@ public class MainService implements CompoundButton.OnCheckedChangeListener {
             String name = file.getName();
             adapter.getMods().add(new Mod(name, preferences.getBoolean(name, false), preferences.getString(name + ":password", null)));
         }
-        adapter.setListener(this);
+        adapter.setCheckedChangeListener(this);
+        adapter.setItemLongClickListener(this);
     }
 
     public Button getLaunch() {
@@ -100,15 +107,7 @@ public class MainService implements CompoundButton.OnCheckedChangeListener {
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                context.chooseApk(dialog);
-            }
-        });
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                final ApplicationInfo info = (ApplicationInfo) adapterView.getAdapter().getItem(i);
-                install(info.sourceDir);
-                dialog.dismiss();
+                context.chooseFile(dialog, MainActivity.CHOOSE_APK_REQUEST_CODE);
             }
         });
     }
@@ -276,6 +275,45 @@ public class MainService implements CompoundButton.OnCheckedChangeListener {
         }
     }
 
+    public void importMod(final String path){
+        final ProgressDialog dialog = ProgressDialog.show(context, "请稍等", "正在导入模组文件到管理器", false, false);
+        Thread thread = new Thread(){
+            @Override
+            public void run() {
+                byte[] buffer = new byte[COPY_BUFFER_SIZE];
+                int len = 0;
+                final File inputFile = new File(path);
+                File outputFile = new File(storagePath + "/" + inputFile.getName());
+                if(!outputFile.exists()) {
+                    try(FileInputStream inputStream = new FileInputStream(inputFile);
+                        FileOutputStream outputStream = new FileOutputStream(storagePath + "/" + inputFile.getName())) {
+                        while ( (len = inputStream.read(buffer)) != -1){
+                            outputStream.write(buffer, 0, len);
+                        }
+                        adapter.getMods().add(new Mod(inputFile.getName(), false, null));
+                        launch.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                adapter.notifyDataSetChanged();
+                            }
+                        });
+                    } catch (IOException e) {
+                        Log.d(MainService.LOG_TAG, "import mod exception", e);
+                    }
+                } else {
+                    launch.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context,"模组文件已存在："+ inputFile.getName() , Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+                dialog.dismiss();
+            }
+        };
+        thread.start();
+    }
+
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
         launch.setText(context.getText(R.string.btn_apply_content));
@@ -311,5 +349,35 @@ public class MainService implements CompoundButton.OnCheckedChangeListener {
                 Log.d("BH3ModManager", "delete failed: " + file.getAbsolutePath());
             }
         }
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+        final List<Mod> mods = adapter.getMods();
+        final Mod mod = mods.get(position);
+        if(mod.enable){
+            Toast.makeText(context,"无法删除已启用的模组，请先禁用：" + mod.name , Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        final AlertDialog.Builder builder=new AlertDialog.Builder(context);
+        builder.setTitle("确认");
+        builder.setMessage("删除模组:" + mod.name);
+        builder.setCancelable(true);
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                new File(storagePath + "/" + mod.name).delete();
+                mods.remove(position);
+                adapter.notifyDataSetChanged();
+            }
+        });
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.show();
+        return true;
     }
 }
