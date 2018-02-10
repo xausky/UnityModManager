@@ -2,7 +2,6 @@ package io.github.xausky.bh3modmanager;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,9 +9,13 @@ import android.content.pm.ApplicationInfo;
 import android.os.Environment;
 import android.os.RemoteException;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.lody.virtual.client.core.VirtualCore;
@@ -22,18 +25,6 @@ import com.lody.virtual.remote.InstalledAppInfo;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -42,7 +33,9 @@ import static android.content.Context.MODE_PRIVATE;
  */
 
 public class MainService implements CompoundButton.OnCheckedChangeListener {
-    private static final String BH3_PACKAGE_NAME = "com.miHoYo.enterprise.NGHSoD";
+    private static final String PACKAGE_NAME_PREFERENCES_KEY = "__INSTALLED_PACKAGE_NAME";
+    public static final String LOG_TAG = "BH3ModManager";
+    private String packageName = null;
     private MainActivity context = null;
     private ModsAdapter adapter = null;
     private String appPath = null;
@@ -54,7 +47,8 @@ public class MainService implements CompoundButton.OnCheckedChangeListener {
 
     public MainService(MainActivity context) {
         this.context = context;
-        preferences = context.getSharedPreferences("mods_install_state", MODE_PRIVATE);
+        preferences = context.getSharedPreferences("default", MODE_PRIVATE);
+        packageName = preferences.getString(PACKAGE_NAME_PREFERENCES_KEY, null);
     }
 
     public ModsAdapter getAdapter() {
@@ -78,7 +72,7 @@ public class MainService implements CompoundButton.OnCheckedChangeListener {
             }
         });
         for(File file: mods){
-            String name = file.getName().substring(0,file.getName().length() - 4 );
+            String name = file.getName();
             adapter.getMods().add(new Mod(name, preferences.getBoolean(name, false), preferences.getString(name + ":password", null)));
         }
         adapter.setListener(this);
@@ -92,49 +86,96 @@ public class MainService implements CompoundButton.OnCheckedChangeListener {
         this.launch = launch;
     }
 
-    private String getAppPath(){
-        List<ApplicationInfo> applications = context.getPackageManager().getInstalledApplications(0);
-        for (ApplicationInfo info : applications) {
-            if (BH3_PACKAGE_NAME.equals(info.packageName)) {
-                return info.sourceDir;
+    public void chooseInstall(boolean cancelable){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View view = LayoutInflater.from(context).inflate(R.layout.choose_client_dialog, null);
+        ListView listView = view.findViewById(R.id.choose_client_dialog_clients);
+        listView.setAdapter(new ClientsAdapter(context));
+        builder.setTitle("请选择客户端");
+        builder.setView(view);
+        builder.setCancelable(cancelable);
+        builder.setPositiveButton("浏览", null);
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                context.chooseApk(dialog);
             }
-        }
-        return null;
+        });
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                final ApplicationInfo info = (ApplicationInfo) adapterView.getAdapter().getItem(i);
+                install(info.sourceDir);
+                dialog.dismiss();
+            }
+        });
+    }
+
+    public void install(final String path){
+        final ProgressDialog dialog = ProgressDialog.show(context, "请稍等", "正在安装崩坏3到虚拟环境，该过程大概需要2到3分钟", false, false);
+        Thread installThread = new Thread(){
+            @Override
+            public void run() {
+                final InstallResult result = VirtualCore.get().installPackage(path, 0);
+                if(result.isSuccess){
+                    InstalledAppInfo virtualAppInfo = VirtualCore.get().getInstalledAppInfo(result.packageName, 0);
+                    virtualAppPath = virtualAppInfo.apkPath;
+                    if(packageName != null && !packageName.equals(result.packageName)){
+                        VirtualCore.get().uninstallPackage(packageName);
+                    }
+                    packageName = result.packageName;
+                    preferences.edit().putString(PACKAGE_NAME_PREFERENCES_KEY, result.packageName).apply();
+                    String backupDirPath = context.getFilesDir().getAbsolutePath() + "/ModsBackup";
+                    deleteFile(new File(backupDirPath));
+                    SharedPreferences.Editor editor = preferences.edit();
+                    for(Mod mod: adapter.getMods()){
+                        mod.enable = false;
+                        editor.putBoolean(mod.name, false);
+                    }
+                    editor.apply();
+                    launch.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
+                } else {
+                    launch.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context, "安装失败:" + result.error, Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+                Log.d("BH3ModManager", "Install APP: " + result.isSuccess + ", Error: " + result.error);
+                dialog.dismiss();
+            }
+        };
+        installThread.start();
     }
 
     public void start(){
-        appPath = getAppPath();
-        if (appPath == null){
-            Toast.makeText(context, "未安装崩坏3rd客户端，程序退出。", Toast.LENGTH_LONG).show();
-            context.finish();
+        if(packageName != null) {
+            InstalledAppInfo virtualAppInfo = VirtualCore.get().getInstalledAppInfo(packageName, 0);
+            if(virtualAppInfo != null){
+                virtualAppPath = virtualAppInfo.apkPath;
+                Log.d("BH3ModManager", "V APP Installed: " + virtualAppInfo.apkPath);
+            }else {
+                chooseInstall(false);
+            }
+        } else {
+            chooseInstall(false);
         }
-        InstalledAppInfo virtualAppInfo = VirtualCore.get().getInstalledAppInfo(BH3_PACKAGE_NAME, 0);
-        if(virtualAppInfo != null){
-            virtualAppPath = virtualAppInfo.apkPath;
-            Log.d("BH3ModManager", "V APP Installed: " + virtualAppInfo.apkPath);
-        }else {
-            Toast.makeText(context, "未安装底包，正在安装。", Toast.LENGTH_LONG).show();
-            final ProgressDialog dialog = ProgressDialog.show(context, "请稍等", "正在安装崩坏3到虚拟环境，该过程大概需要2到3分钟，只需要运行一次。", false, false);
-            Thread installThread = new Thread(){
-                @Override
-                public void run() {
-                    InstallResult result = VirtualCore.get().installPackage(appPath, 0);
-                    if(result.isSuccess){
-                        InstalledAppInfo virtualAppInfo = VirtualCore.get().getInstalledAppInfo(BH3_PACKAGE_NAME, 0);
-                        virtualAppPath = virtualAppInfo.apkPath;
-                    }
-                    Log.d("BH3ModManager", "Install APP: " + result.isSuccess + ", Error: " + result.error);
-                    dialog.dismiss();
-                }
-            };
-            installThread.start();
-        }
+
+
     }
 
     public void launch(){
         if(isLaunch){
             final ProgressDialog dialog = ProgressDialog.show(context, "请稍等", "正在启动崩坏3", false, false);
-            final Intent intent = VirtualCore.get().getLaunchIntent(BH3_PACKAGE_NAME, 0);
+            final Intent intent = VirtualCore.get().getLaunchIntent(packageName, 0);
             VirtualCore.get().setUiCallback(intent, new VirtualCore.UiCallback(){
                 @Override
                 public void onAppOpened(String s, int i) throws RemoteException {
@@ -168,7 +209,7 @@ public class MainService implements CompoundButton.OnCheckedChangeListener {
                         editor.putBoolean(mod.name, mod.enable);
                         editor.putString(mod.name + ":password", mod.password);
                         if(mod.enable){
-                            int result = ZipUtils.unzipFile(storagePath + "/" + mod.name + ".zip", fusionDirPath, mod.password);
+                            int result = ZipUtils.unzipFile(storagePath + "/" + mod.name, fusionDirPath, mod.password);
                             switch (result){
                                 case -1:
                                     launch.post(new Runnable() {
@@ -211,7 +252,7 @@ public class MainService implements CompoundButton.OnCheckedChangeListener {
                             }
                         }
                     }
-                    editor.commit();
+                    editor.apply();
                     if(ZipUtils.patchZip(backupDirPath, fusionDirPath, "assets/bin/Data", virtualAppPath) != 0){
                         launch.post(new Runnable() {
                             @Override

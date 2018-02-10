@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "io.github.xausky.bh3modmanager"
-        minSdkVersion 15
+        minSdkVersion 19
         targetSdkVersion 26
         versionCode 3
         versionName "v0.3-alpha"
