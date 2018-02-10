@@ -110,6 +110,14 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
                 context.chooseFile(dialog, MainActivity.CHOOSE_APK_REQUEST_CODE);
             }
         });
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ApplicationInfo info = (ApplicationInfo) parent.getAdapter().getItem(position);
+                install(info.sourceDir);
+                dialog.dismiss();
+            }
+        });
     }
 
     public void install(final String path){
