@@ -22,5 +22,5 @@ android {
 
 dependencies {
     implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation project(':virtual-app')
+    implementation 'com.github.haygcao:VAExposed:0.3.2'
 }
