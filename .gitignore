@@ -3,3 +3,6 @@
 /.gradle
 .externalNativeBuild
 build
+release
+libs
+obj

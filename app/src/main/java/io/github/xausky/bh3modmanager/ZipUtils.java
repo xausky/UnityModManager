@@ -8,6 +8,6 @@ public class ZipUtils {
     public static native int patchZip(String backupDir, String fusionDir, String prefix, String target);
     public static native int unzipFile(String zipFile, String targetDir, String password);
     static{
-        System.loadLibrary("zip");
+        System.loadLibrary("ZipUtils");
     }
 }
