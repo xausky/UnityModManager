@@ -10,6 +10,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.Build;
 import android.os.Environment;
 import android.os.RemoteException;
 import android.util.Log;
@@ -375,6 +376,11 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
                             }
                         });
                     } else {
+                        if(root){
+                            Shell.setFlags(Shell.FLAG_REDIRECT_STDERR);
+                            Shell.Sync.sh("chown system:system " + appPath);
+                            Shell.Sync.sh("chmod 644 " + appPath);
+                        }
                         launch.post(new Runnable() {
                             @Override
                             public void run() {

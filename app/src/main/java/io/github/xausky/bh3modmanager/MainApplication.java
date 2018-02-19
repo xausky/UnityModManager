@@ -68,7 +68,7 @@ public class MainApplication extends Application {
                 }
             }
         }
-        List<String> result = Shell.Sync.sh("chmod +x " + execFilePath);
+        List<String> result = Shell.Sync.sh("chmod 700 " + execFilePath);
         Log.d(MainService.LOG_TAG, result.toString());
         VirtualCore virtualCore = VirtualCore.get();
         virtualCore.initialize(new VirtualCore.VirtualInitializer() {
