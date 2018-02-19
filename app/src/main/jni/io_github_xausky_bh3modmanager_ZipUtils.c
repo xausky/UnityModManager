@@ -30,7 +30,7 @@ const char * resolveName(const char * name){
     return strchr(file_name, '.') == NULL && strlen(file_name) == 32 ? file_name: NULL;
 }
 
-int unzipFile(const char * zipFile, const char * targetDir, const char * password){
+int unzipFile(const char * zipFile, const char * targetDir, const char * password, uint8_t force){
     int enumber = 0;
     char target_path_buffer[1024];
     uint8_t copy_buffer[CPOY_BUFFER_ZISE];
@@ -71,9 +71,12 @@ int unzipFile(const char * zipFile, const char * targetDir, const char * passwor
             int target_file = open(target_path_buffer, O_CREAT|O_WRONLY|O_EXCL, 0600);
             if(target_file == -1){
                 zip_fclose(file);
-                zip_close(zip);
                 int error = errno;
                 if(error == EEXIST){
+                    if(force){
+                        continue;
+                    }
+                    zip_close(zip);
                     return -3;
                 } else {
                     __FUSION_LOG("target file open failed, error: %s， target file path: %s\n", strerror(error), target_path_buffer);
@@ -94,14 +97,14 @@ int unzipFile(const char * zipFile, const char * targetDir, const char * passwor
 
 #ifdef __ANDROID_NDK__
 JNIEXPORT jint JNICALL Java_io_github_xausky_bh3modmanager_ZipUtils_unzipFile
-        (JNIEnv *env, jclass cls, jstring zipFile, jstring targetDir, jstring password){
+        (JNIEnv *env, jclass cls, jstring zipFile, jstring targetDir, jstring password, jboolean force){
     const char * zipFilePath = (*env)->GetStringUTFChars(env, zipFile,JNI_FALSE);
     const char * targetDirPath = (*env)->GetStringUTFChars(env, targetDir,JNI_FALSE);
     const char * passwordString = NULL;
     if(password != NULL){
         passwordString = (*env)->GetStringUTFChars(env, password,JNI_FALSE);
     }
-    return unzipFile(zipFilePath, targetDirPath, passwordString);
+    return unzipFile(zipFilePath, targetDirPath, passwordString, force);
 }
 #else
 int main(int argc, char* argv[]){

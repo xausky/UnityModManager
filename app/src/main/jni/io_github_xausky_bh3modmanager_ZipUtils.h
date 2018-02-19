@@ -13,7 +13,7 @@ extern "C" {
  * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL Java_io_github_xausky_bh3modmanager_ZipUtils_unzipFile
-  (JNIEnv *, jclass, jstring, jstring, jstring);
+  (JNIEnv *, jclass, jstring, jstring, jstring, jboolean);
 
 #ifdef __cplusplus
 }

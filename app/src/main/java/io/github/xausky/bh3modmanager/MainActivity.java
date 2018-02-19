@@ -11,7 +11,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.Switch;
 
 public class MainActivity extends AppCompatActivity {
     public static final int CHOOSE_APK_REQUEST_CODE = 0x8848;
@@ -19,12 +21,14 @@ public class MainActivity extends AppCompatActivity {
     private MainService service;
     private ModsAdapter adapter = null;
     private Dialog dialog = null;
+    private Switch force = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Button launch = findViewById(R.id.launch);
         ListView mods = findViewById(R.id.mods);
+        force = findViewById(R.id.switch_froce);
         adapter = new ModsAdapter(this);
         mods.setAdapter(adapter);
         service = new MainService(this);
@@ -37,6 +41,16 @@ public class MainActivity extends AppCompatActivity {
                 service.launch();
             }
         });
+        force.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                service.forceChange(isChecked);
+            }
+        });
+    }
+
+    public void setForce(boolean force){
+        this.force.setChecked(force);
     }
 
     @Override
@@ -72,7 +86,11 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode){
             case CHOOSE_APK_REQUEST_CODE:
                 service.install(path, null);
-                dialog.dismiss();
+                try {
+                    dialog.dismiss();
+                }catch (Exception e){
+
+                }
                 break;
             case CHOOSE_MOD_REQUEST_CODE:
                 service.importMod(path);

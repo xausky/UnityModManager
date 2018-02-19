@@ -36,6 +36,7 @@ public class MainApplication extends Application {
         InputStream inputStream = null;
         Shell.setFlags(Shell.FLAG_NON_ROOT_SHELL | Shell.FLAG_REDIRECT_STDERR);
         String execFilePath = getFilesDir().getAbsolutePath() + "/ZipPatch";
+        Log.d(MainService.LOG_TAG, "CPU_ABI:" + Build.CPU_ABI);
         try {
             if(Build.CPU_ABI.equals("x86")){
                 inputStream = getAssets().open("x86/ZipPatch");

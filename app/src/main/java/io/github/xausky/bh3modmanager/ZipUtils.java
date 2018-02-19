@@ -28,7 +28,7 @@ public class ZipUtils {
             return -1;
         }
     }
-    public static native int unzipFile(String zipFile, String targetDir, String password);
+    public static native int unzipFile(String zipFile, String targetDir, String password, boolean force);
     static{
         System.loadLibrary("ZipUtils");
     }

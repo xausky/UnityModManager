@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -8,11 +8,24 @@
         android:id="@+id/launch"
         android:layout_width="match_parent"
         android:layout_height="72sp"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/switch_froce"
         android:text="@string/btn_start_content"
         android:textSize="36sp" />
 
     <ListView
         android:id="@+id/mods"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-</LinearLayout>
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/launch" />
+
+    <Switch
+        android:id="@+id/switch_froce"
+        android:layout_width="wrap_content"
+        android:layout_height="72sp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/switch_force_content"
+        android:textSize="24sp" />
+</RelativeLayout>

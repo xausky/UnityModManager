@@ -2,10 +2,11 @@
     <string name="app_name">崩坏３模组管理器</string>
     <string name="btn_start_content">启动</string>
     <string name="btn_apply_content">应用</string>
+    <string name="switch_force_content">强制安装</string>
     <string name="about_context_text">
         &lt;p&gt;本程序仅用于崩坏3游戏的模组安装，使用。&lt;/p&gt;
 &lt;p&gt;本程序在Github开源请勿用于其他商业用途。&lt;/p&gt;
-&lt;p&gt;本程序的诞生离不开&lt;a href=&quot;https://libzip.org/&quot;&gt;libzip&lt;/a&gt;以及&lt;a href=&quot;https://github.com/haygcao/VAExposed/&quot;&gt;VAExposed&lt;/a&gt;等开源项目。&lt;/p&gt;
+&lt;p&gt;本程序的诞生离不开&lt;a href=&quot;https://libzip.org/&quot;&gt;libzip&lt;/a&gt;, &lt;a href=&quot;https://github.com/topjohnwu/libsu/&quot;&gt;libsu&lt;/a&gt;以及&lt;a href=&quot;https://github.com/haygcao/VAExposed/&quot;&gt;VAExposed&lt;/a&gt;等开源项目。&lt;/p&gt;
 &lt;p&gt;Author: &lt;a href=&quot;https://github.com/xausky/&quot;&gt;xausky&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Github: &lt;a href=&quot;https://github.com/xausky/BH3ModManager/&quot;&gt;https://github.com/xausky/BH3ModManager/&lt;/a&gt;&lt;/p&gt;
     </string>

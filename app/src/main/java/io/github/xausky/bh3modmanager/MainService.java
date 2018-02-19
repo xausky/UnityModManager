@@ -42,8 +42,9 @@ import static android.content.Context.MODE_PRIVATE;
  */
 
 public class MainService implements CompoundButton.OnCheckedChangeListener, AdapterView.OnItemLongClickListener {
-    private static final String PACKAGE_NAME_PREFERENCES_KEY = "__INSTALLED_PACKAGE_NAME";
-    private static final String ROOT_MODE_PREFERENCES_KEY = "__ROOT_MODE";
+    private static final String PACKAGE_NAME_PREFERENCES_KEY = "__PACKAGE_NAME_PREFERENCES_KEY";
+    private static final String ROOT_MODE_PREFERENCES_KEY = "__ROOT_MODE_PREFERENCES_KEY";
+    private static final String FORCE_INSTALL_PREFERENCES_KEY = "__FORCE_INSTALL_PREFERENCES_KEY";
     public static final String LOG_TAG = "BH3ModManager";
     private static final int COPY_BUFFER_SIZE = 10240;
     private String packageName = null;
@@ -53,14 +54,24 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
     private Button launch = null;
     private boolean isLaunch = true;
     private boolean root = false;
+    private boolean force = false;
     private String storagePath = null;
     private SharedPreferences preferences;
+    private String title = null;
 
     public MainService(MainActivity context) {
         this.context = context;
         preferences = context.getSharedPreferences("default", MODE_PRIVATE);
         packageName = preferences.getString(PACKAGE_NAME_PREFERENCES_KEY, null);
         root = preferences.getBoolean(ROOT_MODE_PREFERENCES_KEY, false);
+        force = preferences.getBoolean(FORCE_INSTALL_PREFERENCES_KEY, false);
+        context.setForce(force);
+        title = context.getTitle().toString();
+        if(root){
+            context.setTitle(title + "[Root Mode]");
+        } else {
+            context.setTitle(title + "[Virtual Mode]");
+        }
     }
 
     public ModsAdapter getAdapter() {
@@ -123,7 +134,11 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ApplicationInfo info = (ApplicationInfo) parent.getAdapter().getItem(position);
                 install(info.sourceDir, info.packageName);
-                dialog.dismiss();
+                try {
+                    dialog.dismiss();
+                }catch (Exception e){
+
+                }
             }
         });
     }
@@ -170,7 +185,11 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
                         adapter.notifyDataSetChanged();
                     }
                 });
-                dialog.dismiss();
+                try {
+                    dialog.dismiss();
+                }catch (Exception e){
+
+                }
             }
         };
         installThread.start();
@@ -209,7 +228,16 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
                     Log.d(LOG_TAG, "root:" + root);
                     preferences.edit().putBoolean(ROOT_MODE_PREFERENCES_KEY,root).apply();
                     chooseInstall(false);
-                    dialog.dismiss();
+                    try {
+                        dialog.dismiss();
+                    }catch (Exception e){
+
+                    }
+                    if(root){
+                        context.setTitle(title + "[Root Mode]");
+                    } else {
+                        context.setTitle(title + "[Virtual Mode]");
+                    }
                 }
             });
             builder.setNegativeButton("否", new DialogInterface.OnClickListener() {
@@ -218,7 +246,16 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
                     root = false;
                     preferences.edit().putBoolean(ROOT_MODE_PREFERENCES_KEY,root).apply();
                     chooseInstall(false);
-                    dialog.dismiss();
+                    try {
+                        dialog.dismiss();
+                    }catch (Exception e){
+
+                    }
+                    if(root){
+                        context.setTitle(title + "[Root Mode]");
+                    } else {
+                        context.setTitle(title + "[Virtual Mode]");
+                    }
                 }
             });
             builder.show();
@@ -233,7 +270,11 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
                 VirtualCore.get().setUiCallback(intent, new VirtualCore.UiCallback(){
                     @Override
                     public void onAppOpened(String s, int i) throws RemoteException {
-                        dialog.dismiss();
+                        try {
+                            dialog.dismiss();
+                        }catch (Exception e){
+
+                        }
                     }
                 });
                 Thread startThread = new Thread() {
@@ -266,7 +307,7 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
                         editor.putBoolean(mod.name, mod.enable);
                         editor.putString(mod.name + ":password", mod.password);
                         if(mod.enable){
-                            int result = ZipUtils.unzipFile(storagePath + "/" + mod.name, fusionDirPath, mod.password);
+                            int result = ZipUtils.unzipFile(storagePath + "/" + mod.name, fusionDirPath, mod.password, force);
                             switch (result){
                                 case -1:
                                     launch.post(new Runnable() {
@@ -275,7 +316,11 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
                                             Toast.makeText(context,"解压模组错误："+ mod.name , Toast.LENGTH_LONG).show();
                                         }
                                     });
-                                    dialog.dismiss();
+                                    try {
+                                        dialog.dismiss();
+                                    }catch (Exception e){
+
+                                    }
                                     return;
                                 case -2:
                                     launch.post(new Runnable() {
@@ -290,12 +335,20 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
                                                         @Override
                                                         public void onClick(DialogInterface dialog, int which) {
                                                             mod.password = editText.getText().toString();
-                                                            dialog.dismiss();
+                                                            try {
+                                                                dialog.dismiss();
+                                                            }catch (Exception e){
+
+                                                            }
                                                         }
                                                     }).show();
                                         }
                                     });
-                                    dialog.dismiss();
+                                    try {
+                                        dialog.dismiss();
+                                    }catch (Exception e){
+
+                                    }
                                     return;
                                 case -3:
                                     launch.post(new Runnable() {
@@ -304,7 +357,11 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
                                             Toast.makeText(context,"模组文件冲突："+ mod.name , Toast.LENGTH_LONG).show();
                                         }
                                     });
-                                    dialog.dismiss();
+                                    try {
+                                        dialog.dismiss();
+                                    }catch (Exception e){
+
+                                    }
                                     return;
                             }
                         }
@@ -326,7 +383,11 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
                         });
                         isLaunch = true;
                     }
-                    dialog.dismiss();
+                    try {
+                        dialog.dismiss();
+                    }catch (Exception e){
+
+                    }
                 }
             };
             installThread.start();
@@ -366,7 +427,11 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
                         }
                     });
                 }
-                dialog.dismiss();
+                try {
+                    dialog.dismiss();
+                }catch (Exception e){
+
+                }
             }
         };
         thread.start();
@@ -477,5 +542,10 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
             intent.setComponent(cn);
             context.startActivity(intent);
         }
+    }
+
+    public void forceChange(boolean force){
+        this.force = force;
+        preferences.edit().putBoolean(FORCE_INSTALL_PREFERENCES_KEY, force).apply();
     }
 }
