@@ -9,8 +9,9 @@ LOCAL_SRC_FILES := $(LOCAL_PATH)/../../libzip/obj/local/$(TARGET_ARCH_ABI)/libzi
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
+LOCAL_LDFLAGS := -pie
 LOCAL_MODULE := ZipPatch
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/../../libzip/jni/lib
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../libzip/jni/lib
 LOCAL_SRC_FILES :=  $(wildcard $(LOCAL_PATH)/*.c)
 LOCAL_STATIC_LIBRARIES := libzip
 LOCAL_LDLIBS := -llog -lz

@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(MainService.LOG_TAG, "Choose Path:" + path);
         switch (requestCode){
             case CHOOSE_APK_REQUEST_CODE:
-                service.install(path);
+                service.install(path, null);
                 dialog.dismiss();
                 break;
             case CHOOSE_MOD_REQUEST_CODE:

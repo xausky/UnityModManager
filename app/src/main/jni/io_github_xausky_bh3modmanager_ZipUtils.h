@@ -9,14 +9,6 @@ extern "C" {
 #endif
 /*
  * Class:     io_github_xausky_bh3modmanager_ZipUtils
- * Method:    patchZip
- * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
- */
-JNIEXPORT jint JNICALL Java_io_github_xausky_bh3modmanager_ZipUtils_patchZip
-  (JNIEnv *, jclass, jstring, jstring, jstring, jstring);
-
-/*
- * Class:     io_github_xausky_bh3modmanager_ZipUtils
  * Method:    unzipFile
  * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
  */

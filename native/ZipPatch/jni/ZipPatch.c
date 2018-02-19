@@ -117,8 +117,14 @@ int patchZip(const char * backupDirPath, const char * fusionDirPath, const char 
 }
 
 int main(int argc, char* argv[]){
-    if(argc < 5){
-        return -1;
+    if(argc != 5){
+        puts("PARA_ERROR");
+        return 0;
     }
-    return patchZip(argv[1], argv[2], argv[3], argv[4]);
+    if(patchZip(argv[1], argv[2], argv[3], argv[4]) == 0){
+        puts("SUCCEED");
+    } else {
+        puts("FAILED");
+    }
+    return 0;
 }
