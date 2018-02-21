@@ -3,9 +3,13 @@ package io.github.xausky.bh3modmanager;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,6 +18,8 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Switch;
+
+import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
     public static final int CHOOSE_APK_REQUEST_CODE = 0x8848;
@@ -25,14 +31,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(MainService.LOG_TAG, "MainActivity onCreate");
         setContentView(R.layout.activity_main);
         Button launch = findViewById(R.id.launch);
-        ListView mods = findViewById(R.id.mods);
+        RecyclerView mods = findViewById(R.id.mods);
         force = findViewById(R.id.switch_froce);
-        adapter = new ModsAdapter(this);
-        mods.setAdapter(adapter);
         service = new MainService(this);
-        service.setAdapter(adapter);
+        service.setModsRecyclerView(mods);
         service.setLaunch(launch);
         service.start();
         launch.setOnClickListener(new View.OnClickListener() {

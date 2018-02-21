@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#F0F0F0">
 
     <Button
         android:id="@+id/launch"
@@ -13,7 +14,7 @@
         android:text="@string/btn_start_content"
         android:textSize="36sp" />
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/mods"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

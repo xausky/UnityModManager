@@ -13,6 +13,8 @@ import android.content.pm.ResolveInfo;
 import android.os.Build;
 import android.os.Environment;
 import android.os.RemoteException;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,7 +44,7 @@ import static android.content.Context.MODE_PRIVATE;
  * Created by xausky on 2018/2/1.
  */
 
-public class MainService implements CompoundButton.OnCheckedChangeListener, AdapterView.OnItemLongClickListener {
+public class MainService implements ModsAdapter.OnDataChangeListener {
     private static final String PACKAGE_NAME_PREFERENCES_KEY = "__PACKAGE_NAME_PREFERENCES_KEY";
     private static final String ROOT_MODE_PREFERENCES_KEY = "__ROOT_MODE_PREFERENCES_KEY";
     private static final String FORCE_INSTALL_PREFERENCES_KEY = "__FORCE_INSTALL_PREFERENCES_KEY";
@@ -50,7 +52,7 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
     private static final int COPY_BUFFER_SIZE = 10240;
     private String packageName = null;
     private MainActivity context = null;
-    private ModsAdapter adapter = null;
+    private ModsAdapter modsAdapter;
     private String appPath = null;
     private Button launch = null;
     private boolean isLaunch = true;
@@ -75,12 +77,7 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
         }
     }
 
-    public ModsAdapter getAdapter() {
-        return adapter;
-    }
-
-    public void setAdapter(ModsAdapter adapter) {
-        this.adapter = adapter;
+    public void setModsRecyclerView(RecyclerView view) {
         storagePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/BH3Mods";
         File storage = new File(storagePath);
         if(!storage.exists()){
@@ -89,18 +86,10 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
                 context.finish();
             }
         }
-        File[] mods = storage.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return file.getName().endsWith(".zip");
-            }
-        });
-        for(File file: mods){
-            String name = file.getName();
-            adapter.getMods().add(new Mod(name, preferences.getBoolean(name, false), preferences.getString(name + ":password", null)));
-        }
-        adapter.setCheckedChangeListener(this);
-        adapter.setItemLongClickListener(this);
+        modsAdapter = new ModsAdapter(view, preferences, storage, context);
+        view.setAdapter(modsAdapter);
+        view.setLayoutManager(new LinearLayoutManager(context));
+        modsAdapter.setListener(this);
     }
 
     public Button getLaunch() {
@@ -174,16 +163,11 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
                 preferences.edit().putString(PACKAGE_NAME_PREFERENCES_KEY, packageName).apply();
                 String backupDirPath = context.getFilesDir().getAbsolutePath() + "/ModsBackup";
                 deleteFile(new File(backupDirPath));
-                SharedPreferences.Editor editor = preferences.edit();
-                for(Mod mod: adapter.getMods()){
-                    mod.enable = false;
-                    editor.putBoolean(mod.name, false);
-                }
-                editor.apply();
+                modsAdapter.cleanEnable();
                 launch.post(new Runnable() {
                     @Override
                     public void run() {
-                        adapter.notifyDataSetChanged();
+                        modsAdapter.notifyDataSetChanged();
                     }
                 });
                 try {
@@ -302,11 +286,7 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
                     if(!backupDir.exists()){
                         backupDir.mkdir();
                     }
-                    //开始解压模组文件
-                    final SharedPreferences.Editor editor = preferences.edit();
-                    for(final Mod mod : adapter.getMods()){
-                        editor.putBoolean(mod.name, mod.enable);
-                        editor.putString(mod.name + ":password", mod.password);
+                    for(final Mod mod : modsAdapter.getMods()){
                         if(mod.enable){
                             int result = ZipUtils.unzipFile(storagePath + "/" + mod.name, fusionDirPath, mod.password, force);
                             switch (result){
@@ -367,7 +347,7 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
                             }
                         }
                     }
-                    editor.apply();
+                    modsAdapter.notifyApply();
                     if(ZipUtils.patchZip(root, context, backupDirPath, fusionDirPath, "assets/bin/Data", appPath) != 0){
                         launch.post(new Runnable() {
                             @Override
@@ -378,8 +358,7 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
                     } else {
                         if(root){
                             Shell.setFlags(Shell.FLAG_REDIRECT_STDERR);
-                            Shell.Sync.sh("chown system:system " + appPath);
-                            Shell.Sync.sh("chmod 644 " + appPath);
+                            Shell.Sync.sh("chown system:system " + appPath, "chmod 644 " + appPath);
                         }
                         launch.post(new Runnable() {
                             @Override
@@ -415,11 +394,11 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
                         while ( (len = inputStream.read(buffer)) != -1){
                             outputStream.write(buffer, 0, len);
                         }
-                        adapter.getMods().add(new Mod(inputFile.getName(), false, null));
+                        modsAdapter.getMods().add(new Mod(inputFile.getName(), false, null, Integer.MAX_VALUE));
                         launch.post(new Runnable() {
                             @Override
                             public void run() {
-                                adapter.notifyDataSetChanged();
+                                modsAdapter.notifyDataSetChanged();
                             }
                         });
                     } catch (IOException e) {
@@ -441,12 +420,6 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
             }
         };
         thread.start();
-    }
-
-    @Override
-    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-        launch.setText(context.getText(R.string.btn_apply_content));
-        isLaunch = false;
     }
 
     private static String endSubstring(String str, int len){
@@ -478,36 +451,6 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
                 Log.d("BH3ModManager", "delete failed: " + file.getAbsolutePath());
             }
         }
-    }
-
-    @Override
-    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-        final List<Mod> mods = adapter.getMods();
-        final Mod mod = mods.get(position);
-        if(mod.enable){
-            Toast.makeText(context,"无法删除已启用的模组，请先禁用：" + mod.name , Toast.LENGTH_SHORT).show();
-            return true;
-        }
-        final AlertDialog.Builder builder=new AlertDialog.Builder(context);
-        builder.setTitle("确认");
-        builder.setMessage("删除模组:" + mod.name);
-        builder.setCancelable(true);
-        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                new File(storagePath + "/" + mod.name).delete();
-                mods.remove(position);
-                adapter.notifyDataSetChanged();
-            }
-        });
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
-        });
-        builder.show();
-        return true;
     }
 
     private void startApplicationWithPackageName(String name) {
@@ -553,5 +496,11 @@ public class MainService implements CompoundButton.OnCheckedChangeListener, Adap
     public void forceChange(boolean force){
         this.force = force;
         preferences.edit().putBoolean(FORCE_INSTALL_PREFERENCES_KEY, force).apply();
+    }
+
+    @Override
+    public void onDataChange() {
+        launch.setText(context.getText(R.string.btn_apply_content));
+        isLaunch = false;
     }
 }
