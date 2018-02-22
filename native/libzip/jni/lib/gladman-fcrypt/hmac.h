@@ -36,7 +36,7 @@
 #ifndef _HMAC_H
 #define _HMAC_H
 
-#include "../../../../../../../.local/opt/android-sdk/ndk-bundle/sysroot/usr/include/memory.h"
+#include "memory.h"
 
 #include "sha1.h"
 

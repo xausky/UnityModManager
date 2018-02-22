@@ -2,6 +2,7 @@ NDK_BUILD = $(shell cat ../local.properties | grep ndk.dir | cut -d = -f 2)/ndk-
 LOCAL_PATH = $(PWD)
 
 copy: libzip ZipPatch
+	mkdir $(LOCAL_PATH)/../app/src/main/assets
 	cp -r $(LOCAL_PATH)/ZipPatch/libs/* $(LOCAL_PATH)/../app/src/main/assets
 libzip:
 	NDK_PROJECT_PATH=$(LOCAL_PATH)/libzip $(NDK_BUILD)
