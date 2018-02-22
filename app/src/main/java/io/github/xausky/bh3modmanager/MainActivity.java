@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +22,9 @@ import android.widget.Switch;
 
 import java.util.Collections;
 
+import static android.support.v4.app.ActivityCompat.requestPermissions;
+import static android.support.v4.content.PermissionChecker.PERMISSION_DENIED;
+
 public class MainActivity extends AppCompatActivity {
     public static final int CHOOSE_APK_REQUEST_CODE = 0x8848;
     public static final int CHOOSE_MOD_REQUEST_CODE = 0x8849;
@@ -31,8 +35,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(MainService.LOG_TAG, "MainActivity onCreate");
         setContentView(R.layout.activity_main);
+        Log.d(MainService.LOG_TAG, "MainActivity onCreate");
+        if(PermissionChecker.checkSelfPermission(this, "android.permission.WRITE_EXTERNAL_STORAGE") == PERMISSION_DENIED){
+            requestPermissions(new String[]{"android.permission.READ_SMS"},1);
+        }
         Button launch = findViewById(R.id.launch);
         RecyclerView mods = findViewById(R.id.mods);
         force = findViewById(R.id.switch_froce);

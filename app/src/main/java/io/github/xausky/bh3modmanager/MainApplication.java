@@ -3,6 +3,7 @@ package io.github.xausky.bh3modmanager;
 import android.app.Application;
 import android.content.Context;
 import android.os.Build;
+import android.support.v4.content.PermissionChecker;
 import android.util.Log;
 
 import com.lody.virtual.client.core.VirtualCore;
@@ -13,6 +14,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+
+import static android.support.v4.app.ActivityCompat.requestPermissions;
+import static android.support.v4.content.PermissionChecker.PERMISSION_DENIED;
 
 /**
  * Created by xausky on 2018/2/1.

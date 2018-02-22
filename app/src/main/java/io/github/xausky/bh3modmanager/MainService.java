@@ -78,7 +78,7 @@ public class MainService implements ModsAdapter.OnDataChangeListener {
     }
 
     public void setModsRecyclerView(RecyclerView view) {
-        storagePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/BH3Mods";
+        storagePath = context.getExternalFilesDir("BH3Mods").getAbsolutePath();
         File storage = new File(storagePath);
         if(!storage.exists()){
             if(!storage.mkdir()){

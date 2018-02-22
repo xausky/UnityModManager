@@ -100,10 +100,12 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> {
         holder.mod.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mod.enable = isChecked;
-                Log.d(MainService.LOG_TAG, "Mod State Change " + mod.name + ":" + mod.enable);
-                if(listener!=null){
-                    listener.onDataChange();
+                if(buttonView.isPressed()) {
+                    mod.enable = isChecked;
+                    Log.d(MainService.LOG_TAG, buttonView.getText() + "Mod State Change " + mod.name + ":" + mod.enable);
+                    if (listener != null) {
+                        listener.onDataChange();
+                    }
                 }
             }
         });
