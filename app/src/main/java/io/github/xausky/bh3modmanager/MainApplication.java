@@ -6,6 +6,7 @@ import android.os.Build;
 import android.support.v4.content.PermissionChecker;
 import android.util.Log;
 
+import com.flurry.android.FlurryAgent;
 import com.lody.virtual.client.core.VirtualCore;
 import com.topjohnwu.superuser.Shell;
 
@@ -36,6 +37,9 @@ public class MainApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        new FlurryAgent.Builder()
+                .withLogEnabled(true)
+                .build(this, "YS94RJ9WV9NGSFHT8ZJM");
         OutputStream outputStream = null;
         InputStream inputStream = null;
         Shell.setFlags(Shell.FLAG_NON_ROOT_SHELL | Shell.FLAG_REDIRECT_STDERR);

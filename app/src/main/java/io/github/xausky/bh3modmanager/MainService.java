@@ -10,8 +10,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.os.Build;
-import android.os.Environment;
 import android.os.RemoteException;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,7 +18,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -32,11 +29,16 @@ import com.lody.virtual.remote.InstalledAppInfo;
 import com.topjohnwu.superuser.Shell;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+
+import io.github.xausky.bh3modmanager.activity.MainActivity;
+import io.github.xausky.bh3modmanager.adapter.ClientsAdapter;
+import io.github.xausky.bh3modmanager.adapter.ModsAdapter;
+import io.github.xausky.bh3modmanager.domain.Mod;
+import io.github.xausky.bh3modmanager.utils.ZipUtils;
 
 import static android.content.Context.MODE_PRIVATE;
 

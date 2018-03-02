@@ -1,4 +1,4 @@
-package io.github.xausky.bh3modmanager;
+package io.github.xausky.bh3modmanager.adapter;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -15,6 +15,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.github.xausky.bh3modmanager.R;
 
 /**
  * Created by xausky on 18-2-9.

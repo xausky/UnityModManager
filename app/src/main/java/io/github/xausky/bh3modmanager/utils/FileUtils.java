@@ -1,4 +1,4 @@
-package io.github.xausky.bh3modmanager;
+package io.github.xausky.bh3modmanager.utils;
 
 import android.content.ContentUris;
 import android.content.Context;

@@ -25,4 +25,6 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:26.1.0'
     implementation 'com.github.haygcao:VAExposed:83791402de'
     implementation 'com.github.topjohnwu:libsu:1.1.0'
+    implementation 'com.flurry.android:analytics:9.0.0'
+    implementation 'com.github.medyo:android-about-page:1.2.2'
 }

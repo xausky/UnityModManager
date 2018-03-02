@@ -1,29 +1,23 @@
-package io.github.xausky.bh3modmanager;
+package io.github.xausky.bh3modmanager.activity;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.ListView;
 import android.widget.Switch;
 
-import java.util.Collections;
-
-import static android.support.v4.app.ActivityCompat.requestPermissions;
-import static android.support.v4.content.PermissionChecker.PERMISSION_DENIED;
+import io.github.xausky.bh3modmanager.utils.FileUtils;
+import io.github.xausky.bh3modmanager.MainService;
+import io.github.xausky.bh3modmanager.R;
+import io.github.xausky.bh3modmanager.adapter.ModsAdapter;
 
 public class MainActivity extends AppCompatActivity {
     public static final int CHOOSE_APK_REQUEST_CODE = 0x8848;
@@ -37,9 +31,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(MainService.LOG_TAG, "MainActivity onCreate");
-        if(PermissionChecker.checkSelfPermission(this, "android.permission.WRITE_EXTERNAL_STORAGE") == PERMISSION_DENIED){
-            requestPermissions(new String[]{"android.permission.READ_SMS"},1);
-        }
         Button launch = findViewById(R.id.launch);
         RecyclerView mods = findViewById(R.id.mods);
         force = findViewById(R.id.switch_froce);
