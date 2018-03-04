@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="wrap_content"
+            >
+            <TextView
+                android:layout_gravity="center"
+                android:drawableStart="@drawable/ic_remove_circle"
+                android:drawableLeft="@drawable/ic_remove_circle"
+                android:gravity="center"
+                android:layout_width="128dp"
+                android:layout_height="24dp"
+                android:layout_margin="8dp"
+                android:text="@string/home_latest_version" />
+            <TextView
+                android:layout_gravity="center"
+                android:drawableStart="@drawable/ic_check_circle"
+                android:drawableLeft="@drawable/ic_check_circle"
+                android:gravity="center"
+                android:layout_width="128dp"
+                android:layout_height="24dp"
+                android:layout_margin="8dp"
+                android:text="@string/home_current_version" />
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_margin="10dp">
+            <TextView
+                android:layout_gravity="center"
+                android:drawableStart="@drawable/ic_clear"
+                android:drawableLeft="@drawable/ic_clear"
+                android:gravity="center"
+                android:layout_width="128dp"
+                android:layout_height="24dp"
+                android:layout_margin="8dp"
+                android:text="@string/home_client_uninstalled" />
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
+        <TextView
+            android:id="@+id/home_summary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@android:string/unknownName" />
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

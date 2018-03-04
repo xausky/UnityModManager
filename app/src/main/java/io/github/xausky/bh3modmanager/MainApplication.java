@@ -2,22 +2,7 @@ package io.github.xausky.bh3modmanager;
 
 import android.app.Application;
 import android.content.Context;
-import android.os.Build;
-import android.support.v4.content.PermissionChecker;
-import android.util.Log;
-
-import com.flurry.android.FlurryAgent;
 import com.lody.virtual.client.core.VirtualCore;
-import com.topjohnwu.superuser.Shell;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.List;
-
-import static android.support.v4.app.ActivityCompat.requestPermissions;
-import static android.support.v4.content.PermissionChecker.PERMISSION_DENIED;
 
 /**
  * Created by xausky on 2018/2/1.
@@ -32,51 +17,5 @@ public class MainApplication extends Application {
         } catch (Throwable e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        new FlurryAgent.Builder()
-                .withLogEnabled(true)
-                .build(this, "YS94RJ9WV9NGSFHT8ZJM");
-        OutputStream outputStream = null;
-        InputStream inputStream = null;
-        Shell.setFlags(Shell.FLAG_NON_ROOT_SHELL | Shell.FLAG_REDIRECT_STDERR);
-        String execFilePath = getFilesDir().getAbsolutePath() + "/ZipPatch";
-        Log.d(MainService.LOG_TAG, "CPU_ABI:" + Build.CPU_ABI);
-        try {
-            if(Build.CPU_ABI.equals("x86")){
-                inputStream = getAssets().open("x86/ZipPatch");
-            } else {
-                inputStream = getAssets().open("armeabi-v7a/ZipPatch");
-            }
-
-            outputStream = new FileOutputStream(execFilePath);
-            int len = 0;
-            byte[] buffer = new byte[10240];
-            while ((len = inputStream.read(buffer)) > 0){
-                outputStream.write(buffer, 0, len);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }finally {
-            if(inputStream != null){
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if(outputStream != null){
-                try {
-                    outputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        List<String> result = Shell.Sync.sh("chmod 700 " + execFilePath);
-        Log.d(MainService.LOG_TAG, result.toString());
     }
 }

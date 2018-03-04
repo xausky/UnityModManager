@@ -1,11 +1,26 @@
 <resources>
-    <string name="app_name">崩坏３模组管理器</string>
-    <string name="btn_start_content">启动</string>
-    <string name="btn_apply_content">应用</string>
-    <string name="switch_force_content">强制安装</string>
-    <string name="about_context_text">
-        本程序仅用于崩坏3游戏的模组安装，使用。
-        本程序在Github开源请勿用于其他商业用途。
-        本程序的诞生离不开libzip,libsu以及VAExposed等开源项目。
+    <string name="app_name">崩坏3模组管理器</string>
+    <string name="menu_settings">设置</string>
+    <string name="menu_launch_game">启动游戏</string>
+    <string name="nav_home">主页</string>
+    <string name="nav_mod">模组</string>
+    <string name="nav_attach">附加组件</string>
+    <string name="nav_setting">设置</string>
+    <string name="nav_system">系统</string>
+    <string name="nav_info">关于</string>
+    <string name="info_context_text">
+        本程序仅用于崩坏3游戏的模组安装，使用。\n
+        本程序在Github开源请勿用于其他商业用途。\n
+        本程序的诞生离不开libzip,libsu以及VAExposed等开源项目。\n
     </string>
+    <string name="setting_force_mode">强制模式</string>
+    <string name="setting_root_mode">Root模式</string>
+    <string name="setting_force_mode_summary">忽略所有模组文件冲突，按照优先级强制覆盖安装。</string>
+    <string name="setting_default_password">默认解压密码</string>
+    <string name="setting_default_password_summary">当模组文件是加密的压缩文件时会先尝试此密码。</string>
+    <string name="state">State</string>
+    <string name="home_latest_version">最新版本：</string>
+    <string name="home_current_version">当前版本：</string>
+    <string name="home_client_version">客户端版本：</string>
+    <string name="home_client_uninstalled">客户端未安装</string>
 </resources>

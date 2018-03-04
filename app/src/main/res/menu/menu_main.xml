@@ -1,0 +1,36 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="io.github.xausky.bh3modmanager.MainActivity">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_home"
+            android:checked="true"
+            android:title="@string/nav_home" />
+        <item
+            android:id="@+id/nav_mod"
+            android:icon="@drawable/ic_mod"
+            android:title="@string/nav_mod" />
+        <item
+            android:id="@+id/nav_attach"
+            android:icon="@drawable/ic_attach"
+            android:title="@string/nav_attach" />
+        <item android:title="@string/nav_system">
+            <menu>
+                <group android:checkableBehavior="single">
+                    <item
+                        android:id="@+id/nav_setting"
+                        android:icon="@drawable/ic_setting"
+                        android:title="@string/nav_setting" />
+                    <item
+                        android:id="@+id/nav_info"
+                        android:icon="@drawable/ic_info"
+                        android:title="@string/nav_info" />
+                </group>
+            </menu>
+        </item>
+
+    </group>
+</menu>

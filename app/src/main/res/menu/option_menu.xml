@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="io.github.xausky.bh3modmanager.MainActivity">
+    <item
+        android:id="@+id/menu_launch_game"
+        android:title="@string/menu_launch_game"
+        android:icon="@drawable/ic_game"
+        app:showAsAction="always"/>
+</menu>

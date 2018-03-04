@@ -1,32 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout
+    android:id="@+id/dl_main_drawer"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#F0F0F0">
+    android:fitsSystemWindows="true">
 
-    <Button
-        android:id="@+id/launch"
-        android:layout_width="match_parent"
-        android:layout_height="72sp"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/switch_froce"
-        android:text="@string/btn_start_content"
-        android:textSize="36sp" />
+    <!-- 你的内容布局-->
+    <include layout="@layout/navigation_content"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/mods"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/launch" />
-
-    <Switch
-        android:id="@+id/switch_froce"
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nv_main_navigation"
         android:layout_width="wrap_content"
-        android:layout_height="72sp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:text="@string/switch_force_content"
-        android:textSize="24sp" />
-</RelativeLayout>
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:headerLayout="@layout/navigation_header"
+        app:menu="@menu/menu_main"/>
+
+</android.support.v4.widget.DrawerLayout>
