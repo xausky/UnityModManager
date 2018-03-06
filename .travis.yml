@@ -5,7 +5,8 @@ dd:
 android:
   components:
   - tools
-  - build-tools-26.0.2
+  - build-tools
+  - ndk-bundle
   - platform-tools
   - android-26
 script:
