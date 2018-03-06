@@ -1,7 +1,7 @@
 package io.github.xausky.bh3modmanager.fragment;
 
-import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,56 +16,40 @@ import android.widget.ListView;
 
 import com.lody.virtual.client.core.InstallStrategy;
 import com.lody.virtual.client.core.VirtualCore;
+import com.lody.virtual.client.ipc.VActivityManager;
 import com.lody.virtual.remote.InstallResult;
 
 import io.github.xausky.bh3modmanager.MainApplication;
 import io.github.xausky.bh3modmanager.R;
-import io.github.xausky.bh3modmanager.adapter.ClientsAdapter;
-import ru.bartwell.exfilepicker.ExFilePicker;
+import io.github.xausky.bh3modmanager.adapter.AttachesAdapter;
+import io.github.xausky.bh3modmanager.dialog.ApplicationChooseDialog;
 
 /**
  * Created by xausky on 18-3-3.
  */
 
-public class AttachFragment extends BaseFragment {
-    private static final String ALL_CLIENT_PACKAGE_REGEX = "^.*$";
-    private static final int APP_FILE_PICKER_RESULT = 8849;
+public class AttachFragment extends BaseFragment implements ApplicationChooseDialog.OnApplicationChooseDialogResultListener, AdapterView.OnItemClickListener{
+    private static final String ALL_APPLICATION_PACKAGE_REGEX = "^.*$";
     private Context context;
-    private AlertDialog appDialog;
+    private ApplicationChooseDialog dialog;
     private View view;
+    private ListView attaches;
+    private AttachesAdapter adapter;
+    private HomeFragment homeFragment;
+    private VirtualCore va;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         this.context = inflater.getContext();
         this.view = inflater.inflate(R.layout.attach_fragment, container, false);
-
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-        View dialogView = LayoutInflater.from(context).inflate(R.layout.choose_client_dialog, null);
-        ListView listView = dialogView.findViewById(R.id.choose_client_dialog_clients);
-        listView.setAdapter(new ClientsAdapter(context, ALL_CLIENT_PACKAGE_REGEX));
-        dialogBuilder.setTitle("请选择客户端");
-        dialogBuilder.setView(dialogView);
-        dialogBuilder.setPositiveButton("浏览", null);
-        appDialog = dialogBuilder.create();
-        appDialog.show();
-        appDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ExFilePicker filePicker = new ExFilePicker();
-                filePicker.setShowOnlyExtensions("apk");
-                filePicker.setCanChooseOnlyOneItem(true);
-                filePicker.start(AttachFragment.this, APP_FILE_PICKER_RESULT);
-            }
-        });
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ApplicationInfo info = (ApplicationInfo) parent.getAdapter().getItem(position);
-                appInstall(info.sourceDir);
-                appDialog.hide();
-            }
-        });
-        appDialog.hide();
+        this.dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX);
+        this.dialog.setListener(this);
+        this.attaches = view.findViewById(R.id.attach_list);
+        this.homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
+        this.va = VirtualCore.get();
+        this.adapter = new AttachesAdapter(context, va, homeFragment.packageName);
+        this.attaches.setAdapter(adapter);
+        this.attaches.setOnItemClickListener(this);
         return this.view;
     }
 
@@ -90,6 +74,7 @@ public class AttachFragment extends BaseFragment {
                 AttachFragment.this.view.post(new Runnable() {
                     @Override
                     public void run() {
+                        adapter.update(homeFragment.packageName);
                         Snackbar.make(AttachFragment.this.view, resultString, Snackbar.LENGTH_LONG).show();
                     }
                 });
@@ -104,6 +89,24 @@ public class AttachFragment extends BaseFragment {
 
     @Override
     public void OnActionButtonClick() {
-        AttachFragment.this.appDialog.show();
+        AttachFragment.this.dialog.show();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        dialog.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void OnApplicationChooseDialogResult(String packageName, String apkPath) {
+        appInstall(apkPath);
+        dialog.hide();
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        ApplicationInfo info = (ApplicationInfo) parent.getAdapter().getItem(position);
+        Intent intent = VirtualCore.get().getLaunchIntent(info.packageName, 0);
+        VActivityManager.get().startActivity(intent, 0);
     }
 }

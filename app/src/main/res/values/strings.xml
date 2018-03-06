@@ -9,9 +9,10 @@
     <string name="nav_system">系统</string>
     <string name="nav_info">关于</string>
     <string name="info_context_text">
-        本程序仅用于崩坏3游戏的模组安装，使用。\n
-        本程序在Github开源请勿用于其他商业用途。\n
-        本程序的诞生离不开libzip,libsu以及VAExposed等开源项目。\n
+        本程序仅用于崩坏3游戏的模组安装，使用。\n本程序在Github开源请勿用于其他商业用途。\n本程序的诞生离不开libzip,libsu以及VirtualApp等开源项目。\n
+    </string>
+    <string name="home_summary_context">
+        管理器版本：%s\n已启用模组数量：%d\n已安装模组数量：%d\n已安装附加组件数量：%d\n可见的外部程序数量：%d\n虚拟环境已安装应用数量：%d
     </string>
     <string name="setting_force_mode">强制模式</string>
     <string name="setting_root_mode">Root模式</string>

@@ -2,10 +2,7 @@ package io.github.xausky.bh3modmanager.adapter;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.PackageParser;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,12 +20,12 @@ import io.github.xausky.bh3modmanager.R;
  */
 
 
-public class ClientsAdapter extends BaseAdapter {
+public class ApplicationsAdapter extends BaseAdapter {
     private List<ApplicationInfo> applicationInfos = new ArrayList<>();
     private LayoutInflater inflater;
     private PackageManager manager;
 
-    public ClientsAdapter(Context context, String packageRegex) {
+    public ApplicationsAdapter(Context context, String packageRegex) {
         this.inflater = LayoutInflater.from(context);
         manager = context.getPackageManager();
         List<ApplicationInfo> installedApplications = manager.getInstalledApplications(0);
@@ -56,14 +53,25 @@ public class ClientsAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        View item = inflater.inflate(R.layout.choose_client_dialog_clients_item, null);
-        TextView nameView = item.findViewById(R.id.choose_client_dialog_clients_item_name);
-        TextView packageNameView = item.findViewById(R.id.choose_client_dialog_clients_item_package_name);
-        ImageView iconView = item.findViewById(R.id.choose_client_dialog_clients_item_icon);
+        if(view == null){
+            view = inflater.inflate(R.layout.choose_client_dialog_clients_item, viewGroup, false);
+            ViewHolder holder = new ViewHolder();
+            holder.name = view.findViewById(R.id.choose_client_dialog_clients_item_name);
+            holder.packageName = view.findViewById(R.id.choose_client_dialog_clients_item_package_name);
+            holder.icon = view.findViewById(R.id.choose_client_dialog_clients_item_icon);
+            view.setTag(holder);
+        }
+        ViewHolder holder = (ViewHolder)view.getTag();
         ApplicationInfo info = getItem(i);
-        packageNameView.setText(info.packageName);
-        nameView.setText(manager.getApplicationLabel(info));
-        iconView.setImageDrawable(manager.getApplicationIcon(info));
-        return item;
+        holder.packageName.setText(info.packageName);
+        holder.name.setText(manager.getApplicationLabel(info));
+        holder.icon.setImageDrawable(manager.getApplicationIcon(info));
+        return view;
+    }
+
+    private static class ViewHolder {
+        TextView name;
+        TextView packageName;
+        ImageView icon;
     }
 }

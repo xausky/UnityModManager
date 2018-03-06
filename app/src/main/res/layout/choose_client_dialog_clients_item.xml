@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_toEndOf="@+id/choose_client_dialog_clients_item_icon"
         android:layout_toRightOf="@+id/choose_client_dialog_clients_item_icon"
-        android:textSize="24sp"
+        android:textSize="16sp"
         android:text="@android:string/unknownName" />
 
     <TextView
