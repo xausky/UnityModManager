@@ -9,6 +9,19 @@ android {
         versionCode 200
         versionName "2.0.0"
     }
+    signingConfigs {
+        releaseConfig {
+            storeFile file("../../xausky.jks")
+            storePassword project.hasProperty("KEYSTORE_PASS") ? KEYSTORE_PASS : System.getenv("KEYSTORE_PASS")
+            keyAlias project.hasProperty("ALIAS_NAME") ? ALIAS_NAME : System.getenv("ALIAS_NAME")
+            keyPassword project.hasProperty("ALIAS_PASS") ? ALIAS_PASS : System.getenv("ALIAS_PASS")
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.releaseConfig
+        }
+    }
 }
 
 dependencies {
@@ -16,5 +29,7 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support:cardview-v7:26.1.0'
     implementation 'com.github.medyo:android-about-page:1.2.2'
-    implementation 'com.github.haygcao:VAExposed:83791402de'
+    implementation 'me.zhanghai.android.materialprogressbar:library:1.4.2'
+    implementation 'com.github.bartwell:ExFilePicker:master-SNAPSHOT'
+    implementation project(':libva')
 }
