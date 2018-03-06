@@ -2,5 +2,8 @@ language: android
 dd:
 - openssl aes-256-cbc -K $encrypted_d5896aca80a4_key -iv $encrypted_d5896aca80a4_iv
   -in xausky.jks.enc -out ../xausky.jks -d
+android:
+  components:
+  - build-tools-26.0.2
 script:
   - "./gradlew assembleRelease"
