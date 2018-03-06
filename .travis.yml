@@ -4,10 +4,6 @@ dd:
   -in xausky.jks.enc -out ../xausky.jks -d
 android:
   components:
-  - tools
-  - build-tools
-  - ndk-bundle
-  - platform-tools
-  - android-26
+  - build-tools-26.0.2
 script:
   - "./gradlew assembleRelease"
