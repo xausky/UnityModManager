@@ -22,5 +22,8 @@
     <string name="home_latest_version">最新版本：</string>
     <string name="home_current_version">当前版本：</string>
     <string name="home_client_version">客户端版本：</string>
-    <string name="home_client_uninstalled">客户端未安装</string>
+    <string name="home_client_uninstalled">点击安装客户端</string>
+    <string name="home_client_installed">客户端版本：%s</string>
+    <string name="client_list_item_icon">icon</string>
+    <string name="progress_dialog_processing">正在处理</string>
 </resources>

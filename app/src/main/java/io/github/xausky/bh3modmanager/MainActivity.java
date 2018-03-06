@@ -1,6 +1,7 @@
 package io.github.xausky.bh3modmanager;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -16,6 +17,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.lody.virtual.client.core.VirtualCore;
+import com.lody.virtual.client.ipc.VActivityManager;
+
 import io.github.xausky.bh3modmanager.fragment.BaseFragment;
 import io.github.xausky.bh3modmanager.fragment.HomeFragment;
 import io.github.xausky.bh3modmanager.fragment.InfoFragment;
@@ -24,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private FloatingActionButton actionButton;
     private NavigationView navigationView;
+    private int currentNavigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,16 +49,12 @@ public class MainActivity extends AppCompatActivity {
         actionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Snackbar comes out", Snackbar.LENGTH_LONG)
-                        .setAction("Action", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Toast.makeText(
-                                        MainActivity.this,
-                                        "Toast comes out",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        }).show();
+                BaseFragment fragment = (BaseFragment)BaseFragment.fragment(currentNavigation);
+                try {
+                    fragment.OnActionButtonClick();
+                }catch (UnsupportedOperationException e){
+                    Snackbar.make(view, "不支持的操作", Snackbar.LENGTH_LONG).show();
+                }
             }
         });
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
             actionButton.setVisibility(View.INVISIBLE);
         }
         drawerLayout.closeDrawers();
+        currentNavigation = item;
     }
 
     @Override
@@ -83,9 +85,19 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 drawerLayout.openDrawer(GravityCompat.START);
-                return true;
+                break;
+            case R.id.menu_launch_game:
+                HomeFragment fragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
+                boolean isInstall = VirtualCore.get().isAppInstalled(fragment.packageName);
+                if(!isInstall){
+                    Snackbar.make(actionButton, "客户端未安装，请先到主页安装客户端。", Snackbar.LENGTH_LONG).show();
+                    break;
+                }
+                Intent intent = VirtualCore.get().getLaunchIntent(fragment.packageName, 0);
+                VActivityManager.get().startActivity(intent, 0);
+                break;
         }
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 
     @Override
