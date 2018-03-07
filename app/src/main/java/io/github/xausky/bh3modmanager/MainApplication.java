@@ -11,6 +11,8 @@ import com.lody.virtual.client.core.VirtualCore;
 
 import java.util.List;
 
+import io.github.xausky.bh3modmanager.fragment.BaseFragment;
+
 /**
  * Created by xausky on 2018/2/1.
  */
@@ -22,6 +24,7 @@ public class MainApplication extends Application {
         super.attachBaseContext(base);
         try {
             VirtualCore.get().startup(base);
+            BaseFragment.initialize(base);
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -30,28 +33,5 @@ public class MainApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        final VirtualCore virtualCore = VirtualCore.get();
-        virtualCore.initialize(new VirtualCore.VirtualInitializer() {
-            @Override
-            public void onVirtualProcess() {
-                virtualCore.setCrashHandler(new CrashHandler() {
-                    @Override
-                    public void handleUncaughtException(Thread t, Throwable e) {
-                        Log.i(LOG_TAG, "uncaught :" + t, e);
-                        if (t == Looper.getMainLooper().getThread()) {
-                            System.exit(0);
-                        } else {
-                            Log.e(LOG_TAG, "ignore uncaught exception of thread: " + t);
-                        }
-                    }
-                });
-            }
-
-            @Override
-            public void onServerProcess() {
-                virtualCore.addVisibleOutsidePackage("com.eg.android.AlipayGphone");
-                virtualCore.addVisibleOutsidePackage("com.tencent.mm");
-            }
-        });
     }
 }

@@ -18,4 +18,8 @@ android {
             path file("src/main/jni/Android.mk")
         }
     }
+    lintOptions {
+        abortOnError false
+    }
+
 }

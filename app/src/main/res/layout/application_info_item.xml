@@ -31,7 +31,7 @@
         android:id="@+id/choose_client_dialog_clients_item_icon"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:src="@drawable/app_icon"
+        android:src="@mipmap/ic_launcher"
         android:contentDescription="@string/client_list_item_icon"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"

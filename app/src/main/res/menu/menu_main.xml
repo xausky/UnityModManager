@@ -17,6 +17,10 @@
             android:id="@+id/nav_attach"
             android:icon="@drawable/ic_attach"
             android:title="@string/nav_attach" />
+        <item
+            android:id="@+id/nav_visibility"
+            android:icon="@drawable/ic_visibility"
+            android:title="@string/nav_visibility" />
         <item android:title="@string/nav_system">
             <menu>
                 <group android:checkableBehavior="single">

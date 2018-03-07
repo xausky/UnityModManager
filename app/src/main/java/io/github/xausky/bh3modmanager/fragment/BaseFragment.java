@@ -1,6 +1,8 @@
 package io.github.xausky.bh3modmanager.fragment;
 
+import android.app.Application;
 import android.app.Fragment;
+import android.content.Context;
 import android.view.View;
 
 import java.util.Map;
@@ -22,17 +24,36 @@ public abstract class BaseFragment extends Fragment {
     public int actionButtonVisibility(){
         return View.INVISIBLE;
     }
+    private Context base;
+
+    public BaseFragment(){
+
+    }
+
+    public Context getBase() {
+        return base;
+    }
+
+    public BaseFragment setBase(Context base) {
+        this.base = base;
+        return this;
+    }
+
     public static Map<Integer, Fragment> map;
 
-    public static Fragment fragment(int item){
+    public static void initialize(Context base){
         if(map == null){
             map = new TreeMap<>();
-            map.put(R.id.nav_home, new HomeFragment());
-            map.put(R.id.nav_info, new InfoFragment());
-            map.put(R.id.nav_attach, new AttachFragment());
-            map.put(R.id.nav_mod, new ModFragment());
+            map.put(R.id.nav_home, new HomeFragment().setBase(base));
+            map.put(R.id.nav_info, new InfoFragment().setBase(base));
+            map.put(R.id.nav_attach, new AttachFragment().setBase(base));
+            map.put(R.id.nav_mod, new ModFragment().setBase(base));
+            map.put(R.id.nav_visibility, new VisibilityFragment().setBase(base));
             map.put(R.id.nav_setting, new SettingFragment());
         }
+    }
+
+    public static Fragment fragment(int item){
         return map.get(item);
     }
 }

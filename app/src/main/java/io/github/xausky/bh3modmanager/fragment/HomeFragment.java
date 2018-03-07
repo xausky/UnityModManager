@@ -56,35 +56,44 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     private TextView currentVersion;
     private TextView latestVersion;
     private CardView clientStateCardView;
+    private AttachFragment attachFragment;
     private Context context;
     private SharedPreferences settings;
     private ApplicationChooseDialog dialog;
     private VirtualCore va;
 
+    @Override
+    public BaseFragment setBase(Context base) {
+        settings = base.getSharedPreferences(SettingFragment.SETTINGS_PREFERENCE_NAME, Context.MODE_PRIVATE);
+        packageName = settings.getString(PACKAGE_PREFERENCE_KEY, null);
+        return super.setBase(base);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        context = inflater.getContext();
-        settings = context.getSharedPreferences(SettingFragment.SETTINGS_PREFERENCE_NAME, Context.MODE_PRIVATE);
-        packageName = settings.getString(PACKAGE_PREFERENCE_KEY, null);
-        view = inflater.inflate(R.layout.home_fragment, container, false);
-        summary = view.findViewById(R.id.home_summary);
-        va = VirtualCore.get();
-        currentVersion = view.findViewById(R.id.home_current_version);
-        latestVersion = view.findViewById(R.id.home_latest_version);
-        clientState = view.findViewById(R.id.home_client_state);
-        clientStateCardView = view.findViewById(R.id.home_client_state_card_view);
-        clientStateCardView.setOnClickListener(this);
-        dialog = new ApplicationChooseDialog(context, this, BH3_CLIENT_PACKAGE_REGEX);
-        dialog.setListener(this);
-        String versionName = "unknown";
-        try {
-            versionName = "v" + context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+        if(view == null){
+            view = inflater.inflate(R.layout.home_fragment, container, false);
+            attachFragment = (AttachFragment) BaseFragment.fragment(R.id.nav_attach);
+            context = inflater.getContext();
+            summary = view.findViewById(R.id.home_summary);
+            va = VirtualCore.get();
+            currentVersion = view.findViewById(R.id.home_current_version);
+            latestVersion = view.findViewById(R.id.home_latest_version);
+            clientState = view.findViewById(R.id.home_client_state);
+            clientStateCardView = view.findViewById(R.id.home_client_state_card_view);
+            clientStateCardView.setOnClickListener(this);
+            dialog = new ApplicationChooseDialog(context, this, BH3_CLIENT_PACKAGE_REGEX);
+            dialog.setListener(this);
+            String versionName = "unknown";
+            try {
+                versionName = "v" + context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+            currentVersion.setText(String.format(getText(R.string.home_current_version).toString(), versionName));
+            checkVersion();
         }
-        currentVersion.setText(String.format(getText(R.string.home_current_version).toString(), versionName));
-        checkVersion();
         clientUpdate();
         return view;
     }
@@ -121,6 +130,8 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                va.addVisibleOutsidePackage("com.eg.android.AlipayGphone");
+                va.addVisibleOutsidePackage("com.tencent.mm");
             }
         }.start();
     }
@@ -138,7 +149,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         String summaryString = String.format(getString(R.string.home_summary_context),
                 0,
                 0,
-                0,
+                attachFragment.getItemCount(),
                 0,
                 va.getInstalledAppCount());
         summary.setText(summaryString);
@@ -161,7 +172,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     }
 
     private void clientInstall(final String apkPath){
-        final ProgressDialog progressDialog = new ProgressDialog(context);
+        final ProgressDialog progressDialog = new ProgressDialog(context, view);
         progressDialog.show();
         new Thread(){
             @Override

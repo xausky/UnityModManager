@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">崩坏3模组管理器</string>
-    <string name="menu_settings">设置</string>
     <string name="menu_launch_game">启动游戏</string>
     <string name="nav_home">主页</string>
     <string name="nav_mod">模组</string>
@@ -15,11 +14,9 @@
         已启用模组数量：%d\n已安装模组数量：%d\n已安装附加组件数量：%d\n可见的外部程序数量：%d\n虚拟环境已安装应用数量：%d
     </string>
     <string name="setting_force_mode">强制模式</string>
-    <string name="setting_root_mode">Root模式</string>
     <string name="setting_force_mode_summary">忽略所有模组文件冲突，按照优先级强制覆盖安装。</string>
     <string name="setting_default_password">默认解压密码</string>
     <string name="setting_default_password_summary">当模组文件是加密的压缩文件时会先尝试此密码。</string>
-    <string name="state">State</string>
     <string name="home_latest_version">最新版本：%s</string>
     <string name="home_latest_version_default">最新版本：.....</string>
     <string name="home_current_version">当前版本：%s</string>
@@ -33,4 +30,6 @@
     <string name="attach_delete_confirm_message">确定要删除附加组件 %s 么？</string>
     <string name="attach_delete_fail">删除附加组件失败</string>
     <string name="attach_delete_success">删除附加组件成功</string>
+    <string name="banner_content_description">崩坏3壁纸</string>
+    <string name="nav_visibility">外部应用可见性</string>
 </resources>

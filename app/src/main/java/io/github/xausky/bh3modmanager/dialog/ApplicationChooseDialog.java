@@ -8,6 +8,7 @@ import android.content.pm.ApplicationInfo;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
@@ -26,7 +27,7 @@ public class ApplicationChooseDialog extends AlertDialog implements DialogInterf
     private OnApplicationChooseDialogResultListener listener;
     public ApplicationChooseDialog(Context context, final Fragment fragment, String packageRegex) {
         super(context);
-        View dialogView = LayoutInflater.from(context).inflate(R.layout.choose_client_dialog, null);
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.choose_client_dialog, (ViewGroup) fragment.getView(), false);
         ListView listView = dialogView.findViewById(R.id.choose_client_dialog_clients);
         listView.setAdapter(new ApplicationsAdapter(context, packageRegex));
         this.setTitle("请选择客户端");
@@ -35,6 +36,8 @@ public class ApplicationChooseDialog extends AlertDialog implements DialogInterf
         this.fragment = fragment;
         listView.setOnItemClickListener(this);
     }
+
+
 
 
 

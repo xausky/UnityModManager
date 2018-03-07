@@ -40,23 +40,35 @@ public class AttachFragment extends BaseFragment implements ApplicationChooseDia
     private HomeFragment homeFragment;
     private VirtualCore va;
 
+
+
+    public AttachFragment() {
+        va = VirtualCore.get();
+        homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
+        adapter = new AttachesAdapter(va, homeFragment.packageName);
+    }
+
+    public int getItemCount(){
+        return adapter.getItemCount();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        this.context = inflater.getContext();
-        this.view = inflater.inflate(R.layout.attach_fragment, container, false);
-        this.dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX);
-        this.dialog.setListener(this);
-        this.attaches = view.findViewById(R.id.attach_list);
-        this.homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
-        this.va = VirtualCore.get();
-        this.adapter = new AttachesAdapter(attaches, va, homeFragment.packageName);
-        return this.view;
+        if(view == null){
+            view = inflater.inflate(R.layout.attach_fragment, container, false);
+            context = inflater.getContext();
+            dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX);
+            dialog.setListener(this);
+            attaches = view.findViewById(R.id.attach_list);
+            adapter.setRecyclerView(attaches);
+        }
+        return view;
     }
 
     private void appInstall(final String apkPath){
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
-        View bottomSheetDialogView = LayoutInflater.from(context).inflate(R.layout.progress_dialog, null);
+        View bottomSheetDialogView = LayoutInflater.from(context).inflate(R.layout.progress_dialog, (ViewGroup) view, false);
         bottomSheetDialog.setContentView(bottomSheetDialogView);
         bottomSheetDialog.setCancelable(false);
         bottomSheetDialog.show();

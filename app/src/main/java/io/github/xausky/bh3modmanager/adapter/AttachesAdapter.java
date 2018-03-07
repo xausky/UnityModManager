@@ -41,15 +41,18 @@ public class AttachesAdapter extends RecyclerView.Adapter<AttachesAdapter.ViewHo
     private String uninstallPackageName;
     private String excludePackageName;
 
-    public AttachesAdapter(RecyclerView view, VirtualCore va, String excludePackageName) {
-        new ItemTouchHelper(new CallBack()).attachToRecyclerView(view);
+    public AttachesAdapter(VirtualCore va, String excludePackageName) {
         this.va = va;
-        this.context = view.getContext();
         this.manager = va.getPackageManager();
-        this.dialog = new ConfirmDialog(context, this);
+        update(excludePackageName);
+    }
+
+    public void setRecyclerView(RecyclerView view){
+        context = view.getContext();
+        dialog = new ConfirmDialog(context, this);
+        new ItemTouchHelper(new CallBack()).attachToRecyclerView(view);
         view.setLayoutManager(new LinearLayoutManager(context));
         view.setAdapter(this);
-        update(excludePackageName);
     }
 
     public void update(String excludePackageName){

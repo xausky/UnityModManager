@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="128dp"
-    android:background="@color/colorPrimaryDark">
+    android:layout_height="match_parent">
 
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/app_banner" />
+        android:layout_height="180dp"
+        android:adjustViewBounds="true"
+        android:background="@drawable/banner"
+        android:contentDescription="@string/banner_content_description"
+        android:cropToPadding="false"
+        android:scaleType="center" />
 
 </LinearLayout>
