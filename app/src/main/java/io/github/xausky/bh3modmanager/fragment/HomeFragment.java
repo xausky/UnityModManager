@@ -16,14 +16,30 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lody.virtual.client.core.InstallStrategy;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.remote.InstallResult;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import javax.net.ssl.HttpsURLConnection;
+
 import io.github.xausky.bh3modmanager.MainApplication;
 import io.github.xausky.bh3modmanager.R;
 import io.github.xausky.bh3modmanager.dialog.ApplicationChooseDialog;
+import io.github.xausky.bh3modmanager.dialog.ProgressDialog;
 
 /**
  * Created by xausky on 18-3-3.
@@ -37,6 +53,8 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     private View view;
     private TextView summary;
     private TextView clientState;
+    private TextView currentVersion;
+    private TextView latestVersion;
     private CardView clientStateCardView;
     private Context context;
     private SharedPreferences settings;
@@ -52,13 +70,59 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         view = inflater.inflate(R.layout.home_fragment, container, false);
         summary = view.findViewById(R.id.home_summary);
         va = VirtualCore.get();
+        currentVersion = view.findViewById(R.id.home_current_version);
+        latestVersion = view.findViewById(R.id.home_latest_version);
         clientState = view.findViewById(R.id.home_client_state);
         clientStateCardView = view.findViewById(R.id.home_client_state_card_view);
         clientStateCardView.setOnClickListener(this);
         dialog = new ApplicationChooseDialog(context, this, BH3_CLIENT_PACKAGE_REGEX);
         dialog.setListener(this);
+        String versionName = "unknown";
+        try {
+            versionName = "v" + context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        currentVersion.setText(String.format(getText(R.string.home_current_version).toString(), versionName));
+        checkVersion();
         clientUpdate();
         return view;
+    }
+
+    private void checkVersion(){
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL("https://api.github.com/repos/xausky/BH3ModManager/releases");
+                    HttpsURLConnection connection = (HttpsURLConnection)url.openConnection();
+                    connection.setRequestMethod("GET");
+                    InputStream in=connection.getInputStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                    StringBuilder response = new StringBuilder();
+                    String line=null;
+                    while((line=reader.readLine())!=null){
+                        response.append(line);
+                    }
+                    JSONArray array = new JSONArray(response.toString());
+                    JSONObject latestRelease = array.getJSONObject(0);
+                    String latestVersion = latestRelease.getString("tag_name");
+                    final String textViewString = String.format(context.getString(R.string.home_latest_version), latestVersion);
+                    HomeFragment.this.latestVersion.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            HomeFragment.this.latestVersion.setText(textViewString);
+                        }
+                    });
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 
     private void clientUpdate(){
@@ -71,14 +135,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             clientState.setText(getText(R.string.home_client_uninstalled));
             clientState.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_clear),null, null, null);
         }
-        String versionName = "unknown";
-        try {
-            versionName = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
         String summaryString = String.format(getString(R.string.home_summary_context),
-                versionName,
                 0,
                 0,
                 0,
@@ -104,11 +161,8 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     }
 
     private void clientInstall(final String apkPath){
-        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
-        View bottomSheetDialogView = LayoutInflater.from(context).inflate(R.layout.progress_dialog, null);
-        bottomSheetDialog.setContentView(bottomSheetDialogView);
-        bottomSheetDialog.setCancelable(false);
-        bottomSheetDialog.show();
+        final ProgressDialog progressDialog = new ProgressDialog(context);
+        progressDialog.show();
         new Thread(){
             @Override
             public void run() {
@@ -126,12 +180,12 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 } else {
                     resultString = result.error;
                 }
-                bottomSheetDialog.dismiss();
+                progressDialog.dismiss();
                 HomeFragment.this.view.post(new Runnable() {
                     @Override
                     public void run() {
                         clientUpdate();
-                        Snackbar.make(HomeFragment.this.view, resultString, Snackbar.LENGTH_LONG).show();
+                        Toast.makeText(context, resultString, Toast.LENGTH_LONG).show();
                     }
                 });
             }

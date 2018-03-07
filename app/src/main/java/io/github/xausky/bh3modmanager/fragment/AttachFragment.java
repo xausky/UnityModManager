@@ -7,12 +7,14 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.lody.virtual.client.core.InstallStrategy;
 import com.lody.virtual.client.core.VirtualCore;
@@ -33,10 +35,11 @@ public class AttachFragment extends BaseFragment implements ApplicationChooseDia
     private Context context;
     private ApplicationChooseDialog dialog;
     private View view;
-    private ListView attaches;
+    private RecyclerView attaches;
     private AttachesAdapter adapter;
     private HomeFragment homeFragment;
     private VirtualCore va;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -47,9 +50,7 @@ public class AttachFragment extends BaseFragment implements ApplicationChooseDia
         this.attaches = view.findViewById(R.id.attach_list);
         this.homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
         this.va = VirtualCore.get();
-        this.adapter = new AttachesAdapter(context, va, homeFragment.packageName);
-        this.attaches.setAdapter(adapter);
-        this.attaches.setOnItemClickListener(this);
+        this.adapter = new AttachesAdapter(attaches, va, homeFragment.packageName);
         return this.view;
     }
 
@@ -75,7 +76,7 @@ public class AttachFragment extends BaseFragment implements ApplicationChooseDia
                     @Override
                     public void run() {
                         adapter.update(homeFragment.packageName);
-                        Snackbar.make(AttachFragment.this.view, resultString, Snackbar.LENGTH_LONG).show();
+                        Toast.makeText(context, resultString, Toast.LENGTH_LONG).show();
                     }
                 });
             }
@@ -106,7 +107,6 @@ public class AttachFragment extends BaseFragment implements ApplicationChooseDia
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         ApplicationInfo info = (ApplicationInfo) parent.getAdapter().getItem(position);
-        Intent intent = VirtualCore.get().getLaunchIntent(info.packageName, 0);
-        VActivityManager.get().startActivity(intent, 0);
+
     }
 }

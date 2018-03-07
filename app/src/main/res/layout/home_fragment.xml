@@ -14,6 +14,7 @@
             android:layout_height="wrap_content"
             >
             <TextView
+                android:id="@+id/home_latest_version"
                 android:layout_gravity="center"
                 android:drawableStart="@drawable/ic_remove_circle"
                 android:drawableLeft="@drawable/ic_remove_circle"
@@ -21,8 +22,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="24dp"
                 android:layout_margin="8dp"
-                android:text="@string/home_latest_version" />
+                android:text="@string/home_latest_version_default" />
             <TextView
+                android:id="@+id/home_current_version"
                 android:layout_gravity="center"
                 android:drawableStart="@drawable/ic_check_circle"
                 android:drawableLeft="@drawable/ic_check_circle"

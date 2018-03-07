@@ -1,87 +1,146 @@
 package io.github.xausky.bh3modmanager.adapter;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lody.virtual.client.core.VirtualCore;
+import com.lody.virtual.client.ipc.VActivityManager;
 import com.lody.virtual.remote.InstalledAppInfo;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.github.xausky.bh3modmanager.R;
+import io.github.xausky.bh3modmanager.dialog.ConfirmDialog;
 
 /**
- * Created by xausky on 18-3-6.
+ * Created by xausky on 2018/2/1.
  */
 
-public class AttachesAdapter extends BaseAdapter {
-    private List<ApplicationInfo> applicationInfos = new ArrayList<>();
-    private LayoutInflater inflater;
-    private PackageManager manager;
-    private VirtualCore va;
+public class AttachesAdapter extends RecyclerView.Adapter<AttachesAdapter.ViewHolder> implements DialogInterface.OnClickListener {
 
-    public AttachesAdapter(Context context, VirtualCore va, String excludePackageName) {
-        this.inflater = LayoutInflater.from(context);
-        manager = va.getPackageManager();
+    private List<ApplicationInfo> applications = new ArrayList<>();
+    private Context context;
+    private VirtualCore va;
+    private PackageManager manager;
+    private ConfirmDialog dialog;
+    private String uninstallPackageName;
+    private String excludePackageName;
+
+    public AttachesAdapter(RecyclerView view, VirtualCore va, String excludePackageName) {
+        new ItemTouchHelper(new CallBack()).attachToRecyclerView(view);
         this.va = va;
+        this.context = view.getContext();
+        this.manager = va.getPackageManager();
+        this.dialog = new ConfirmDialog(context, this);
+        view.setLayoutManager(new LinearLayoutManager(context));
+        view.setAdapter(this);
         update(excludePackageName);
     }
 
     public void update(String excludePackageName){
-        applicationInfos.clear();
+        this.excludePackageName = excludePackageName;
+        applications.clear();
         List<InstalledAppInfo> installedApplications = va.getInstalledApps(0);
         for(InstalledAppInfo info: installedApplications){
             if(!info.packageName.equals(excludePackageName)) {
-                applicationInfos.add(info.getApplicationInfo(0));
+                applications.add(info.getApplicationInfo(0));
             }
         }
         this.notifyDataSetChanged();
     }
 
     @Override
-    public int getCount() {
-        return applicationInfos.size();
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.application_info_item, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
-    public ApplicationInfo getItem(int i) {
-        return applicationInfos.get(i);
-    }
-
-    @Override
-    public long getItemId(int i) {
-        return i;
-    }
-
-    @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
-        if(view == null){
-            view = inflater.inflate(R.layout.choose_client_dialog_clients_item, viewGroup, false);
-            AttachesAdapter.ViewHolder holder = new AttachesAdapter.ViewHolder();
-            holder.name = view.findViewById(R.id.choose_client_dialog_clients_item_name);
-            holder.packageName = view.findViewById(R.id.choose_client_dialog_clients_item_package_name);
-            holder.icon = view.findViewById(R.id.choose_client_dialog_clients_item_icon);
-            view.setTag(holder);
-        }
-        AttachesAdapter.ViewHolder holder = (AttachesAdapter.ViewHolder)view.getTag();
-        ApplicationInfo info = getItem(i);
-        holder.packageName.setText(info.packageName);
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        final ApplicationInfo info = applications.get(position);
         holder.name.setText(manager.getApplicationLabel(info));
         holder.icon.setImageDrawable(manager.getApplicationIcon(info));
-        return view;
+        holder.packageName.setText(info.packageName);
+        holder.view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = VirtualCore.get().getLaunchIntent(info.packageName, 0);
+                VActivityManager.get().startActivity(intent, 0);
+            }
+        });
     }
 
-    private static class ViewHolder {
+    @Override
+    public int getItemCount() {
+        return applications.size();
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        if(which == AlertDialog.BUTTON_POSITIVE){
+            if (va.uninstallPackage(uninstallPackageName)){
+                update(excludePackageName);
+                Toast.makeText(context, R.string.attach_delete_success, Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(context, R.string.attach_delete_fail, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+
+    class ViewHolder extends RecyclerView.ViewHolder {
         TextView name;
         TextView packageName;
         ImageView icon;
+        View view;
+        ViewHolder(View itemView) {
+            super(itemView);
+            view = itemView;
+            name = itemView.findViewById(R.id.choose_client_dialog_clients_item_name);
+            packageName = itemView.findViewById(R.id.choose_client_dialog_clients_item_package_name);
+            icon = itemView.findViewById(R.id.choose_client_dialog_clients_item_icon);
+
+        }
+    }
+
+    class CallBack extends ItemTouchHelper.Callback {
+
+        @Override
+        public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+            int dragFlags = ItemTouchHelper.UP|ItemTouchHelper.DOWN;
+            int swipeFlags = ItemTouchHelper.LEFT|ItemTouchHelper.RIGHT;
+            return makeMovementFlags(dragFlags,swipeFlags);
+        }
+
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(final RecyclerView.ViewHolder target, int direction) {
+            ViewHolder holder = (ViewHolder)target;
+            String name = holder.name.getText().toString();
+            uninstallPackageName = holder.packageName.getText().toString();
+            String message = String.format(context.getString(R.string.attach_delete_confirm_message), name);
+            dialog.setMessage(message);
+            dialog.show();
+        }
+
     }
 }

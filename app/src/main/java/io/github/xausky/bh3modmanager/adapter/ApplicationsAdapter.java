@@ -54,7 +54,7 @@ public class ApplicationsAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         if(view == null){
-            view = inflater.inflate(R.layout.choose_client_dialog_clients_item, viewGroup, false);
+            view = inflater.inflate(R.layout.application_info_item, viewGroup, false);
             ViewHolder holder = new ViewHolder();
             holder.name = view.findViewById(R.id.choose_client_dialog_clients_item_name);
             holder.packageName = view.findViewById(R.id.choose_client_dialog_clients_item_package_name);
