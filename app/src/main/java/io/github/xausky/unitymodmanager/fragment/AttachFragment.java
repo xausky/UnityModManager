@@ -1,4 +1,4 @@
-package io.github.xausky.bh3modmanager.fragment;
+package io.github.xausky.unitymodmanager.fragment;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,25 +6,22 @@ import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialog;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.lody.virtual.client.core.InstallStrategy;
 import com.lody.virtual.client.core.VirtualCore;
-import com.lody.virtual.client.ipc.VActivityManager;
 import com.lody.virtual.remote.InstallResult;
 
-import io.github.xausky.bh3modmanager.MainApplication;
-import io.github.xausky.bh3modmanager.R;
-import io.github.xausky.bh3modmanager.adapter.AttachesAdapter;
-import io.github.xausky.bh3modmanager.dialog.ApplicationChooseDialog;
+import io.github.xausky.unitymodmanager.MainApplication;
+import io.github.xausky.unitymodmanager.R;
+import io.github.xausky.unitymodmanager.adapter.AttachesAdapter;
+import io.github.xausky.unitymodmanager.dialog.ApplicationChooseDialog;
 
 /**
  * Created by xausky on 18-3-3.

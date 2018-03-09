@@ -1,4 +1,4 @@
-package io.github.xausky.bh3modmanager.adapter;
+package io.github.xausky.unitymodmanager.adapter;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -13,7 +13,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.xausky.bh3modmanager.R;
+import io.github.xausky.unitymodmanager.R;
 
 /**
  * Created by xausky on 18-2-9.

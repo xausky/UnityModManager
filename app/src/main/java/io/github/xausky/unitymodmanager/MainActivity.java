@@ -1,4 +1,4 @@
-package io.github.xausky.bh3modmanager;
+package io.github.xausky.unitymodmanager;
 
 import android.app.Fragment;
 import android.content.Intent;
@@ -15,14 +15,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.ipc.VActivityManager;
 
-import io.github.xausky.bh3modmanager.fragment.BaseFragment;
-import io.github.xausky.bh3modmanager.fragment.HomeFragment;
-import io.github.xausky.bh3modmanager.fragment.InfoFragment;
+import io.github.xausky.unitymodmanager.fragment.BaseFragment;
+import io.github.xausky.unitymodmanager.fragment.HomeFragment;
 
 public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;

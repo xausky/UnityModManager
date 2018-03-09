@@ -1,12 +1,10 @@
-package io.github.xausky.bh3modmanager.fragment;
+package io.github.xausky.unitymodmanager.fragment;
 
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceScreen;
 import android.support.annotation.Nullable;
 
-import io.github.xausky.bh3modmanager.R;
+import io.github.xausky.unitymodmanager.R;
 
 /**
  * Created by xausky on 18-3-3.

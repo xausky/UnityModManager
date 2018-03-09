@@ -1,4 +1,4 @@
-package io.github.xausky.bh3modmanager.fragment;
+package io.github.xausky.unitymodmanager.fragment;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,8 +7,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.util.Log;
@@ -30,16 +28,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import io.github.xausky.bh3modmanager.MainApplication;
-import io.github.xausky.bh3modmanager.R;
-import io.github.xausky.bh3modmanager.dialog.ApplicationChooseDialog;
-import io.github.xausky.bh3modmanager.dialog.ProgressDialog;
+import io.github.xausky.unitymodmanager.MainApplication;
+import io.github.xausky.unitymodmanager.R;
+import io.github.xausky.unitymodmanager.dialog.ApplicationChooseDialog;
+import io.github.xausky.unitymodmanager.dialog.ProgressDialog;
 
 /**
  * Created by xausky on 18-3-3.
@@ -47,7 +44,7 @@ import io.github.xausky.bh3modmanager.dialog.ProgressDialog;
 
 public class HomeFragment extends BaseFragment implements View.OnClickListener, ApplicationChooseDialog.OnApplicationChooseDialogResultListener{
     private static final String PACKAGE_PREFERENCE_KEY = "PACKAGE_PREFERENCE_KEY";
-    private static final String BH3_CLIENT_PACKAGE_REGEX = "^com\\.miHoYo\\..*$";
+    private static final String ALL_APPLICATION_PACKAGE_REGEX = "^.*$";
     public String packageName;
     private String apkPath;
     private View view;
@@ -83,7 +80,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             clientState = view.findViewById(R.id.home_client_state);
             clientStateCardView = view.findViewById(R.id.home_client_state_card_view);
             clientStateCardView.setOnClickListener(this);
-            dialog = new ApplicationChooseDialog(context, this, BH3_CLIENT_PACKAGE_REGEX);
+            dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX);
             dialog.setListener(this);
             String versionName = "unknown";
             try {
@@ -103,7 +100,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             @Override
             public void run() {
                 try {
-                    URL url = new URL("https://api.github.com/repos/xausky/BH3ModManager/releases");
+                    URL url = new URL("https://api.github.com/repos/xausky/UnityModManager/releases");
                     HttpsURLConnection connection = (HttpsURLConnection)url.openConnection();
                     connection.setRequestMethod("GET");
                     InputStream in=connection.getInputStream();

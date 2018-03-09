@@ -5,11 +5,9 @@
 
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="180dp"
-        android:adjustViewBounds="true"
+        android:layout_height="140dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/banner"
-        android:contentDescription="@string/banner_content_description"
-        android:cropToPadding="false"
-        android:scaleType="center" />
+        android:contentDescription="@string/banner_content_description"/>
 
 </LinearLayout>

@@ -1,11 +1,10 @@
-package io.github.xausky.bh3modmanager.adapter;
+package io.github.xausky.unitymodmanager.adapter;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,8 +23,8 @@ import com.lody.virtual.remote.InstalledAppInfo;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.xausky.bh3modmanager.R;
-import io.github.xausky.bh3modmanager.dialog.ConfirmDialog;
+import io.github.xausky.unitymodmanager.R;
+import io.github.xausky.unitymodmanager.dialog.ConfirmDialog;
 
 /**
  * Created by xausky on 2018/2/1.

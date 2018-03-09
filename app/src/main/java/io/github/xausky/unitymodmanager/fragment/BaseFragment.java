@@ -1,6 +1,5 @@
-package io.github.xausky.bh3modmanager.fragment;
+package io.github.xausky.unitymodmanager.fragment;
 
-import android.app.Application;
 import android.app.Fragment;
 import android.content.Context;
 import android.view.View;
@@ -8,7 +7,7 @@ import android.view.View;
 import java.util.Map;
 import java.util.TreeMap;
 
-import io.github.xausky.bh3modmanager.R;
+import io.github.xausky.unitymodmanager.R;
 
 /**
  * Created by xausky on 18-3-3.

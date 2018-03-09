@@ -1,4 +1,4 @@
-package io.github.xausky.bh3modmanager.dialog;
+package io.github.xausky.unitymodmanager.dialog;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -12,8 +12,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import io.github.xausky.bh3modmanager.R;
-import io.github.xausky.bh3modmanager.adapter.ApplicationsAdapter;
+import io.github.xausky.unitymodmanager.R;
+import io.github.xausky.unitymodmanager.adapter.ApplicationsAdapter;
 import ru.bartwell.exfilepicker.ExFilePicker;
 import ru.bartwell.exfilepicker.data.ExFilePickerResult;
 
