@@ -1,8 +1,10 @@
 package io.github.xausky.unitymodmanager.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.github.xausky.unitymodmanager.R;
@@ -25,13 +28,17 @@ public class ApplicationsAdapter extends BaseAdapter {
     private LayoutInflater inflater;
     private PackageManager manager;
 
-    public ApplicationsAdapter(Context context, String packageRegex) {
+    public ApplicationsAdapter(Context context, String packageRegex, boolean launchFilter) {
         this.inflater = LayoutInflater.from(context);
         manager = context.getPackageManager();
-        List<ApplicationInfo> installedApplications = manager.getInstalledApplications(0);
-        for(ApplicationInfo info: installedApplications){
-            if(info.packageName.matches(packageRegex)){
-                applicationInfos.add(info);
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        if(launchFilter) {
+            intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        }
+        List<ResolveInfo> infos = manager.queryIntentActivities(intent, 0);
+        for(ResolveInfo info: infos){
+            if(info.activityInfo.packageName.matches(packageRegex)){
+                applicationInfos.add(info.activityInfo.applicationInfo);
             }
         }
     }

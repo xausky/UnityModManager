@@ -28,8 +28,10 @@
     <string name="cancel">取消</string>
     <string name="prompt">提示</string>
     <string name="attach_delete_confirm_message">确定要删除附加组件 %s 么？</string>
+    <string name="visibility_delete_confirm_message">确定要移除 %s 的可见性么？</string>
     <string name="attach_delete_fail">删除附加组件失败</string>
     <string name="attach_delete_success">删除附加组件成功</string>
+    <string name="visibility_delete_success">移除可见性成功</string>
     <string name="banner_content_description">Unity</string>
     <string name="nav_visibility">外部应用可见性</string>
 </resources>

@@ -35,6 +35,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import io.github.xausky.unitymodmanager.MainApplication;
 import io.github.xausky.unitymodmanager.R;
+import io.github.xausky.unitymodmanager.adapter.VisibilityAdapter;
 import io.github.xausky.unitymodmanager.dialog.ApplicationChooseDialog;
 import io.github.xausky.unitymodmanager.dialog.ProgressDialog;
 
@@ -54,6 +55,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     private TextView latestVersion;
     private CardView clientStateCardView;
     private AttachFragment attachFragment;
+    private VisibilityFragment visibilityFragment;
     private Context context;
     private SharedPreferences settings;
     private ApplicationChooseDialog dialog;
@@ -72,6 +74,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         if(view == null){
             view = inflater.inflate(R.layout.home_fragment, container, false);
             attachFragment = (AttachFragment) BaseFragment.fragment(R.id.nav_attach);
+            visibilityFragment = (VisibilityFragment) BaseFragment.fragment(R.id.nav_visibility);
             context = inflater.getContext();
             summary = view.findViewById(R.id.home_summary);
             va = VirtualCore.get();
@@ -80,7 +83,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             clientState = view.findViewById(R.id.home_client_state);
             clientStateCardView = view.findViewById(R.id.home_client_state_card_view);
             clientStateCardView.setOnClickListener(this);
-            dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX);
+            dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, true, true);
             dialog.setListener(this);
             String versionName = "unknown";
             try {
@@ -127,8 +130,6 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                va.addVisibleOutsidePackage("com.eg.android.AlipayGphone");
-                va.addVisibleOutsidePackage("com.tencent.mm");
             }
         }.start();
     }
@@ -147,7 +148,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 0,
                 0,
                 attachFragment.getItemCount(),
-                0,
+                visibilityFragment.getItemCount(),
                 va.getInstalledAppCount());
         summary.setText(summaryString);
     }

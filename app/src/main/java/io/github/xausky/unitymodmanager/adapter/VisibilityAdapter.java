@@ -3,6 +3,7 @@ package io.github.xausky.unitymodmanager.adapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.support.v7.app.AlertDialog;
@@ -17,8 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lody.virtual.client.core.VirtualCore;
-import com.lody.virtual.client.ipc.VActivityManager;
-import com.lody.virtual.remote.InstalledAppInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,23 +26,26 @@ import io.github.xausky.unitymodmanager.R;
 import io.github.xausky.unitymodmanager.dialog.ConfirmDialog;
 
 /**
- * Created by xausky on 2018/2/1.
+ * Created by xausky on 18-3-9.
  */
 
-public class AttachesAdapter extends RecyclerView.Adapter<AttachesAdapter.ViewHolder> implements DialogInterface.OnClickListener {
+public class VisibilityAdapter  extends RecyclerView.Adapter<VisibilityAdapter.ViewHolder> implements DialogInterface.OnClickListener {
+    public static final String VISIBILITY_SHARED_PREFERENCES_KEY = "visibility";
 
     private List<ApplicationInfo> applications = new ArrayList<>();
     private Context context;
     private VirtualCore va;
     private PackageManager manager;
     private ConfirmDialog dialog;
-    private String uninstallPackageName;
-    private String excludePackageName;
+    private String removePackageName;
+    private SharedPreferences preferences;
 
-    public AttachesAdapter(VirtualCore va, String excludePackageName) {
+    public VisibilityAdapter(VirtualCore va, Context context) {
         this.va = va;
-        this.manager = va.getPackageManager();
-        update(excludePackageName);
+        this.context = context;
+        this.manager = context.getPackageManager();
+        this.preferences = context.getSharedPreferences(VISIBILITY_SHARED_PREFERENCES_KEY,Context.MODE_PRIVATE);
+        update();
     }
 
     public void setRecyclerView(RecyclerView view){
@@ -54,13 +56,15 @@ public class AttachesAdapter extends RecyclerView.Adapter<AttachesAdapter.ViewHo
         view.setAdapter(this);
     }
 
-    public void update(String excludePackageName){
-        this.excludePackageName = excludePackageName;
+    public void update(){
         applications.clear();
-        List<InstalledAppInfo> installedApplications = va.getInstalledApps(0);
-        for(InstalledAppInfo info: installedApplications){
-            if(!info.packageName.equals(excludePackageName)) {
-                applications.add(info.getApplicationInfo(0));
+        List<ApplicationInfo> installedApplications = manager.getInstalledApplications(0);
+        for(ApplicationInfo info: installedApplications){
+            if(preferences.getBoolean(info.packageName, false)){
+                va.addVisibleOutsidePackage(info.packageName);
+            }
+            if(va.isOutsidePackageVisible(info.packageName)) {
+                applications.add(info);
             }
         }
         this.notifyDataSetChanged();
@@ -73,7 +77,7 @@ public class AttachesAdapter extends RecyclerView.Adapter<AttachesAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(AttachesAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(VisibilityAdapter.ViewHolder holder, int position) {
         final ApplicationInfo info = applications.get(position);
         holder.name.setText(manager.getApplicationLabel(info));
         holder.icon.setImageDrawable(manager.getApplicationIcon(info));
@@ -81,8 +85,8 @@ public class AttachesAdapter extends RecyclerView.Adapter<AttachesAdapter.ViewHo
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = VirtualCore.get().getLaunchIntent(info.packageName, 0);
-                VActivityManager.get().startActivity(intent, 0);
+                Intent intent = manager.getLaunchIntentForPackage(info.packageName);
+                context.startActivity(intent);
             }
         });
     }
@@ -95,13 +99,17 @@ public class AttachesAdapter extends RecyclerView.Adapter<AttachesAdapter.ViewHo
     @Override
     public void onClick(DialogInterface dialog, int which) {
         if(which == AlertDialog.BUTTON_POSITIVE){
-            if (va.uninstallPackage(uninstallPackageName)){
-                update(excludePackageName);
-                Toast.makeText(context, R.string.attach_delete_success, Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(context, R.string.attach_delete_fail, Toast.LENGTH_LONG).show();
-            }
+            va.removeVisibleOutsidePackage(removePackageName);
+            preferences.edit().remove(removePackageName).apply();
+            Toast.makeText(context, R.string.visibility_delete_success, Toast.LENGTH_LONG).show();
         }
+        update();
+    }
+
+    public void addVisibleOutsidePackage(String packageName){
+        va.addVisibleOutsidePackage(packageName);
+        update();
+        preferences.edit().putBoolean(packageName, true).apply();
     }
 
 
@@ -136,10 +144,10 @@ public class AttachesAdapter extends RecyclerView.Adapter<AttachesAdapter.ViewHo
 
         @Override
         public void onSwiped(final RecyclerView.ViewHolder target, int direction) {
-            ViewHolder holder = (ViewHolder)target;
+            VisibilityAdapter.ViewHolder holder = (VisibilityAdapter.ViewHolder)target;
             String name = holder.name.getText().toString();
-            uninstallPackageName = holder.packageName.getText().toString();
-            String message = String.format(context.getString(R.string.attach_delete_confirm_message), name);
+            removePackageName = holder.packageName.getText().toString();
+            String message = String.format(context.getString(R.string.visibility_delete_confirm_message), name);
             dialog.setMessage(message);
             dialog.show();
         }

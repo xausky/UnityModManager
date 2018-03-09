@@ -25,10 +25,6 @@ public abstract class BaseFragment extends Fragment {
     }
     private Context base;
 
-    public BaseFragment(){
-
-    }
-
     public Context getBase() {
         return base;
     }
@@ -41,7 +37,7 @@ public abstract class BaseFragment extends Fragment {
     public static Map<Integer, Fragment> map;
 
     public static void initialize(Context base){
-        if(map == null){
+        if (map == null) {
             map = new TreeMap<>();
             map.put(R.id.nav_home, new HomeFragment().setBase(base));
             map.put(R.id.nav_info, new InfoFragment().setBase(base));

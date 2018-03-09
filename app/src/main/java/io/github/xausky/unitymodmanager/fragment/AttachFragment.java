@@ -27,7 +27,7 @@ import io.github.xausky.unitymodmanager.dialog.ApplicationChooseDialog;
  * Created by xausky on 18-3-3.
  */
 
-public class AttachFragment extends BaseFragment implements ApplicationChooseDialog.OnApplicationChooseDialogResultListener, AdapterView.OnItemClickListener{
+public class AttachFragment extends BaseFragment implements ApplicationChooseDialog.OnApplicationChooseDialogResultListener{
     private static final String ALL_APPLICATION_PACKAGE_REGEX = "^.*$";
     private Context context;
     private ApplicationChooseDialog dialog;
@@ -55,7 +55,7 @@ public class AttachFragment extends BaseFragment implements ApplicationChooseDia
         if(view == null){
             view = inflater.inflate(R.layout.attach_fragment, container, false);
             context = inflater.getContext();
-            dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX);
+            dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, true, true);
             dialog.setListener(this);
             attaches = view.findViewById(R.id.attach_list);
             adapter.setRecyclerView(attaches);
@@ -111,11 +111,5 @@ public class AttachFragment extends BaseFragment implements ApplicationChooseDia
     public void OnApplicationChooseDialogResult(String packageName, String apkPath) {
         appInstall(apkPath);
         dialog.hide();
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        ApplicationInfo info = (ApplicationInfo) parent.getAdapter().getItem(position);
-
     }
 }
