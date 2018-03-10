@@ -8,6 +8,14 @@ android {
         targetSdkVersion 26
         versionCode 200
         versionName "2.0.0"
+        ndk{
+            abiFilters "armeabi-v7a","x86"
+        }
+    }
+    externalNativeBuild {
+        ndkBuild {
+            path file("src/main/cpp/Android.mk")
+        }
     }
     signingConfigs {
         releaseConfig {

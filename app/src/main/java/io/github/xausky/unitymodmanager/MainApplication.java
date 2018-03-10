@@ -33,7 +33,6 @@ public class MainApplication extends Application {
         } catch (Throwable e) {
             e.printStackTrace();
         }
-
     }
 
     @Override

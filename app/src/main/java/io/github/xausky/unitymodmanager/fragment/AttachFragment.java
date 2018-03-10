@@ -1,5 +1,6 @@
 package io.github.xausky.unitymodmanager.fragment;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -31,6 +32,7 @@ public class AttachFragment extends BaseFragment implements ApplicationChooseDia
     private static final String ALL_APPLICATION_PACKAGE_REGEX = "^.*$";
     private Context context;
     private ApplicationChooseDialog dialog;
+    private ProgressDialog progressDialog;
     private View view;
     private RecyclerView attaches;
     private AttachesAdapter adapter;
@@ -55,6 +57,10 @@ public class AttachFragment extends BaseFragment implements ApplicationChooseDia
         if(view == null){
             view = inflater.inflate(R.layout.attach_fragment, container, false);
             context = inflater.getContext();
+            progressDialog = new ProgressDialog(context);
+            progressDialog.setTitle(R.string.progress_dialog_title);
+            progressDialog.setMessage(getString(R.string.progress_dialog_message));
+            progressDialog.setCancelable(false);
             dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, true, true);
             dialog.setListener(this);
             attaches = view.findViewById(R.id.attach_list);
@@ -64,11 +70,7 @@ public class AttachFragment extends BaseFragment implements ApplicationChooseDia
     }
 
     private void appInstall(final String apkPath){
-        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
-        View bottomSheetDialogView = LayoutInflater.from(context).inflate(R.layout.progress_dialog, (ViewGroup) view, false);
-        bottomSheetDialog.setContentView(bottomSheetDialogView);
-        bottomSheetDialog.setCancelable(false);
-        bottomSheetDialog.show();
+        progressDialog.show();
         new Thread(){
             @Override
             public void run() {
@@ -80,7 +82,7 @@ public class AttachFragment extends BaseFragment implements ApplicationChooseDia
                 } else {
                     resultString = result.error;
                 }
-                bottomSheetDialog.dismiss();
+                progressDialog.hide();
                 AttachFragment.this.view.post(new Runnable() {
                     @Override
                     public void run() {

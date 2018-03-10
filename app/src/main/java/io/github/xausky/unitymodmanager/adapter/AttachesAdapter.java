@@ -143,6 +143,9 @@ public class AttachesAdapter extends RecyclerView.Adapter<AttachesAdapter.ViewHo
             dialog.setMessage(message);
             dialog.show();
         }
-
+        @Override
+        public boolean isLongPressDragEnabled() {
+            return false;
+        }
     }
 }

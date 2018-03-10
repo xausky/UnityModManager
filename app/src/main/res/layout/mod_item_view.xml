@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="4dp">
+
+    <ImageView
+        android:id="@+id/mod_list_item_icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:contentDescription="@string/client_list_item_icon"
+        android:src="@mipmap/ic_launcher" />
+
+    <TextView
+        android:id="@+id/mod_list_item_name"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/mod_list_item_icon"
+        android:layout_toLeftOf="@+id/mod_list_item_switch"
+        android:layout_toRightOf="@+id/mod_list_item_icon"
+        android:layout_toStartOf="@+id/mod_list_item_switch"
+        android:text="@android:string/unknownName"
+        android:gravity="center_vertical"
+        android:textSize="24sp" />
+
+    <Switch
+        android:id="@+id/mod_list_item_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"/>
+
+</RelativeLayout>

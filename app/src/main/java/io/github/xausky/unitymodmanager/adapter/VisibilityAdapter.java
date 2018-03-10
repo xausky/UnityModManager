@@ -152,5 +152,10 @@ public class VisibilityAdapter  extends RecyclerView.Adapter<VisibilityAdapter.V
             dialog.show();
         }
 
+        @Override
+        public boolean isLongPressDragEnabled() {
+            return false;
+        }
+
     }
 }

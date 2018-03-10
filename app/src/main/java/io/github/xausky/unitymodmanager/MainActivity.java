@@ -1,7 +1,10 @@
 package io.github.xausky.unitymodmanager;
 
+import android.annotation.SuppressLint;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -15,18 +18,24 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.ipc.VActivityManager;
 
 import io.github.xausky.unitymodmanager.fragment.BaseFragment;
 import io.github.xausky.unitymodmanager.fragment.HomeFragment;
+import io.github.xausky.unitymodmanager.fragment.ModFragment;
 
 public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private FloatingActionButton actionButton;
     private NavigationView navigationView;
     private int currentNavigation;
+    private ProgressDialog dialog;
+    private HomeFragment homeFragment;
+    private ModFragment modFragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +73,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         navigation(R.id.nav_home);
+        dialog = new ProgressDialog(this);
+        dialog.setTitle(R.string.progress_dialog_title);
+        dialog.setMessage(getString(R.string.progress_dialog_message));
+        dialog.setCancelable(false);
+        homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
+        modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
     }
 
     private void navigation(int item){
@@ -85,14 +100,12 @@ public class MainActivity extends AppCompatActivity {
                 drawerLayout.openDrawer(GravityCompat.START);
                 break;
             case R.id.menu_launch_game:
-                HomeFragment fragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
-                boolean isInstall = VirtualCore.get().isAppInstalled(fragment.packageName);
+                boolean isInstall = VirtualCore.get().isAppInstalled(homeFragment.packageName);
                 if(!isInstall){
                     Snackbar.make(actionButton, "客户端未安装，请先到主页安装客户端。", Snackbar.LENGTH_LONG).show();
                     break;
                 }
-                Intent intent = VirtualCore.get().getLaunchIntent(fragment.packageName, 0);
-                VActivityManager.get().startActivity(intent, 0);
+                new PatchApkTask(homeFragment.apkPath).execute();
                 break;
         }
         return true;
@@ -102,5 +115,44 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.option_menu, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+
+    @SuppressLint("StaticFieldLeak")
+    class PatchApkTask extends AsyncTask<Object, Object, Boolean> {
+        private String apkPath;
+
+        public PatchApkTask(String apkPath) {
+            super();
+            this.apkPath = apkPath;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            dialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Object ...params) {
+            boolean result = true;
+            if(modFragment.needPatch){
+                result = modFragment.patch(apkPath);
+            }
+            if(result){
+                Intent intent = VirtualCore.get().getLaunchIntent(homeFragment.packageName, 0);
+                VActivityManager.get().startActivity(intent, 0);
+            }
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            dialog.hide();
+            if(result){
+                modFragment.needPatch = false;
+            }else {
+                Toast.makeText(MainActivity.this, "安装模组失败", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }

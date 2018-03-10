@@ -1,9 +1,9 @@
 package io.github.xausky.unitymodmanager.fragment;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.lody.virtual.client.core.InstallStrategy;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.remote.InstallResult;
+import com.lody.virtual.remote.InstalledAppInfo;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,9 +36,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import io.github.xausky.unitymodmanager.MainApplication;
 import io.github.xausky.unitymodmanager.R;
-import io.github.xausky.unitymodmanager.adapter.VisibilityAdapter;
 import io.github.xausky.unitymodmanager.dialog.ApplicationChooseDialog;
-import io.github.xausky.unitymodmanager.dialog.ProgressDialog;
 
 /**
  * Created by xausky on 18-3-3.
@@ -47,7 +46,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     private static final String PACKAGE_PREFERENCE_KEY = "PACKAGE_PREFERENCE_KEY";
     private static final String ALL_APPLICATION_PACKAGE_REGEX = "^.*$";
     public String packageName;
-    private String apkPath;
+    public String apkPath;
     private View view;
     private TextView summary;
     private TextView clientState;
@@ -56,9 +55,11 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     private CardView clientStateCardView;
     private AttachFragment attachFragment;
     private VisibilityFragment visibilityFragment;
+    private ModFragment modFragment;
     private Context context;
     private SharedPreferences settings;
     private ApplicationChooseDialog dialog;
+    private ProgressDialog progressDialog;
     private VirtualCore va;
 
     @Override
@@ -75,6 +76,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             view = inflater.inflate(R.layout.home_fragment, container, false);
             attachFragment = (AttachFragment) BaseFragment.fragment(R.id.nav_attach);
             visibilityFragment = (VisibilityFragment) BaseFragment.fragment(R.id.nav_visibility);
+            modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
             context = inflater.getContext();
             summary = view.findViewById(R.id.home_summary);
             va = VirtualCore.get();
@@ -83,6 +85,10 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             clientState = view.findViewById(R.id.home_client_state);
             clientStateCardView = view.findViewById(R.id.home_client_state_card_view);
             clientStateCardView.setOnClickListener(this);
+            progressDialog = new ProgressDialog(context);
+            progressDialog.setTitle(R.string.progress_dialog_title);
+            progressDialog.setMessage(getString(R.string.progress_dialog_message));
+            progressDialog.setCancelable(false);
             dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, true, true);
             dialog.setListener(this);
             String versionName = "unknown";
@@ -135,18 +141,19 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     }
 
     private void clientUpdate(){
-        try {
-            PackageInfo packageInfo = va.getPackageManager().getPackageInfo(packageName, 0);
-            String versionName = packageInfo.versionName;
+        InstalledAppInfo installedAppInfo = va.getInstalledAppInfo(packageName, 0);
+        if(installedAppInfo != null){
+            String versionName = installedAppInfo.getPackageInfo(0).versionName;
+            apkPath = installedAppInfo.apkPath;
             clientState.setText(String.format(getText(R.string.home_client_installed).toString(), versionName));
             clientState.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_check),null, null, null);
-        } catch (PackageManager.NameNotFoundException e) {
+        } else {
             clientState.setText(getText(R.string.home_client_uninstalled));
             clientState.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_clear),null, null, null);
         }
         String summaryString = String.format(getString(R.string.home_summary_context),
-                0,
-                0,
+                modFragment.getEnableItemCount(),
+                modFragment.getItemCount(),
                 attachFragment.getItemCount(),
                 visibilityFragment.getItemCount(),
                 va.getInstalledAppCount());
@@ -170,7 +177,6 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     }
 
     private void clientInstall(final String apkPath){
-        final ProgressDialog progressDialog = new ProgressDialog(context, view);
         progressDialog.show();
         new Thread(){
             @Override
