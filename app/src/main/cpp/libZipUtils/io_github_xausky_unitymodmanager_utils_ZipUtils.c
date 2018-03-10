@@ -4,7 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#ifdef __ANDROID_NDK__
+#ifdef __ANDROID__
 #include <android/log.h>
 #include <zip.h>
 #include "io_github_xausky_unitymodmanager_utils_ZipUtils.h"
@@ -12,7 +12,7 @@
 #include <zip.h>
 #endif
 
-#ifdef __ANDROID_NDK__
+#ifdef __ANDROID__
 #define __FUSION_LOG(str, args...) __android_log_print(ANDROID_LOG_DEBUG, "BH3ModManager", str, ##args)
 #else
 #define __FUSION_LOG(str, args...) printf(str, ##args)
@@ -196,7 +196,7 @@ int unzipFile(const char * zipFile, const char * targetDir, const char * passwor
     return RESULT_STATE_OK;
 }
 
-#ifdef __ANDROID_NDK__
+#ifdef __ANDROID__
 JNIEXPORT jint JNICALL Java_io_github_xausky_unitymodmanager_utils_ZipUtils_patchZip
         (JNIEnv *env, jclass cls, jstring backupDir, jstring fusionDir, jstring prefix, jstring target) {
     const char * backupDirPath = (*env)->GetStringUTFChars(env, backupDir,JNI_FALSE);
@@ -217,7 +217,7 @@ JNIEXPORT jint JNICALL Java_io_github_xausky_unitymodmanager_utils_ZipUtils_unzi
 }
 #else
 int main(int argc, char* argv[]){
-    printf(resolveName(argv[1]));
-    return RESULT_STATE_OK;
+    puts(resolveName(argv[1]));
+    return 0;
 }
 #endif

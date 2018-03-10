@@ -6,7 +6,6 @@ before_script:
   -O
 - unzip -q android-ndk-r14b-linux-x86_64.zip
 - export ANDROID_NDK_HOME="$PWD/android-ndk-r14b"
-- gem install fir-cli
 android:
   components:
   - build-tools-26.0.2
@@ -25,4 +24,5 @@ deploy:
     all_branches: true
     repo: xausky/BH3ModManager
 after_deploy:
+- gem install fir-cli
 - fir p app/build/outputs/apk/release/app-release.apk -T $FIR_TOKEN -c "$(git cat-file tag $TRAVIS_TAG)"
