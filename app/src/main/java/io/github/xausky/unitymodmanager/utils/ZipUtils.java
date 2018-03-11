@@ -10,7 +10,7 @@ public class ZipUtils {
     public static final int RESULT_STATE_PASSWORD_ERROR = -2;
     public static final int RESULT_STATE_FILE_CONFLICT = -3;
     public static native int patchZip(String backupDir, String fusionDir, String prefix, String target);
-    public static native int unzipFile(String zipFile, String targetDir, String password);
+    public static native int unzipFile(String zipFile, String targetDir, String password, boolean force);
     static{
         System.loadLibrary("ZipUtils");
     }

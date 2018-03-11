@@ -21,7 +21,7 @@ JNIEXPORT jint JNICALL Java_io_github_xausky_unitymodmanager_utils_ZipUtils_patc
  * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL Java_io_github_xausky_unitymodmanager_utils_ZipUtils_unzipFile
-  (JNIEnv *, jclass, jstring, jstring, jstring);
+  (JNIEnv *, jclass, jstring, jstring, jstring, jboolean);
 
 #ifdef __cplusplus
 }

@@ -26,6 +26,7 @@ import com.lody.virtual.client.ipc.VActivityManager;
 import io.github.xausky.unitymodmanager.fragment.BaseFragment;
 import io.github.xausky.unitymodmanager.fragment.HomeFragment;
 import io.github.xausky.unitymodmanager.fragment.ModFragment;
+import io.github.xausky.unitymodmanager.utils.FileUtils;
 
 public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
@@ -119,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     @SuppressLint("StaticFieldLeak")
-    class PatchApkTask extends AsyncTask<Object, Object, Boolean> {
+    class PatchApkTask extends AsyncTask<Object, Object, Integer> {
         private String apkPath;
 
         public PatchApkTask(String apkPath) {
@@ -133,12 +134,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected Boolean doInBackground(Object ...params) {
-            boolean result = true;
+        protected Integer doInBackground(Object ...params) {
+            int result = FileUtils.RESULT_STATE_OK;
             if(modFragment.needPatch){
                 result = modFragment.patch(apkPath);
             }
-            if(result){
+            if(result == FileUtils.RESULT_STATE_OK){
                 Intent intent = VirtualCore.get().getLaunchIntent(homeFragment.packageName, 0);
                 VActivityManager.get().startActivity(intent, 0);
             }
@@ -146,12 +147,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(Boolean result) {
+        protected void onPostExecute(Integer result) {
             dialog.hide();
-            if(result){
+            if(result == FileUtils.RESULT_STATE_OK){
                 modFragment.needPatch = false;
-            }else {
+            }else if(result == FileUtils.RESULT_STATE_INTERNAL_ERROR){
                 Toast.makeText(MainActivity.this, "安装模组失败", Toast.LENGTH_LONG).show();
+            }else if(result == FileUtils.RESULT_STATE_FILE_CONFLICT){
+                Toast.makeText(MainActivity.this, "模组文件冲突，可以到设置界面开启强制安装模式。", Toast.LENGTH_LONG).show();
             }
         }
     }

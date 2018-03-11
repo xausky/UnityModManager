@@ -40,4 +40,5 @@
     <string name="import_mod_exists">同名模组%s已存在，跳过导入。</string>
     <string name="progress_dialog_title">请稍等</string>
     <string name="progress_dialog_message">正在操作</string>
+    <string name="please_input_password">请输入解压密码</string>
 </resources>

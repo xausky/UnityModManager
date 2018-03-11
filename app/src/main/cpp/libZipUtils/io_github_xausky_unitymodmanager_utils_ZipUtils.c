@@ -7,6 +7,7 @@
 #ifdef __ANDROID__
 #include <android/log.h>
 #include <zip.h>
+#include <zipint.h>
 #include "io_github_xausky_unitymodmanager_utils_ZipUtils.h"
 #else
 #include <zip.h>
@@ -134,7 +135,7 @@ const char * resolveName(const char * name){
     return strchr(file_name, '.') == NULL && strlen(file_name) == 32 ? file_name: NULL;
 }
 
-int unzipFile(const char * zipFile, const char * targetDir, const char * password){
+int unzipFile(const char * zipFile, const char * targetDir, const char * password, uint8_t force){
     int enumber = 0;
     char target_path_buffer[1024];
     uint8_t copy_buffer[COPY_BUFFER_SIZE];
@@ -178,15 +179,24 @@ int unzipFile(const char * zipFile, const char * targetDir, const char * passwor
                 zip_close(zip);
                 int error = errno;
                 if(error == EEXIST){
+                    if(force){
+                        continue;
+                    }
                     return RESULT_STATE_FILE_CONFLICT;
                 } else {
                     __FUSION_LOG("target file open failed, error: %s， target file path: %s\n", strerror(error), target_path_buffer);
                     return RESULT_STATE_INTERNAL_ERROR;
                 }
             }
+            zip_stat_t stat;
             size_t len = 0;
-            while((len = zip_fread(file, copy_buffer, COPY_BUFFER_SIZE)) > 0){
+            size_t lenCount = 0;
+            if(zip_source_stat(file->src, &stat) == 0){
+                __FUSION_LOG("zip_source_stat_size: %lld， file: %s\n", stat.size, target_path_buffer);
+            }
+            while(lenCount < stat.size && (len = zip_fread(file, copy_buffer, COPY_BUFFER_SIZE)) > 0){
                 write(target_file, copy_buffer, len);
+                lenCount += len;
             }
             zip_fclose(file);
             close(target_file);
@@ -206,18 +216,13 @@ JNIEXPORT jint JNICALL Java_io_github_xausky_unitymodmanager_utils_ZipUtils_patc
     return patchZip(backupDirPath, fusionDirPath, prefixString, targetPath);
 }
 JNIEXPORT jint JNICALL Java_io_github_xausky_unitymodmanager_utils_ZipUtils_unzipFile
-        (JNIEnv *env, jclass cls, jstring zipFile, jstring targetDir, jstring password){
+        (JNIEnv *env, jclass cls, jstring zipFile, jstring targetDir, jstring password, jboolean force){
     const char * zipFilePath = (*env)->GetStringUTFChars(env, zipFile,JNI_FALSE);
     const char * targetDirPath = (*env)->GetStringUTFChars(env, targetDir,JNI_FALSE);
     const char * passwordString = NULL;
     if(password != NULL){
         passwordString = (*env)->GetStringUTFChars(env, password,JNI_FALSE);
     }
-    return unzipFile(zipFilePath, targetDirPath, passwordString);
-}
-#else
-int main(int argc, char* argv[]){
-    puts(resolveName(argv[1]));
-    return 0;
+    return unzipFile(zipFilePath, targetDirPath, passwordString, force);
 }
 #endif

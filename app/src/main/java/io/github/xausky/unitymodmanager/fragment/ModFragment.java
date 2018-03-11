@@ -68,9 +68,12 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         this.context = inflater.getContext();
-        view = inflater.inflate(R.layout.mod_fragment, container, false);
-        recyclerView = view.findViewById(R.id.mod_list);
-        adapter.setRecyclerView(recyclerView);
+        if(view == null){
+            view = inflater.inflate(R.layout.mod_fragment, container, false);
+            recyclerView = view.findViewById(R.id.mod_list);
+            adapter.setRecyclerView(recyclerView);
+        }
+        adapter.updateSetting();
         return view;
     }
 
@@ -83,7 +86,8 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
     public void OnActionButtonClick() {
         ExFilePicker filePicker = new ExFilePicker();
         filePicker.setShowOnlyExtensions("zip");
-        filePicker.setCanChooseOnlyOneItem(true);
+        filePicker.setHideHiddenFilesEnabled(true);
+        filePicker.setCanChooseOnlyOneItem(false);
         filePicker.start(this, MOD_FILE_PICKER_RESULT);
     }
 
@@ -102,33 +106,33 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
         needPatch = true;
     }
 
-    public boolean patch(String apkPath){
+    public int patch(String apkPath){
         List<Mod> mods = adapter.getMods();
         File fusionFile = new File(context.getCacheDir().getAbsolutePath() + "/fusion");
         if(!FileUtils.deleteFile(fusionFile)){
             Log.d(MainApplication.LOG_TAG, "deleteFile Failed: " + fusionFile);
-            return false;
+            return FileUtils.RESULT_STATE_INTERNAL_ERROR;
         }
         if(!fusionFile.mkdir()){
             Log.d(MainApplication.LOG_TAG, "mkdir Failed: " + fusionFile);
-            return false;
+            return FileUtils.RESULT_STATE_INTERNAL_ERROR;
         }
         for(Mod mod : mods){
             if(mod.enable){
-                int result = FileUtils.copyModDirectoryFile(storeFile.getAbsolutePath() + "/" + mod.name,
-                        fusionFile.getAbsolutePath());
-                if(result != FileUtils.COPY_MOD_DIRECTOR_RESULT_OK){
+                int result = FileUtils.copyModDirectoryFile(new File(storeFile.getAbsolutePath() + "/" + mod.name),
+                        fusionFile.getAbsolutePath(), adapter.forceMode);
+                if(result != FileUtils.RESULT_STATE_OK){
                     Log.d(MainApplication.LOG_TAG, "Copy Mod Directory File Failed: " + result);
-                    return false;
+                    return result;
                 }
             }
         }
         int result = ZipUtils.patchZip(backupFile.getAbsolutePath(), fusionFile.getAbsolutePath(), "assets/bin/Data", apkPath);
         if(result != ZipUtils.RESULT_STATE_OK){
             Log.d(MainApplication.LOG_TAG, "Patch APK File Failed: " + result);
-            return false;
+            return result;
         }
         adapter.notifyApply();
-        return true;
+        return ZipUtils.RESULT_STATE_OK;
     }
 }

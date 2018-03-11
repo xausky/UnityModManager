@@ -9,13 +9,11 @@ import android.support.annotation.NonNull;
 public class Mod implements Comparable<Mod> {
     public String name;
     public boolean enable;
-    public String password;
     public int order;
 
-    public Mod(String name, boolean enable, String password, int order) {
+    public Mod(String name, boolean enable, int order) {
         this.name = name;
         this.enable = enable;
-        this.password = password;
         this.order = order;
     }
 

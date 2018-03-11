@@ -23,9 +23,9 @@ import io.github.xausky.unitymodmanager.MainApplication;
  */
 
 public class FileUtils {
-    public static final int COPY_MOD_DIRECTOR_RESULT_OK = 0;
-    public static final int COPY_MOD_DIRECTOR_RESULT_INTERNAL_ERROR = -1;
-    public static final int COPY_MOD_DIRECTOR_RESULT_CONFLICT = -2;
+    public static final int RESULT_STATE_OK = 0;
+    public static final int RESULT_STATE_INTERNAL_ERROR = -1;
+    public static final int RESULT_STATE_FILE_CONFLICT = -3;
     /**
      * 通过递归调用删除一个文件夹及下面的所有文件
      * @param file
@@ -55,15 +55,16 @@ public class FileUtils {
         return true;
     }
 
-    public static int copyModDirectoryFile(String source, String target) {
+    public static int copyModDirectoryFile(File source, String target, boolean force) {
         byte[] buffer = new byte[10240];
-        File sourceFile = new File(source);
-        File[] files = sourceFile.listFiles();
+        File[] files = source.listFiles();
         for(File file: files){
             if(file.isFile() && file.getName().indexOf('.') == -1){
                 File targetFile = new File(target + '/' + file.getName());
                 if(targetFile.exists()){
-                    return COPY_MOD_DIRECTOR_RESULT_CONFLICT;
+                    if(!force){
+                        return RESULT_STATE_FILE_CONFLICT;
+                    }
                 }
                 FileInputStream inputStream = null;
                 FileOutputStream outputStream = null;
@@ -76,10 +77,10 @@ public class FileUtils {
                     }
                 }catch (FileNotFoundException e){
                     e.printStackTrace();
-                    return COPY_MOD_DIRECTOR_RESULT_INTERNAL_ERROR;
+                    return RESULT_STATE_INTERNAL_ERROR;
                 } catch (IOException e) {
                     e.printStackTrace();
-                    return COPY_MOD_DIRECTOR_RESULT_INTERNAL_ERROR;
+                    return RESULT_STATE_INTERNAL_ERROR;
                 }finally {
                     if (inputStream != null){
                         try {
@@ -96,8 +97,15 @@ public class FileUtils {
                         }
                     }
                 }
+            } else if(file.isDirectory()){
+                for(File child: file.listFiles()){
+                    int result = copyModDirectoryFile(child, target, force);
+                    if(result != RESULT_STATE_OK){
+                        return result;
+                    }
+                }
             }
         }
-        return COPY_MOD_DIRECTOR_RESULT_OK;
+        return RESULT_STATE_OK;
     }
 }
