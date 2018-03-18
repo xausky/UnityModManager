@@ -22,7 +22,7 @@ deploy:
   on:
     tags: true
     all_branches: true
-    repo: xausky/BH3ModManager
+    repo: xausky/UnityModManager
 after_deploy:
 - gem install fir-cli
 - fir p app/build/outputs/apk/release/app-release.apk -T $FIR_TOKEN -c "$(git cat-file tag $TRAVIS_TAG)"
