@@ -24,6 +24,8 @@ import android.widget.Toast;
 
 import com.lody.virtual.client.core.VirtualCore;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.sql.Struct;
 import java.util.ArrayList;
@@ -70,10 +72,16 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
         for (File file : modFiles) {
             if (file.isDirectory()) {
                 String name = file.getName();
-                Mod mod = new Mod(name, preferences.getBoolean(name + ":enable", false),
-                        preferences.getInt(name + ":order", Integer.MAX_VALUE));
+                Mod mod = new Mod(name,
+                        preferences.getBoolean(name + ":enable", false),
+                        preferences.getInt(name + ":order", Integer.MAX_VALUE),
+                        preferences.getInt(name + ":fileCount", -1));
                 if (mod.enable) {
                     ++enableItemCount;
+                }
+                if(mod.fileCount == -1){
+                    File targetFile = new File(storage.getAbsolutePath() + "/" + name);
+                    mod.fileCount = targetFile.list().length;
                 }
                 mods.add(mod);
             }
@@ -120,6 +128,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
             mod.order = i;
             editor.putBoolean(mod.name + ":enable", mod.enable);
             editor.putInt(mod.name + ":order", mod.order);
+            editor.putInt(mod.name + ":fileCount", mod.fileCount);
         }
         editor.apply();
     }
@@ -148,7 +157,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
         }
         switch (result) {
             case ZipUtils.RESULT_STATE_OK:
-                mods.add(new Mod(name, false, Integer.MAX_VALUE));
+                mods.add(new Mod(name, false, Integer.MAX_VALUE, targetFile.list().length));
                 notifyDataSetChanged();
                 if (iterator.hasNext()) {
                     processMod(path, iterator.next(), iterator, null, force, true);
@@ -218,6 +227,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
     public void onBindViewHolder(ViewHolder holder, int position) {
         final Mod mod = mods.get(position);
         holder.name.setText(mod.name);
+        holder.content.setText(String.format(context.getString(R.string.mod_list_item_content), mod.fileCount));
         holder.aSwitch.setChecked(mod.enable);
         holder.aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -256,12 +266,14 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
         private Switch aSwitch;
         private ImageView icon;
         private TextView name;
+        private TextView content;
 
         public ViewHolder(View itemView) {
             super(itemView);
             aSwitch = itemView.findViewById(R.id.mod_list_item_switch);
             icon = itemView.findViewById(R.id.mod_list_item_icon);
             name = itemView.findViewById(R.id.mod_list_item_name);
+            content = itemView.findViewById(R.id.mod_list_item_content);
         }
     }
 

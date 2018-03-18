@@ -72,12 +72,18 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        context = inflater.getContext();
+        dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, true, true);
+        dialog.setListener(this);
+        progressDialog = new ProgressDialog(context);
+        progressDialog.setTitle(R.string.progress_dialog_title);
+        progressDialog.setMessage(getString(R.string.progress_dialog_message));
+        progressDialog.setCancelable(false);
         if(view == null){
             view = inflater.inflate(R.layout.home_fragment, container, false);
             attachFragment = (AttachFragment) BaseFragment.fragment(R.id.nav_attach);
             visibilityFragment = (VisibilityFragment) BaseFragment.fragment(R.id.nav_visibility);
             modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
-            context = inflater.getContext();
             summary = view.findViewById(R.id.home_summary);
             va = VirtualCore.get();
             currentVersion = view.findViewById(R.id.home_current_version);
@@ -85,12 +91,6 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             clientState = view.findViewById(R.id.home_client_state);
             clientStateCardView = view.findViewById(R.id.home_client_state_card_view);
             clientStateCardView.setOnClickListener(this);
-            progressDialog = new ProgressDialog(context);
-            progressDialog.setTitle(R.string.progress_dialog_title);
-            progressDialog.setMessage(getString(R.string.progress_dialog_message));
-            progressDialog.setCancelable(false);
-            dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, true, true);
-            dialog.setListener(this);
             String versionName = "unknown";
             try {
                 versionName = "v" + context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
@@ -120,15 +120,25 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                         response.append(line);
                     }
                     JSONArray array = new JSONArray(response.toString());
-                    JSONObject latestRelease = array.getJSONObject(0);
-                    String latestVersion = latestRelease.getString("tag_name");
-                    final String textViewString = String.format(context.getString(R.string.home_latest_version), latestVersion);
-                    HomeFragment.this.latestVersion.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            HomeFragment.this.latestVersion.setText(textViewString);
+                    JSONObject latestRelease = null;
+                    for(int i =0; i < array.length(); ++ i){
+                        JSONObject release = array.getJSONObject(i);
+                        if(!release.getBoolean("prerelease")){
+                            latestRelease = release;
+                            break;
                         }
-                    });
+                    }
+                    if(latestRelease != null){
+
+                        String latestVersion = latestRelease.getString("tag_name");
+                        final String textViewString = String.format(context.getString(R.string.home_latest_version), latestVersion);
+                        HomeFragment.this.latestVersion.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                HomeFragment.this.latestVersion.setText(textViewString);
+                            }
+                        });
+                    }
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 } catch (IOException e) {

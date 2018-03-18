@@ -82,10 +82,10 @@ public class AttachFragment extends BaseFragment implements ApplicationChooseDia
                 } else {
                     resultString = result.error;
                 }
-                progressDialog.hide();
                 AttachFragment.this.view.post(new Runnable() {
                     @Override
                     public void run() {
+                        progressDialog.hide();
                         adapter.update(homeFragment.packageName);
                         Toast.makeText(context, resultString, Toast.LENGTH_LONG).show();
                     }

@@ -10,11 +10,13 @@ public class Mod implements Comparable<Mod> {
     public String name;
     public boolean enable;
     public int order;
+    public int fileCount;
 
-    public Mod(String name, boolean enable, int order) {
+    public Mod(String name, boolean enable, int order, int fileCount) {
         this.name = name;
         this.enable = enable;
         this.order = order;
+        this.fileCount = fileCount;
     }
 
 

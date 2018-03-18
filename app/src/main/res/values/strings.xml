@@ -41,4 +41,5 @@
     <string name="progress_dialog_title">请稍等</string>
     <string name="progress_dialog_message">正在操作</string>
     <string name="please_input_password">请输入解压密码</string>
+    <string name="mod_list_item_content">有效模组文件数量：%d</string>
 </resources>
