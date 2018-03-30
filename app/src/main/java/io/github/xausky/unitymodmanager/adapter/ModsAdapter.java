@@ -2,32 +2,26 @@ package io.github.xausky.unitymodmanager.adapter;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.lody.virtual.client.core.VirtualCore;
+import com.hzy.libp7zip.P7ZipApi;
 
-import org.w3c.dom.Text;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.sql.Struct;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -38,10 +32,10 @@ import io.github.xausky.unitymodmanager.dialog.ConfirmDialog;
 import io.github.xausky.unitymodmanager.dialog.PasswordDialog;
 import io.github.xausky.unitymodmanager.domain.Mod;
 import io.github.xausky.unitymodmanager.fragment.SettingFragment;
-import io.github.xausky.unitymodmanager.utils.FileUtils;
-import io.github.xausky.unitymodmanager.utils.ZipUtils;
+import io.github.xausky.unitymodmanager.utils.ModUtils;
+import io.github.xausky.unitymodmanager.utils.NativeUtils;
 
-import static io.github.xausky.unitymodmanager.utils.ZipUtils.RESULT_STATE_INTERNAL_ERROR;
+import static io.github.xausky.unitymodmanager.utils.NativeUtils.RESULT_STATE_INTERNAL_ERROR;
 
 /**
  * Created by xausky on 18-3-9.
@@ -79,10 +73,6 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
                 if (mod.enable) {
                     ++enableItemCount;
                 }
-                if(mod.fileCount == -1){
-                    File targetFile = new File(storage.getAbsolutePath() + "/" + name);
-                    mod.fileCount = targetFile.list().length;
-                }
                 mods.add(mod);
             }
         }
@@ -106,6 +96,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
         new ItemTouchHelper(new ModsAdapter.CallBack()).attachToRecyclerView(view);
         view.setLayoutManager(new LinearLayoutManager(context));
         view.setAdapter(this);
+        view.addItemDecoration(new DividerItemDecoration(context,DividerItemDecoration.VERTICAL));
     }
 
     public void cleanEnable() {
@@ -133,13 +124,13 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
         editor.apply();
     }
 
-    private void processMod(final String path, final String name, final Iterator<String> iterator, String password, final boolean force, boolean first) {
+    private void process(final String path, final String name, final Iterator<String> iterator, String password, final boolean force, boolean first) {
         final File targetFile = new File(storage.getAbsolutePath() + "/" + name);
         if (first) {
             if (targetFile.exists()) {
                 Toast.makeText(context, String.format(context.getString(R.string.import_mod_exists), name), Toast.LENGTH_LONG).show();
                 if (iterator.hasNext()) {
-                    processMod(path, iterator.next(), iterator, null, force, true);
+                    process(path, iterator.next(), iterator, null, force, true);
                 }
                 return;
             }
@@ -149,37 +140,65 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
             }
         }
         File sourceFile = new File(path + name);
-        int result = FileUtils.RESULT_STATE_INTERNAL_ERROR;
+        int result = ModUtils.RESULT_STATE_INTERNAL_ERROR;
         if(sourceFile.isFile()){
-            result = ZipUtils.unzipFile(path + name, targetFile.getAbsolutePath(), password, force);
+            File temp = new File(context.getCacheDir().getAbsolutePath() + "/" + System.currentTimeMillis());
+            try {
+                FileUtils.forceMkdir(temp);
+                int p7zip = P7ZipApi.executeCommand(String.format("7z x -aoa -o%s -p%s %s", temp.getAbsolutePath(), password, sourceFile.getAbsolutePath()));
+                if(p7zip == 0){
+                    result = ModUtils.Standardization(temp, targetFile);
+                }
+                FileUtils.deleteDirectory(temp);
+                if(p7zip == 2){
+                    result = NativeUtils.RESULT_STATE_PASSWORD_ERROR;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                result = ModUtils.RESULT_STATE_INTERNAL_ERROR;
+            }
         }else if(sourceFile.isDirectory()){
-            result = FileUtils.copyModDirectoryFile(sourceFile, targetFile.getAbsolutePath(), force);
+            result = ModUtils.Standardization(sourceFile, targetFile);
+        }
+        if(result >= 0){
+            mods.add(new Mod(name, false, Integer.MAX_VALUE, result));
+            notifyDataSetChanged();
+            if (iterator.hasNext()) {
+                process(path, iterator.next(), iterator, null, force, true);
+            } else {
+                notifyApply();
+            }
         }
         switch (result) {
-            case ZipUtils.RESULT_STATE_OK:
-                mods.add(new Mod(name, false, Integer.MAX_VALUE, targetFile.list().length));
-                notifyDataSetChanged();
-                if (iterator.hasNext()) {
-                    processMod(path, iterator.next(), iterator, null, force, true);
-                }
-                break;
-            case ZipUtils.RESULT_STATE_FILE_CONFLICT:
+            case NativeUtils.RESULT_STATE_FILE_CONFLICT:
                 Toast.makeText(context, String.format("模组[%s]内部存在文件冲突，如要强制安装请到设置开启强制安装选项。", name), Toast.LENGTH_LONG).show();
-                FileUtils.deleteFile(targetFile);
+                try {
+                    FileUtils.deleteDirectory(targetFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 if (iterator.hasNext()) {
-                    processMod(path, iterator.next(), iterator, null, force, true);
+                    process(path, iterator.next(), iterator, null, force, true);
+                } else {
+                    notifyApply();
                 }
                 break;
             case RESULT_STATE_INTERNAL_ERROR:
                 Toast.makeText(context, String.format("模组[%s]解压错误，请确定模组文件是Zip文件。", name), Toast.LENGTH_LONG).show();
-                FileUtils.deleteFile(targetFile);
+                try {
+                    FileUtils.deleteDirectory(targetFile);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 if (iterator.hasNext()) {
-                    processMod(path, iterator.next(), iterator, null, force, true);
+                    process(path, iterator.next(), iterator, null, force, true);
+                } else {
+                    notifyApply();
                 }
                 break;
-            case ZipUtils.RESULT_STATE_PASSWORD_ERROR:
+            case NativeUtils.RESULT_STATE_PASSWORD_ERROR:
                 if(password == null && this.defaultPassword != null){
-                    processMod(path, name, iterator, this.defaultPassword, force, false);
+                    process(path, name, iterator, this.defaultPassword, force, false);
                 } else {
                     this.passwordDialog.show();
                     this.passwordDialog.setTitle(String.format("请输入模组[%s]的解压密码", name));
@@ -190,16 +209,22 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
                         @Override
                         public void onClick(View v) {
                             ModsAdapter.this.passwordDialog.hide();
-                            processMod(path, name, iterator, ModsAdapter.this.passwordDialog.edit.getText().toString(), force, false);
+                            process(path, name, iterator, ModsAdapter.this.passwordDialog.edit.getText().toString(), force, false);
                         }
                     });
                     this.passwordDialog.setNegativeListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             ModsAdapter.this.passwordDialog.hide();
-                            FileUtils.deleteFile(targetFile);
+                            try {
+                                FileUtils.deleteDirectory(targetFile);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                             if (iterator.hasNext()) {
-                                processMod(path, iterator.next(), iterator, null, force, true);
+                                process(path, iterator.next(), iterator, null, force, true);
+                            } else {
+                                notifyApply();
                             }
                         }
                     });
@@ -210,7 +235,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
 
     public void addMods(String path, List<String> names) {
         Iterator<String> iterator = names.iterator();
-        processMod(path, iterator.next(), iterator, null, forceMode, true);
+        process(path, iterator.next(), iterator, null, forceMode, true);
     }
 
     public void setListener(OnDataChangeListener listener) {
@@ -252,9 +277,11 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
     public void onClick(DialogInterface dialog, int which) {
         if (which == DialogInterface.BUTTON_POSITIVE) {
             Mod mod = mods.get(operationPosition);
-            if (FileUtils.deleteFile(new File(storage.getAbsolutePath() + "/" + mod.name))) {
-                mods.remove(operationPosition);
-            } else {
+            try {
+                FileUtils.deleteDirectory(new File(storage.getAbsolutePath() + "/" + mod.name));
+                mods.remove(mod);
+            } catch (Exception e) {
+                e.printStackTrace();
                 Toast.makeText(context, context.getString(R.string.mod_file_delete_failed) + mod.name, Toast.LENGTH_SHORT).show();
             }
         }

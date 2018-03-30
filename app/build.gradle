@@ -4,10 +4,10 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "io.github.xausky.unitymodmanager"
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 26
-        versionCode 200
-        versionName "2.0.0-alpha1"
+        versionCode 220
+        versionName "2.2.0-beta1"
         ndk{
             abiFilters "armeabi-v7a","x86"
         }
@@ -37,7 +37,8 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support:cardview-v7:26.1.0'
     implementation 'com.github.medyo:android-about-page:1.2.2'
-    implementation 'me.zhanghai.android.materialprogressbar:library:1.4.2'
     implementation 'com.github.bartwell:ExFilePicker:master-SNAPSHOT'
+    implementation 'commons-io:commons-io:2.4'
+    implementation 'com.hzy:libp7zip:1.5.0'
     implementation project(':libva')
 }

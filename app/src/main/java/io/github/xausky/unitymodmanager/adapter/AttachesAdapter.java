@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -52,6 +53,7 @@ public class AttachesAdapter extends RecyclerView.Adapter<AttachesAdapter.ViewHo
         new ItemTouchHelper(new CallBack()).attachToRecyclerView(view);
         view.setLayoutManager(new LinearLayoutManager(context));
         view.setAdapter(this);
+        view.addItemDecoration(new DividerItemDecoration(context,DividerItemDecoration.VERTICAL));
     }
 
     public void update(String excludePackageName){

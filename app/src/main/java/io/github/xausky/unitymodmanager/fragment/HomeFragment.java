@@ -44,9 +44,11 @@ import io.github.xausky.unitymodmanager.dialog.ApplicationChooseDialog;
 
 public class HomeFragment extends BaseFragment implements View.OnClickListener, ApplicationChooseDialog.OnApplicationChooseDialogResultListener{
     private static final String PACKAGE_PREFERENCE_KEY = "PACKAGE_PREFERENCE_KEY";
+    private static final String BASE_APK_PATH_PREFERENCE_KEY = "BASE_APK_PATH_PREFERENCE_KEY";
     private static final String ALL_APPLICATION_PACKAGE_REGEX = "^.*$";
     public String packageName;
     public String apkPath;
+    public String baseApkPath;
     private View view;
     private TextView summary;
     private TextView clientState;
@@ -66,6 +68,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     public BaseFragment setBase(Context base) {
         settings = base.getSharedPreferences(SettingFragment.SETTINGS_PREFERENCE_NAME, Context.MODE_PRIVATE);
         packageName = settings.getString(PACKAGE_PREFERENCE_KEY, null);
+        baseApkPath = settings.getString(BASE_APK_PATH_PREFERENCE_KEY, null);
         return super.setBase(base);
     }
 
@@ -196,8 +199,13 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 final String resultString;
                 if(result.isSuccess){
                     HomeFragment.this.packageName = result.packageName;
+                    HomeFragment.this.baseApkPath = apkPath;
                     HomeFragment.this.apkPath = VirtualCore.get().getInstalledAppInfo(HomeFragment.this.packageName, 0).apkPath;
-                    if(!settings.edit().putString(PACKAGE_PREFERENCE_KEY, HomeFragment.this.packageName).commit()){
+                    boolean commitResult = settings.edit()
+                            .putString(PACKAGE_PREFERENCE_KEY, HomeFragment.this.packageName)
+                            .putString(BASE_APK_PATH_PREFERENCE_KEY, HomeFragment.this.baseApkPath)
+                            .commit();
+                    if(!commitResult){
                         resultString = "SharedPreferences commit failed";
                     } else {
                         resultString = "Success";

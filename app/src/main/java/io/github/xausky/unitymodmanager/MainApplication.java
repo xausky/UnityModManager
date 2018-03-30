@@ -6,8 +6,13 @@ import android.content.SharedPreferences;
 
 import com.lody.virtual.client.core.VirtualCore;
 
+import org.json.JSONObject;
+
+import java.io.InputStream;
+
 import io.github.xausky.unitymodmanager.adapter.VisibilityAdapter;
 import io.github.xausky.unitymodmanager.fragment.BaseFragment;
+import io.github.xausky.unitymodmanager.utils.ModUtils;
 
 /**
  * Created by xausky on 2018/2/1.
@@ -30,6 +35,13 @@ public class MainApplication extends Application {
                 preferences.edit().putBoolean("first", false).apply();
             }
             BaseFragment.initialize(base);
+            InputStream mapInputStream = base.getAssets().open("map.json");
+            byte[] bytes = new byte[mapInputStream.available()];
+            if(mapInputStream.read(bytes) == -1){
+                throw new Exception("map.json read failed.");
+            }
+            String json = new String(bytes);
+            ModUtils.map = new JSONObject(json);
         } catch (Throwable e) {
             e.printStackTrace();
         }
