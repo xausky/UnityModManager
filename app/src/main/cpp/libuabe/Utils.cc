@@ -34,9 +34,12 @@ namespace xausky {
         list<string> files = ListFolderFiles(path);
         for (list<string>::iterator it = files.begin(); it != files.end(); it++){
             string file = (*it);
-            char name[1024];
+            size_t first = file.find_first_of('-');
+            size_t last = file.find_last_of('-');
+            string name = file.substr(first + 1, last - first -1);
+            string postfix = file.substr(last + 1, file.size() - last);
             int64_t pathId;
-            sscanf(file.c_str(), "%[^_]_%lld.dat", name, &pathId);
+            sscanf(postfix.c_str(), "%llu.dat", &pathId);
             map<string, map<int64_t, BinaryStream*>*>::iterator iterator = patch->find(name);
             map<int64_t, BinaryStream*>* mod;
             if(iterator == patch->end()){
