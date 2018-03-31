@@ -65,15 +65,14 @@ namespace xausky {
         output.AlignStreamOutput(4);
         printf("AlignStreamOutput befor size:%lld\n",output.size());
         patch_t patchs[assetCount];
-        int64_t firstOffset = -1;
         printf("assetCount:%d, %lld\n", assetCount, input.position());
-        int64_t patchOffset = 0;
+        int64_t patchOffset = dataOffset;
         for (int i = 0; i < assetCount; i++){
             int64_t pathId = input.ReadInt64();
             int32_t offset = input.ReadInt32() + dataOffset;
             int32_t size = input.ReadInt32();
             int32_t index = input.ReadInt32();
-            printf("pathId:%lld, offset:%d, size:%d\n", pathId, offset, size);
+            printf("SRC: pathId:%lld, offset:%d, size:%d\n", pathId, offset, size);
             map<int64_t, BinaryStream*>::iterator it = mods.find(pathId);
             patchs[i].size = size;
             patchs[i].offset = offset;
@@ -82,10 +81,6 @@ namespace xausky {
                 patchs[i].mod = it->second;
                 size = patchs[i].mod->size();
             }
-            if(firstOffset == -1){
-                firstOffset = offset;
-                patchOffset = dataOffset;
-            }
             output.WriteInt64(pathId);
             output.WriteInt32(patchOffset - dataOffset);
             output.WriteInt32(size);
@@ -93,29 +88,33 @@ namespace xausky {
             patchOffset+=size;
             int mod = size%8;
             if(mod != 0){
-                patchOffset+=8-mod;
+                patchOffset += 8 - mod;
             }
         }
         int64_t extraOffset = input.position();
-        int64_t extraSize = firstOffset - extraOffset;
+        int64_t extraSize = dataOffset - extraOffset;
+        printf("extraSize:%d\n", extraSize);
         char* extra = new char[extraSize];
         input.ReadData(extra, extraSize);
         output.WriteData(extra, extraSize);
         delete[] extra;
         for(int i = 0; i < assetCount; i++){
-            input.AlignStream(8);
             patch_t patch = patchs[i];
-            int64_t len = patch.size;
-            char* data = new char[len];
-            input.ReadData(data, len);
+            int64_t len;
+            char* data;
             if(patch.mod != NULL){
-                delete[] data;
                 len =  patch.mod->size();
                 data = new char[len];
                 patch.mod->ReadData(data, len);
+            } else {
+                len = patch.size;
+                data = new char[len];
+                input.position(patch.offset, ios::beg);
+                input.ReadData(data, len);
             }
-            output.AlignStreamOutput(8);
             output.WriteData(data, len);
+            output.AlignStreamOutput(8);
+            delete[] data;
         }
         //更新dataEnd
         output.setEndian(true);
