@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
                     Snackbar.make(actionButton, "客户端未安装，请先到主页安装客户端。", Snackbar.LENGTH_LONG).show();
                     break;
                 }
-                new PatchApkTask(homeFragment.apkPath, homeFragment.baseApkPath).execute();
+                new PatchApkTask(dialog).execute();
                 break;
         }
         return true;
@@ -119,15 +119,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @SuppressLint("StaticFieldLeak")
-    class PatchApkTask extends AsyncTask<Object, Object, Integer> {
-        private String apkPath;
-        private String baseApkPath;
+    static class PatchApkTask extends AsyncTask<Object, Object, Integer> {
+        private ProgressDialog dialog;
 
-        public PatchApkTask(String apkPath, String baseApkPath) {
+        public PatchApkTask(ProgressDialog dialog) {
             super();
-            this.apkPath = apkPath;
-            this.baseApkPath = baseApkPath;
+            this.dialog = dialog;
         }
 
         @Override
@@ -136,12 +133,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected Integer doInBackground(Object ...params) {
+        protected Integer doInBackground(Object... params) {
             int result = ModUtils.RESULT_STATE_OK;
-            if(modFragment.needPatch){
-                result = modFragment.patch(apkPath, baseApkPath);
+            ModFragment modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
+            HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
+            if (modFragment.needPatch) {
+                result = modFragment.patch(homeFragment.apkPath, homeFragment.baseApkPath);
             }
-            if(result == ModUtils.RESULT_STATE_OK){
+            if (result == ModUtils.RESULT_STATE_OK) {
                 Intent intent = VirtualCore.get().getLaunchIntent(homeFragment.packageName, 0);
                 VActivityManager.get().startActivity(intent, 0);
             }
@@ -151,12 +150,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer result) {
             dialog.hide();
-            if(result == ModUtils.RESULT_STATE_OK){
+            ModFragment modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
+            if (result == ModUtils.RESULT_STATE_OK) {
                 modFragment.needPatch = false;
-            }else if(result == ModUtils.RESULT_STATE_INTERNAL_ERROR){
-                Toast.makeText(MainActivity.this, "安装模组失败", Toast.LENGTH_LONG).show();
-            }else if(result == ModUtils.RESULT_STATE_FILE_CONFLICT){
-                Toast.makeText(MainActivity.this, "模组文件冲突，可以到设置界面开启强制安装模式。", Toast.LENGTH_LONG).show();
+            } else if (result == ModUtils.RESULT_STATE_INTERNAL_ERROR) {
+                Toast.makeText(modFragment.getBase(), "安装模组失败", Toast.LENGTH_LONG).show();
             }
         }
     }

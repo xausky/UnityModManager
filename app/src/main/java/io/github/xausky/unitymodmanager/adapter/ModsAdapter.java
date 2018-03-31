@@ -55,7 +55,6 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
     private int enableItemCount;
     private String defaultPassword;
     private PasswordDialog passwordDialog;
-    public boolean forceMode;
 
     public ModsAdapter(File storage, Context context) {
         this.storage = storage;
@@ -82,7 +81,6 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
 
     public void updateSetting(){
         this.defaultPassword = settingPreferences.getString("setting_default_password", null);
-        this.forceMode = settingPreferences.getBoolean("setting_force_mode", false);
     }
 
     public int getEnableItemCount() {
@@ -124,13 +122,13 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
         editor.apply();
     }
 
-    private void process(final String path, final String name, final Iterator<String> iterator, String password, final boolean force, boolean first) {
+    private void process(final String path, final String name, final Iterator<String> iterator, String password, boolean first) {
         final File targetFile = new File(storage.getAbsolutePath() + "/" + name);
         if (first) {
             if (targetFile.exists()) {
                 Toast.makeText(context, String.format(context.getString(R.string.import_mod_exists), name), Toast.LENGTH_LONG).show();
                 if (iterator.hasNext()) {
-                    process(path, iterator.next(), iterator, null, force, true);
+                    process(path, iterator.next(), iterator, null, true);
                 }
                 return;
             }
@@ -164,7 +162,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
             mods.add(new Mod(name, false, Integer.MAX_VALUE, result));
             notifyDataSetChanged();
             if (iterator.hasNext()) {
-                process(path, iterator.next(), iterator, null, force, true);
+                process(path, iterator.next(), iterator, null, true);
             } else {
                 notifyApply();
             }
@@ -178,7 +176,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
                     e.printStackTrace();
                 }
                 if (iterator.hasNext()) {
-                    process(path, iterator.next(), iterator, null, force, true);
+                    process(path, iterator.next(), iterator, null, true);
                 } else {
                     notifyApply();
                 }
@@ -191,14 +189,14 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
                     e.printStackTrace();
                 }
                 if (iterator.hasNext()) {
-                    process(path, iterator.next(), iterator, null, force, true);
+                    process(path, iterator.next(), iterator, null, true);
                 } else {
                     notifyApply();
                 }
                 break;
             case NativeUtils.RESULT_STATE_PASSWORD_ERROR:
                 if(password == null && this.defaultPassword != null){
-                    process(path, name, iterator, this.defaultPassword, force, false);
+                    process(path, name, iterator, this.defaultPassword, false);
                 } else {
                     this.passwordDialog.show();
                     this.passwordDialog.setTitle(String.format("请输入模组[%s]的解压密码", name));
@@ -209,7 +207,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
                         @Override
                         public void onClick(View v) {
                             ModsAdapter.this.passwordDialog.hide();
-                            process(path, name, iterator, ModsAdapter.this.passwordDialog.edit.getText().toString(), force, false);
+                            process(path, name, iterator, ModsAdapter.this.passwordDialog.edit.getText().toString(), false);
                         }
                     });
                     this.passwordDialog.setNegativeListener(new View.OnClickListener() {
@@ -222,7 +220,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
                                 e.printStackTrace();
                             }
                             if (iterator.hasNext()) {
-                                process(path, iterator.next(), iterator, null, force, true);
+                                process(path, iterator.next(), iterator, null, true);
                             } else {
                                 notifyApply();
                             }
@@ -235,7 +233,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
 
     public void addMods(String path, List<String> names) {
         Iterator<String> iterator = names.iterator();
-        process(path, iterator.next(), iterator, null, forceMode, true);
+        process(path, iterator.next(), iterator, null, true);
     }
 
     public void setListener(OnDataChangeListener listener) {

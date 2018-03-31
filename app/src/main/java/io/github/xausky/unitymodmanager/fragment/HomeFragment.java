@@ -16,11 +16,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.allenliu.versionchecklib.v2.AllenVersionChecker;
+import com.allenliu.versionchecklib.v2.builder.UIData;
+import com.allenliu.versionchecklib.v2.callback.RequestVersionListener;
 import com.lody.virtual.client.core.InstallStrategy;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.remote.InstallResult;
 import com.lody.virtual.remote.InstalledAppInfo;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -108,49 +112,57 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     }
 
     private void checkVersion(){
-        new Thread(){
-            @Override
-            public void run() {
-                try {
-                    URL url = new URL("https://api.github.com/repos/xausky/UnityModManager/releases");
-                    HttpsURLConnection connection = (HttpsURLConnection)url.openConnection();
-                    connection.setRequestMethod("GET");
-                    InputStream in=connection.getInputStream();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                    StringBuilder response = new StringBuilder();
-                    String line=null;
-                    while((line=reader.readLine())!=null){
-                        response.append(line);
-                    }
-                    JSONArray array = new JSONArray(response.toString());
-                    JSONObject latestRelease = null;
-                    for(int i =0; i < array.length(); ++ i){
-                        JSONObject release = array.getJSONObject(i);
-                        if(!release.getBoolean("prerelease")){
-                            latestRelease = release;
-                            break;
-                        }
-                    }
-                    if(latestRelease != null){
-
-                        String latestVersion = latestRelease.getString("tag_name");
-                        final String textViewString = String.format(context.getString(R.string.home_latest_version), latestVersion);
-                        HomeFragment.this.latestVersion.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                HomeFragment.this.latestVersion.setText(textViewString);
+        AllenVersionChecker
+                .getInstance()
+                .requestVersion()
+                .setRequestUrl("https://api.github.com/repos/xausky/UnityModManager/releases")
+                .request(new RequestVersionListener() {
+                    @Nullable
+                    @Override
+                    public UIData onRequestVersionSuccess(String result) {
+                        try {
+                            JSONArray array = new JSONArray(result);
+                            JSONObject latestRelease = null;
+                            for(int i =0; i < array.length(); ++ i){
+                                JSONObject release = array.getJSONObject(i);
+                                if(!release.getBoolean("prerelease")){
+                                    latestRelease = release;
+                                    break;
+                                }
                             }
-                        });
+                            if(latestRelease != null){
+                                String latestVersion = latestRelease.getString("tag_name");
+                                final String textViewString = String.format(context.getString(R.string.home_latest_version), latestVersion);
+                                HomeFragment.this.latestVersion.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        HomeFragment.this.latestVersion.setText(textViewString);
+                                    }
+                                });
+                                String currentVersion = HomeFragment.this.currentVersion.getText().toString();
+                                if(currentVersion.indexOf('-') > 0){
+                                    return null;
+                                }
+                                if(!HomeFragment.this.currentVersion.getText().equals(latestVersion)){
+                                    UIData data = UIData.create();
+                                    data.setTitle("新版本发布:" + latestVersion);
+                                    data.setContent("更新日志：\n" + latestRelease.getString("body") + "\n\n若更新失败可到B站找最新下载地址自行更新。");
+                                    data.setDownloadUrl(latestRelease.getJSONArray("assets").getJSONObject(0).getString("browser_download_url"));
+                                    return data;
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        return null;
                     }
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
+
+                    @Override
+                    public void onRequestVersionFailure(String message) {
+
+                    }
+                })
+                .excuteMission(context);
     }
 
     private void clientUpdate(){

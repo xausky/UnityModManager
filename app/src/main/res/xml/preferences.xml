@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <SwitchPreference
-        android:defaultValue="false"
-        android:key="setting_force_mode"
-        android:summary="@string/setting_force_mode_summary"
-        android:title="@string/setting_force_mode" />
     <EditTextPreference
         android:key="setting_default_password"
         android:title="@string/setting_default_password"
         android:summary="@string/setting_default_password_summary"
         android:defaultValue="meshe" />
+    <Preference
+        android:key="setting_export_apk"
+        android:title="导出整合APK文件"
+        android:summary="点击将导出已安装补丁的APK文件到内部存储根目录的out.apk"/>
 </PreferenceScreen>

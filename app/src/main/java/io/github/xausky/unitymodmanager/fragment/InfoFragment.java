@@ -20,7 +20,7 @@ public class InfoFragment extends BaseFragment {
         return new AboutPage(inflater.getContext())
                 .setDescription(getString(R.string.info_context_text))
                 .addEmail("xausky@163.com")
-                .addWebsite("https://xausky.github.io/")
+                .addWebsite("https://space.bilibili.com/8419077/", "我的B站")
                 .addGitHub("xausky")
                 .create();
     }
