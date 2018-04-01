@@ -42,13 +42,11 @@ public class ModUtils {
         File[] files = input.listFiles();
         for(File file : files){
             String path = null;
-            if(file.isFile() || file.getName().endsWith(".unity3d")){
-                try {
-                    path = map.getString(file.getName());
-                    Log.d(MainApplication.LOG_TAG, "Standardization: " + path);
-                } catch (JSONException e) {
-                    //ignore
-                }
+            try {
+                path = map.getString(input.getName() + "/" + file.getName());
+                Log.d(MainApplication.LOG_TAG, "Standardization: " + path);
+            } catch (JSONException e) {
+                //ignore
             }
             if(path != null){
                 try {

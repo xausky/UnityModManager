@@ -8,7 +8,13 @@ namespace xausky {
     char dataBuffer[DATA_BUFFER_SIZE];
     void PatchFile(mz_zip_archive* out, mz_zip_archive* zip, mz_uint i, mz_zip_archive_file_stat* entrityStat, const char *mods){
         struct stat modStat;
-        sprintf(pathBuffer, "%s/%s", mods, entrityStat->m_filename);
+        string filename = entrityStat->m_filename;
+        size_t pos = filename.find_last_of('_');
+        if(pos != string::npos){
+            filename = filename.substr(0, pos);
+            __LIBUABE_LOG("filename:%s\n", filename.c_str());
+        }
+        sprintf(pathBuffer, "%s/%s", mods, filename.c_str());
         if(stat(pathBuffer,&modStat)==0){
             if(S_ISDIR(modStat.st_mode)){
                 if(mz_zip_reader_extract_to_mem(zip, i, dataBuffer, DATA_BUFFER_SIZE, 0)){
