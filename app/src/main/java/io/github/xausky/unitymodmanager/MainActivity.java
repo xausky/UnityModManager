@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
             int result = ModUtils.RESULT_STATE_OK;
             ModFragment modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
             HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
-            if (modFragment.needPatch) {
+            if (modFragment.isNeedPatch()) {
                 result = modFragment.patch(homeFragment.apkPath, homeFragment.baseApkPath);
             }
             if (result == ModUtils.RESULT_STATE_OK) {
@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
             dialog.hide();
             ModFragment modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
             if (result == ModUtils.RESULT_STATE_OK) {
-                modFragment.needPatch = false;
+                modFragment.setNeedPatch(false);
             } else if (result == ModUtils.RESULT_STATE_INTERNAL_ERROR) {
                 Toast.makeText(modFragment.getBase(), "安装模组失败", Toast.LENGTH_LONG).show();
             }

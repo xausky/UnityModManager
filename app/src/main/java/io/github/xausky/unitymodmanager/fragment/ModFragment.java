@@ -2,6 +2,7 @@ package io.github.xausky.unitymodmanager.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -37,12 +38,14 @@ import ru.bartwell.exfilepicker.data.ExFilePickerResult;
 
 public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChangeListener {
     private static final int MOD_FILE_PICKER_RESULT = 1;
+    private static final String NEED_PATCH_PREFERENCES_KEY = "NEED_PATCH_PREFERENCES_KEY";
     private View view;
     private RecyclerView recyclerView;
     private ModsAdapter adapter;
-    public boolean needPatch;
+    private boolean needPatch;
     private Context context;
     private File storeFile;
+    private SharedPreferences settingsPreferences;
 
     @Override
     public BaseFragment setBase(Context base) {
@@ -52,9 +55,20 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
                 Toast.makeText(base, R.string.store_mkdir_failed, Toast.LENGTH_LONG).show();
             }
         }
+        this.settingsPreferences = base.getSharedPreferences(SettingFragment.SETTINGS_PREFERENCE_NAME, Context.MODE_PRIVATE);
+        needPatch = settingsPreferences.getBoolean(NEED_PATCH_PREFERENCES_KEY, false);
         adapter = new ModsAdapter(storeFile, base);
         adapter.setListener(this);
         return super.setBase(base);
+    }
+
+    public boolean isNeedPatch() {
+        return needPatch;
+    }
+
+    public void setNeedPatch(boolean needPatch) {
+        this.needPatch = needPatch;
+        settingsPreferences.edit().putBoolean(NEED_PATCH_PREFERENCES_KEY, needPatch).apply();
     }
 
     public int getItemCount(){
@@ -69,11 +83,9 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         this.context = inflater.getContext();
-        if(view == null){
-            view = inflater.inflate(R.layout.mod_fragment, container, false);
-            recyclerView = view.findViewById(R.id.mod_list);
-            adapter.setRecyclerView(recyclerView);
-        }
+        view = inflater.inflate(R.layout.mod_fragment, container, false);
+        recyclerView = view.findViewById(R.id.mod_list);
+        adapter.setRecyclerView(recyclerView);
         adapter.updateSetting();
         return view;
     }

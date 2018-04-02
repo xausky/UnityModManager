@@ -75,7 +75,7 @@ public class ModUtils {
                     return RESULT_STATE_INTERNAL_ERROR;
                 }
                 result += r;
-            } else if(supportImageType.contains(name.substring(name.length() - 4))){
+            } else if(name.length() - 4 > 0 && supportImageType.contains(name.substring(name.length() - 4))){
                 try {
                     FileUtils.copyFile(file, new File(output + "/images/" + System.currentTimeMillis() + "-" + name));
                 } catch (IOException e) {

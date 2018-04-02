@@ -72,7 +72,7 @@ public class SettingFragment extends PreferenceFragmentCompat {
             int result = ModUtils.RESULT_STATE_OK;
             ModFragment modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
             HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
-            if (modFragment.needPatch) {
+            if (modFragment.isNeedPatch()) {
                 result = modFragment.patch(homeFragment.apkPath, homeFragment.baseApkPath);
             }
             if (result == ModUtils.RESULT_STATE_OK) {
@@ -92,7 +92,7 @@ public class SettingFragment extends PreferenceFragmentCompat {
             dialog.hide();
             ModFragment modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
             if (result == ModUtils.RESULT_STATE_OK) {
-                modFragment.needPatch = false;
+                modFragment.setNeedPatch(false);
                 String exportPath = Environment.getExternalStorageDirectory() + "/out.apk";
                 Toast.makeText(modFragment.getBase(), "导出整合包成功=>" + exportPath, Toast.LENGTH_LONG).show();
             } else if (result == RESULT_STATE_INTERNAL_ERROR) {
