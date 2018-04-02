@@ -21,6 +21,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Set;
+import java.util.TreeSet;
 
 import io.github.xausky.unitymodmanager.MainApplication;
 
@@ -31,8 +33,14 @@ import io.github.xausky.unitymodmanager.MainApplication;
 public class ModUtils {
     public static final int RESULT_STATE_OK = 0;
     public static final int RESULT_STATE_INTERNAL_ERROR = -1;
-    public static final int RESULT_STATE_FILE_CONFLICT = -3;
     public static JSONObject map;
+    public static Set<String> supportImageType = new TreeSet<>();
+
+    static {
+        supportImageType.add(".jpg");
+        supportImageType.add(".png");
+        supportImageType.add(".bmp");
+    }
 
     public static int Standardization(File input, File output){
         int result = 0;
@@ -42,8 +50,9 @@ public class ModUtils {
         File[] files = input.listFiles();
         for(File file : files){
             String path = null;
+            String name = file.getName();
             try {
-                path = map.getString(input.getName() + "/" + file.getName());
+                path = map.getString(input.getName() + "/" + name);
                 Log.d(MainApplication.LOG_TAG, "Standardization: " + path);
             } catch (JSONException e) {
                 //ignore
@@ -61,11 +70,17 @@ public class ModUtils {
                     return RESULT_STATE_INTERNAL_ERROR;
                 }
             } else if(file.isDirectory()){
-                int r = Standardization(new File(input + "/" + file.getName()), output);
+                int r = Standardization(new File(input + "/" + name), output);
                 if(r == RESULT_STATE_INTERNAL_ERROR){
                     return RESULT_STATE_INTERNAL_ERROR;
                 }
                 result += r;
+            } else if(supportImageType.contains(name.substring(name.length() - 4))){
+                try {
+                    FileUtils.copyFile(file, new File(output + "/images/" + System.currentTimeMillis() + "-" + name));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
         return result;

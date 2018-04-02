@@ -1,8 +1,11 @@
 package io.github.xausky.unitymodmanager.adapter;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,18 +14,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hzy.libp7zip.P7ZipApi;
+import com.stfalcon.frescoimageviewer.ImageViewer;
 
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -36,6 +44,7 @@ import io.github.xausky.unitymodmanager.utils.ModUtils;
 import io.github.xausky.unitymodmanager.utils.NativeUtils;
 
 import static io.github.xausky.unitymodmanager.utils.NativeUtils.RESULT_STATE_INTERNAL_ERROR;
+import static io.github.xausky.unitymodmanager.utils.NativeUtils.patch;
 
 /**
  * Created by xausky on 18-3-9.
@@ -65,10 +74,12 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
         for (File file : modFiles) {
             if (file.isDirectory()) {
                 String name = file.getName();
+                String path = file.getAbsolutePath();
                 Mod mod = new Mod(name,
                         preferences.getBoolean(name + ":enable", false),
                         preferences.getInt(name + ":order", Integer.MAX_VALUE),
-                        preferences.getInt(name + ":fileCount", -1));
+                        preferences.getInt(name + ":fileCount", -1),
+                        path);
                 if (mod.enable) {
                     ++enableItemCount;
                 }
@@ -159,7 +170,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
             result = ModUtils.Standardization(sourceFile, targetFile);
         }
         if(result >= 0){
-            mods.add(new Mod(name, false, Integer.MAX_VALUE, result));
+            mods.add(new Mod(name, false, Integer.MAX_VALUE, result, targetFile.getAbsolutePath()));
             notifyDataSetChanged();
             if (iterator.hasNext()) {
                 process(path, iterator.next(), iterator, null, true);
@@ -261,6 +272,26 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
                     if (listener != null) {
                         listener.onDataChange();
                     }
+                }
+            }
+        });
+        final File[] images = new File(mod.path + "/images").listFiles();
+        if(images != null && images.length != 0){
+            holder.icon.setImageDrawable(Drawable.createFromPath(images[0].getAbsolutePath()));
+        }
+        holder.icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(images != null && images.length != 0){
+                    List<String> files = new ArrayList<>();
+                    for(File image: images){
+                        files.add(image.toURI().toString());
+                    }
+                    new ImageViewer.Builder<String>(context, files)
+                            .setStartPosition(0)
+                            .show();
+                } else {
+                    Toast.makeText(context, "模组内没有可供预览的图片。", Toast.LENGTH_LONG).show();
                 }
             }
         });

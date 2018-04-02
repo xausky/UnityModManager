@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.flurry.android.FlurryAgent;
 import com.lody.virtual.client.core.VirtualCore;
 
@@ -51,6 +52,7 @@ public class MainApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fresco.initialize(getApplicationContext());
         new FlurryAgent.Builder()
                 .withLogEnabled(true)
                 .build(this, "YS94RJ9WV9NGSFHT8ZJM");

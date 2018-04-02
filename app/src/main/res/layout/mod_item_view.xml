@@ -12,8 +12,12 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
+        android:layout_marginRight="4dp"
+        android:layout_marginEnd="4dp"
+        android:scaleType="centerCrop"
+        android:background="#000000"
         android:contentDescription="@string/client_list_item_icon"
-        android:src="@mipmap/ic_launcher" />
+        android:src="@drawable/ic_mod_icon_default" />
 
     <TextView
         android:id="@+id/mod_list_item_name"
