@@ -4,10 +4,10 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "io.github.xausky.unitymodmanager"
-        minSdkVersion 17
+        minSdkVersion 15
         targetSdkVersion 27
         versionCode 220
-        versionName "2.2.0-beta4"
+        versionName "2.2.0-rc1"
         ndk{
             abiFilters "armeabi-v7a","x86"
         }
