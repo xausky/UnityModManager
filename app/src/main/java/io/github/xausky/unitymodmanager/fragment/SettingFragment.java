@@ -1,29 +1,23 @@
 package io.github.xausky.unitymodmanager.fragment;
 
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.Preference;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.support.annotation.Nullable;
+import android.support.v7.preference.PreferenceFragmentCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
-import com.lody.virtual.client.core.VirtualCore;
-import com.lody.virtual.client.ipc.VActivityManager;
 
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 
-import io.github.xausky.unitymodmanager.MainActivity;
 import io.github.xausky.unitymodmanager.R;
 import io.github.xausky.unitymodmanager.utils.ModUtils;
 
@@ -33,13 +27,12 @@ import static io.github.xausky.unitymodmanager.utils.ModUtils.RESULT_STATE_INTER
  * Created by xausky on 18-3-3.
  */
 
-public class SettingFragment extends PreferenceFragment {
+public class SettingFragment extends PreferenceFragmentCompat {
     public static final String SETTINGS_PREFERENCE_NAME = "settings";
     private ProgressDialog dialog;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         this.getPreferenceManager().setSharedPreferencesName(SETTINGS_PREFERENCE_NAME);
         this.addPreferencesFromResource(R.xml.preferences);
     }
@@ -54,11 +47,11 @@ public class SettingFragment extends PreferenceFragment {
     }
 
     @Override
-    public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+    public boolean onPreferenceTreeClick(android.support.v7.preference.Preference preference) {
         if(preference.getKey().equals("setting_export_apk")){
             new ExportApkTask(dialog).execute();
         }
-        return super.onPreferenceTreeClick(preferenceScreen, preference);
+        return super.onPreferenceTreeClick(preference);
     }
 
     static class ExportApkTask extends AsyncTask<Object, Object, Integer> {

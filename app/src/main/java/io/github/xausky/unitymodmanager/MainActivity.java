@@ -1,13 +1,12 @@
 package io.github.xausky.unitymodmanager;
 
-import android.annotation.SuppressLint;
-import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -35,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
     private int currentNavigation;
     private ProgressDialog dialog;
     private HomeFragment homeFragment;
-    private ModFragment modFragment;
 
 
     @Override
@@ -79,12 +77,11 @@ public class MainActivity extends AppCompatActivity {
         dialog.setMessage(getString(R.string.progress_dialog_message));
         dialog.setCancelable(false);
         homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
-        modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
     }
 
     private void navigation(int item){
         Fragment fragment = BaseFragment.fragment(item);
-        getFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
         if(fragment instanceof BaseFragment){
             actionButton.setVisibility(((BaseFragment)fragment).actionButtonVisibility());
         } else {

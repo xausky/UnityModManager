@@ -1,7 +1,7 @@
 package io.github.xausky.unitymodmanager.fragment;
 
-import android.app.Fragment;
 import android.content.Context;
+import android.support.v4.app.Fragment;
 import android.view.View;
 
 import java.util.Map;
