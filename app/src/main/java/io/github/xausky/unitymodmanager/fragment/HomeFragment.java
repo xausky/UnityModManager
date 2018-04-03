@@ -210,7 +210,9 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 final InstallResult result = VirtualCore.get().installPackage(apkPath, InstallStrategy.UPDATE_IF_EXIST);
                 final String resultString;
                 if(result.isSuccess){
-                    modFragment.setNeedPatch(true);
+                    if(modFragment.getEnableItemCount() > 0){
+                        modFragment.setNeedPatch(true);
+                    }
                     HomeFragment.this.packageName = result.packageName;
                     HomeFragment.this.baseApkPath = apkPath;
                     HomeFragment.this.apkPath = VirtualCore.get().getInstalledAppInfo(HomeFragment.this.packageName, 0).apkPath;
