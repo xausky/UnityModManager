@@ -21,6 +21,8 @@ import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.ipc.VActivityManager;
 import com.lody.virtual.remote.InstalledAppInfo;
 
+import junit.framework.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,9 +117,9 @@ public class AttachesAdapter extends RecyclerView.Adapter<AttachesAdapter.ViewHo
         ViewHolder(View itemView) {
             super(itemView);
             view = itemView;
-            name = itemView.findViewById(R.id.choose_client_dialog_clients_item_name);
-            packageName = itemView.findViewById(R.id.choose_client_dialog_clients_item_package_name);
-            icon = itemView.findViewById(R.id.choose_client_dialog_clients_item_icon);
+            name = (TextView) itemView.findViewById(R.id.choose_client_dialog_clients_item_name);
+            packageName = (TextView) itemView.findViewById(R.id.choose_client_dialog_clients_item_package_name);
+            icon = (ImageView) itemView.findViewById(R.id.choose_client_dialog_clients_item_icon);
 
         }
     }

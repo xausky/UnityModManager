@@ -13,7 +13,6 @@ import android.content.pm.ServiceInfo;
 import android.os.Build;
 import android.os.Process;
 import android.util.DisplayMetrics;
-import android.util.Log;
 
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.os.VUserHandle;

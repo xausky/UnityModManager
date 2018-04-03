@@ -28,7 +28,7 @@ public class ApplicationChooseDialog extends AlertDialog implements DialogInterf
     public ApplicationChooseDialog(Context context, final Fragment fragment, String packageRegex, boolean chooseEnable, boolean launchFilter) {
         super(context);
         View dialogView = LayoutInflater.from(context).inflate(R.layout.choose_client_dialog, (ViewGroup) fragment.getView(), false);
-        ListView listView = dialogView.findViewById(R.id.choose_client_dialog_clients);
+        ListView listView = (ListView) dialogView.findViewById(R.id.choose_client_dialog_clients);
         listView.setAdapter(new ApplicationsAdapter(context, packageRegex, launchFilter));
         this.setTitle("请选择客户端");
         this.setView(dialogView);

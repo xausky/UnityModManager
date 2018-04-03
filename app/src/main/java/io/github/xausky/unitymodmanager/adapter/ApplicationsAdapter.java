@@ -63,9 +63,9 @@ public class ApplicationsAdapter extends BaseAdapter {
         if(view == null){
             view = inflater.inflate(R.layout.application_info_item, viewGroup, false);
             ViewHolder holder = new ViewHolder();
-            holder.name = view.findViewById(R.id.choose_client_dialog_clients_item_name);
-            holder.packageName = view.findViewById(R.id.choose_client_dialog_clients_item_package_name);
-            holder.icon = view.findViewById(R.id.choose_client_dialog_clients_item_icon);
+            holder.name = (TextView) view.findViewById(R.id.choose_client_dialog_clients_item_name);
+            holder.packageName = (TextView) view.findViewById(R.id.choose_client_dialog_clients_item_package_name);
+            holder.icon = (ImageView) view.findViewById(R.id.choose_client_dialog_clients_item_icon);
             view.setTag(holder);
         }
         ViewHolder holder = (ViewHolder)view.getTag();

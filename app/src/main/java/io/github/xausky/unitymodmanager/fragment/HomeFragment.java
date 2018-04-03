@@ -91,12 +91,12 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             attachFragment = (AttachFragment) BaseFragment.fragment(R.id.nav_attach);
             visibilityFragment = (VisibilityFragment) BaseFragment.fragment(R.id.nav_visibility);
             modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
-            summary = view.findViewById(R.id.home_summary);
+            summary = (TextView) view.findViewById(R.id.home_summary);
             va = VirtualCore.get();
-            currentVersion = view.findViewById(R.id.home_current_version);
-            latestVersion = view.findViewById(R.id.home_latest_version);
-            clientState = view.findViewById(R.id.home_client_state);
-            clientStateCardView = view.findViewById(R.id.home_client_state_card_view);
+            currentVersion = (TextView) view.findViewById(R.id.home_current_version);
+            latestVersion = (TextView) view.findViewById(R.id.home_latest_version);
+            clientState = (TextView) view.findViewById(R.id.home_client_state);
+            clientStateCardView = (CardView) view.findViewById(R.id.home_client_state_card_view);
             clientStateCardView.setOnClickListener(this);
             String versionName = "unknown";
             try {

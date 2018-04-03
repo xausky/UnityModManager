@@ -84,7 +84,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         this.context = inflater.getContext();
         view = inflater.inflate(R.layout.mod_fragment, container, false);
-        recyclerView = view.findViewById(R.id.mod_list);
+        recyclerView = (RecyclerView) view.findViewById(R.id.mod_list);
         adapter.setRecyclerView(recyclerView);
         adapter.updateSetting();
         return view;

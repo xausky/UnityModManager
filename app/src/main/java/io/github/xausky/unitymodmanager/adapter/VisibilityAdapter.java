@@ -123,9 +123,9 @@ public class VisibilityAdapter  extends RecyclerView.Adapter<VisibilityAdapter.V
         ViewHolder(View itemView) {
             super(itemView);
             view = itemView;
-            name = itemView.findViewById(R.id.choose_client_dialog_clients_item_name);
-            packageName = itemView.findViewById(R.id.choose_client_dialog_clients_item_package_name);
-            icon = itemView.findViewById(R.id.choose_client_dialog_clients_item_icon);
+            name = (TextView) itemView.findViewById(R.id.choose_client_dialog_clients_item_name);
+            packageName = (TextView) itemView.findViewById(R.id.choose_client_dialog_clients_item_package_name);
+            icon = (ImageView) itemView.findViewById(R.id.choose_client_dialog_clients_item_icon);
 
         }
     }

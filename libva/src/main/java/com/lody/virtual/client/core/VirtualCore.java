@@ -170,6 +170,7 @@ public final class VirtualCore {
         return unHookPackageManager;
     }
 
+
     public void startup(Context context) throws Throwable {
         if (!isStartUp) {
             if (Looper.myLooper() != Looper.getMainLooper()) {

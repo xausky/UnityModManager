@@ -326,10 +326,10 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
 
         public ViewHolder(View itemView) {
             super(itemView);
-            aSwitch = itemView.findViewById(R.id.mod_list_item_switch);
-            icon = itemView.findViewById(R.id.mod_list_item_icon);
-            name = itemView.findViewById(R.id.mod_list_item_name);
-            content = itemView.findViewById(R.id.mod_list_item_content);
+            aSwitch = (Switch) itemView.findViewById(R.id.mod_list_item_switch);
+            icon = (ImageView) itemView.findViewById(R.id.mod_list_item_icon);
+            name = (TextView) itemView.findViewById(R.id.mod_list_item_name);
+            content = (TextView) itemView.findViewById(R.id.mod_list_item_content);
         }
     }
 

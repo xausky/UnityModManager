@@ -55,7 +55,7 @@ _disused static size_t MSSizeOfPushPointer(void *target) {
 }
 
 _disused static size_t MSSizeOfJump(bool blind, uintptr_t target, uintptr_t source = 0) {
-    if (ia32 || (!blind && MSIs32BitOffset(target, source + 5)))
+    if (ia32 || !blind && MSIs32BitOffset(target, source + 5))
         return MSSizeOfSkip();
     else
         return MSSizeOfPushPointer(target) + 1;
@@ -103,7 +103,7 @@ _disused static void MSWriteCall(uint8_t *&current, I$r target) {
     if (target >> 3 != 0)
         MSWrite<uint8_t>(current, 0x40 | (target & 0x08) >> 3);
     MSWrite<uint8_t>(current, 0xff);
-    MSWrite<uint8_t>(current, 0xd0 | (target & 0x07));
+    MSWrite<uint8_t>(current, 0xd0 | target & 0x07);
 }
 
 _disused static void MSWriteCall(uint8_t *&current, uintptr_t target) {
@@ -151,13 +151,13 @@ _disused static void MSWriteJump(uint8_t *&current, I$r target) {
     if (target >> 3 != 0)
         MSWrite<uint8_t>(current, 0x40 | (target & 0x08) >> 3);
     MSWrite<uint8_t>(current, 0xff);
-    MSWrite<uint8_t>(current, 0xe0 | (target & 0x07));
+    MSWrite<uint8_t>(current, 0xe0 | target & 0x07);
 }
 
 _disused static void MSWritePop(uint8_t *&current, uint8_t target) {
     if (target >> 3 != 0)
         MSWrite<uint8_t>(current, 0x40 | (target & 0x08) >> 3);
-    MSWrite<uint8_t>(current, 0x58 | (target & 0x07));
+    MSWrite<uint8_t>(current, 0x58 | target & 0x07);
 }
 
 _disused static size_t MSSizeOfPop(uint8_t target) {
@@ -167,18 +167,18 @@ _disused static size_t MSSizeOfPop(uint8_t target) {
 _disused static void MSWritePush(uint8_t *&current, I$r target) {
     if (target >> 3 != 0)
         MSWrite<uint8_t>(current, 0x40 | (target & 0x08) >> 3);
-    MSWrite<uint8_t>(current, 0x50 | (target & 0x07));
+    MSWrite<uint8_t>(current, 0x50 | target & 0x07);
 }
 
 _disused static void MSWriteAdd(uint8_t *&current, I$r target, uint8_t source) {
     MSWrite<uint8_t>(current, 0x83);
-    MSWrite<uint8_t>(current, 0xc4 | (target & 0x07));
+    MSWrite<uint8_t>(current, 0xc4 | target & 0x07);
     MSWrite<uint8_t>(current, source);
 }
 
 _disused static void MSWriteSet64(uint8_t *&current, I$r target, uintptr_t source) {
     MSWrite<uint8_t>(current, 0x48 | (target & 0x08) >> 3 << 2);
-    MSWrite<uint8_t>(current, 0xb8 | (target & 0x7));
+    MSWrite<uint8_t>(current, 0xb8 | target & 0x7);
     MSWrite<uint64_t>(current, source);
 }
 
@@ -190,7 +190,7 @@ _disused static void MSWriteSet64(uint8_t *&current, I$r target, Type_ *source) 
 _disused static void MSWriteMove64(uint8_t *&current, uint8_t source, uint8_t target) {
     MSWrite<uint8_t>(current, 0x48 | (target & 0x08) >> 3 << 2 | (source & 0x08) >> 3);
     MSWrite<uint8_t>(current, 0x8b);
-    MSWrite<uint8_t>(current, (target & 0x07) << 3 | (source & 0x07));
+    MSWrite<uint8_t>(current, (target & 0x07) << 3 | source & 0x07);
 }
 
 _disused static size_t MSSizeOfMove64() {

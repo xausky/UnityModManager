@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
@@ -49,9 +49,9 @@ public class MainActivity extends AppCompatActivity {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        drawerLayout = findViewById(R.id.dl_main_drawer);
-        navigationView = findViewById(R.id.nv_main_navigation);
-        actionButton = findViewById(R.id.action_button);
+        drawerLayout = (DrawerLayout) findViewById(R.id.dl_main_drawer);
+        navigationView = (NavigationView) findViewById(R.id.nv_main_navigation);
+        actionButton = (FloatingActionButton) findViewById(R.id.action_button);
         actionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

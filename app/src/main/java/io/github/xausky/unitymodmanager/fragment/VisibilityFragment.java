@@ -61,7 +61,7 @@ public class VisibilityFragment extends BaseFragment  implements ApplicationChoo
             context = inflater.getContext();
             dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, false, true);
             dialog.setListener(this);
-            attaches = view.findViewById(R.id.visibility_list);
+            attaches = (RecyclerView) view.findViewById(R.id.visibility_list);
             adapter.setRecyclerView(attaches);
         }
         return view;

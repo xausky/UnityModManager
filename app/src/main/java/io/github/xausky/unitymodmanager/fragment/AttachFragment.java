@@ -63,7 +63,7 @@ public class AttachFragment extends BaseFragment implements ApplicationChooseDia
             progressDialog.setCancelable(false);
             dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, true, true);
             dialog.setListener(this);
-            attaches = view.findViewById(R.id.attach_list);
+            attaches = (RecyclerView) view.findViewById(R.id.attach_list);
             adapter.setRecyclerView(attaches);
         }
         return view;
