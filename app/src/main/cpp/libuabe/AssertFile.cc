@@ -57,22 +57,17 @@ namespace xausky {
         input.ReadData(base, baseSize);
         output.WriteData(base, baseSize);
         delete[] base;
-        printf("baseSize:%lld, tableSize:%d, dataOffset:%d, dataEnd:%d\n", baseSize, tableSize, dataOffset, dataEnd);
         int assetCount = input.ReadInt32();
         output.WriteInt32(assetCount);
         input.AlignStream(4);
-        printf("AlignStreamOutput befor size:%lld\n",output.size());
         output.AlignStreamOutput(4);
-        printf("AlignStreamOutput befor size:%lld\n",output.size());
         patch_t patchs[assetCount];
-        printf("assetCount:%d, %lld\n", assetCount, input.position());
         int64_t patchOffset = dataOffset;
         for (int i = 0; i < assetCount; i++){
             int64_t pathId = input.ReadInt64();
             int32_t offset = input.ReadInt32() + dataOffset;
             int32_t size = input.ReadInt32();
             int32_t index = input.ReadInt32();
-            printf("SRC: pathId:%lld, offset:%d, size:%d\n", pathId, offset, size);
             map<int64_t, BinaryStream*>::iterator it = mods.find(pathId);
             patchs[i].size = size;
             patchs[i].offset = offset;
@@ -93,7 +88,6 @@ namespace xausky {
         }
         int64_t extraOffset = input.position();
         int64_t extraSize = dataOffset - extraOffset;
-        printf("extraSize:%d\n", extraSize);
         char* extra = new char[extraSize];
         input.ReadData(extra, extraSize);
         output.WriteData(extra, extraSize);

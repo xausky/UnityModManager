@@ -4,10 +4,11 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.crashlytics.android.Crashlytics;
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.flurry.android.FlurryAgent;
 import com.lody.virtual.client.core.VirtualCore;
 
+import io.fabric.sdk.android.Fabric;
 import org.json.JSONObject;
 
 import java.io.InputStream;
@@ -52,10 +53,7 @@ public class MainApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
         Fresco.initialize(getApplicationContext());
-        new FlurryAgent.Builder()
-                .withLogEnabled(true)
-                .build(this, "YS94RJ9WV9NGSFHT8ZJM");
-        //这个是我的Flurry的移动分析API Key，如果你fork了我的项目并且准备自己发布请务必修改这个。
     }
 }

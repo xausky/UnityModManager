@@ -22,7 +22,7 @@ import ru.bartwell.exfilepicker.data.ExFilePickerResult;
  */
 
 public class ApplicationChooseDialog extends AlertDialog implements DialogInterface.OnClickListener, AdapterView.OnItemClickListener{
-    private static final int APPLICATION_FILE_PICKER_RESULT = 848848;
+    private static final int APPLICATION_FILE_PICKER_RESULT = 848;
     private Fragment fragment;
     private OnApplicationChooseDialogResultListener listener;
     public ApplicationChooseDialog(Context context, final Fragment fragment, String packageRegex, boolean chooseEnable, boolean launchFilter) {
