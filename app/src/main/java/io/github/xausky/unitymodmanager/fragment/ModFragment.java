@@ -121,7 +121,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
 
     public int patch(String apkPath, String baseApkPath){
         List<Mod> mods = adapter.getMods();
-        File fusionFile = new File(context.getCacheDir().getAbsolutePath() + "/fusion");
+        File fusionFile = new File(getBase().getCacheDir().getAbsolutePath() + "/fusion");
         try {
             FileUtils.deleteDirectory(fusionFile);
         } catch (IOException e) {
