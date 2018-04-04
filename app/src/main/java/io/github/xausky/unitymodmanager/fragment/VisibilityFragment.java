@@ -55,15 +55,13 @@ public class VisibilityFragment extends BaseFragment  implements ApplicationChoo
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        if(view == null){
-            view = inflater.inflate(R.layout.visibility_fragment, container, false);
-            homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
-            context = inflater.getContext();
-            dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, false, true);
-            dialog.setListener(this);
-            attaches = (RecyclerView) view.findViewById(R.id.visibility_list);
-            adapter.setRecyclerView(attaches);
-        }
+        view = inflater.inflate(R.layout.visibility_fragment, container, false);
+        homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
+        context = inflater.getContext();
+        dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, false, true);
+        dialog.setListener(this);
+        attaches = (RecyclerView) view.findViewById(R.id.visibility_list);
+        adapter.setRecyclerView(attaches);
         return view;
     }
 

@@ -54,18 +54,16 @@ public class AttachFragment extends BaseFragment implements ApplicationChooseDia
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        if(view == null){
-            view = inflater.inflate(R.layout.attach_fragment, container, false);
-            context = inflater.getContext();
-            progressDialog = new ProgressDialog(context);
-            progressDialog.setTitle(R.string.progress_dialog_title);
-            progressDialog.setMessage(getString(R.string.progress_dialog_message));
-            progressDialog.setCancelable(false);
-            dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, true, true);
-            dialog.setListener(this);
-            attaches = (RecyclerView) view.findViewById(R.id.attach_list);
-            adapter.setRecyclerView(attaches);
-        }
+        view = inflater.inflate(R.layout.attach_fragment, container, false);
+        context = inflater.getContext();
+        progressDialog = new ProgressDialog(context);
+        progressDialog.setTitle(R.string.progress_dialog_title);
+        progressDialog.setMessage(getString(R.string.progress_dialog_message));
+        progressDialog.setCancelable(false);
+        dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, true, true);
+        dialog.setListener(this);
+        attaches = (RecyclerView) view.findViewById(R.id.attach_list);
+        adapter.setRecyclerView(attaches);
         return view;
     }
 

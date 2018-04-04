@@ -28,7 +28,7 @@ namespace xausky {
                     Utils::FreeBundlePatch(patch);
                     int len = patchedBundle.size();
                     patchedBundle.ReadData(dataBuffer, len);
-                    mz_zip_writer_add_mem(out, entrityStat->m_filename, dataBuffer, len, MZ_DEFAULT_COMPRESSION);
+                    mz_zip_writer_add_mem(out, entrityStat->m_filename, dataBuffer, len, MZ_NO_COMPRESSION);
                     __LIBUABE_LOG("bundle patch: %s\n", entrityStat->m_filename);
                     return;
                 } else {
@@ -36,7 +36,7 @@ namespace xausky {
                 }
             }
             if(S_ISREG(modStat.st_mode)){
-                mz_zip_writer_add_file(out, entrityStat->m_filename, pathBuffer, NULL, 0, MZ_DEFAULT_COMPRESSION);
+                mz_zip_writer_add_file(out, entrityStat->m_filename, pathBuffer, NULL, 0, MZ_NO_COMPRESSION);
                 __LIBUABE_LOG("copy patch: %s\n", entrityStat->m_filename);
                 return;
             }

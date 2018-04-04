@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'io.fabric.tools:gradle:1.25.2'
     }
 }
 apply plugin: 'com.android.application'
@@ -22,7 +22,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 220
-        versionName "2.2.0-rc4"
+        versionName "2.2.0-rc5"
         ndk{
             abiFilters "armeabi-v7a","x86"
         }
