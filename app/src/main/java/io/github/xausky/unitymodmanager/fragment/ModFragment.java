@@ -49,7 +49,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
 
     @Override
     public BaseFragment setBase(Context base) {
-        storeFile = new File(base.getExternalFilesDir("mods").getAbsolutePath());
+        storeFile = base.getExternalFilesDir("mods");
         if(!storeFile.exists()){
             if(storeFile.mkdir()){
                 Toast.makeText(base, R.string.store_mkdir_failed, Toast.LENGTH_LONG).show();

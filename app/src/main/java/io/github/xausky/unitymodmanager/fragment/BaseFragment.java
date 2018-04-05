@@ -39,10 +39,10 @@ public abstract class BaseFragment extends Fragment {
     public static void initialize(Context base){
         if (map == null) {
             map = new TreeMap<>();
+            map.put(R.id.nav_mod, new ModFragment().setBase(base));
             map.put(R.id.nav_home, new HomeFragment().setBase(base));
             map.put(R.id.nav_info, new InfoFragment().setBase(base));
             map.put(R.id.nav_attach, new AttachFragment().setBase(base));
-            map.put(R.id.nav_mod, new ModFragment().setBase(base));
             map.put(R.id.nav_visibility, new VisibilityFragment().setBase(base));
             map.put(R.id.nav_setting, new SettingFragment());
         }

@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.github.xausky.unitymodmanager">
-
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <application
-        android:fullBackupContent="false"
         android:name=".MainApplication"
-        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
@@ -23,7 +22,8 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="0b5f5d8b7175354de10b85bb209dee947ff08cf6" />
+        <meta-data
+            android:name="android.max_aspect"
+            android:value="2.1" />
     </application>
-
-    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>

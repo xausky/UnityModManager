@@ -1,5 +1,6 @@
 package io.github.xausky.unitymodmanager.adapter;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -71,6 +72,11 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
         this.settingPreferences = context.getSharedPreferences(SettingFragment.SETTINGS_PREFERENCE_NAME, Context.MODE_PRIVATE);
         this.enableItemCount = 0;
         File[] modFiles = storage.listFiles();
+        if(modFiles == null){
+            Toast.makeText(context, "应用没有读写手机存储权限，请到手机权限管理界面给予，否则无法运行。", Toast.LENGTH_LONG).show();
+            ((Activity)context).finish();
+            return;
+        }
         for (File file : modFiles) {
             if (file.isDirectory()) {
                 String name = file.getName();
