@@ -51,7 +51,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
     public BaseFragment setBase(Context base) {
         storeFile = base.getExternalFilesDir("mods");
         if(!storeFile.exists()){
-            if(storeFile.mkdir()){
+            if(!storeFile.mkdir()){
                 Toast.makeText(base, R.string.store_mkdir_failed, Toast.LENGTH_LONG).show();
             }
         }

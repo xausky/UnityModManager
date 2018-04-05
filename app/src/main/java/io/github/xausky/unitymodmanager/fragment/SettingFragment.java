@@ -49,7 +49,12 @@ public class SettingFragment extends PreferenceFragmentCompat {
     @Override
     public boolean onPreferenceTreeClick(android.support.v7.preference.Preference preference) {
         if(preference.getKey().equals("setting_export_apk")){
-            new ExportApkTask(dialog).execute();
+            HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
+            if(homeFragment.apkPath == null || homeFragment.baseApkPath == null || !new File(homeFragment.baseApkPath).exists()){
+                Toast.makeText(this.getContext(), "请先到主页安装客户端，并且保证安装源不被卸载或者删除。", Toast.LENGTH_LONG).show();
+            } else {
+                new ExportApkTask(dialog).execute();
+            }
         }
         return super.onPreferenceTreeClick(preference);
     }

@@ -25,6 +25,8 @@ import android.widget.Toast;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.ipc.VActivityManager;
 
+import java.io.File;
+
 import io.github.xausky.unitymodmanager.fragment.BaseFragment;
 import io.github.xausky.unitymodmanager.fragment.HomeFragment;
 import io.github.xausky.unitymodmanager.fragment.ModFragment;
@@ -100,9 +102,8 @@ public class MainActivity extends AppCompatActivity {
                 drawerLayout.openDrawer(GravityCompat.START);
                 break;
             case R.id.menu_launch_game:
-                boolean isInstall = VirtualCore.get().isAppInstalled(homeFragment.packageName);
-                if(!isInstall){
-                    Snackbar.make(actionButton, "客户端未安装，请先到主页安装客户端。", Snackbar.LENGTH_LONG).show();
+                if(homeFragment.apkPath == null || homeFragment.baseApkPath == null || !new File(homeFragment.baseApkPath).exists()){
+                    Toast.makeText(this, "请先到主页安装客户端，并且保证安装源不被卸载或者删除。", Toast.LENGTH_LONG).show();
                     break;
                 }
                 new PatchApkTask(dialog).execute();
