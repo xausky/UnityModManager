@@ -44,6 +44,8 @@ namespace xausky {
         static uint32_t SwapByteOrder(uint32_t v);
         static uint64_t SwapByteOrder(uint64_t v);
 
+        int32_t classId;
+
         private:
         void init(iostream* stream, bool bigEndian);
         int16_t AdjustByteOrder(int16_t v);

@@ -1,4 +1,5 @@
 #include "Utils.hh"
+#include "LogUtils.hh"
 #include <iostream>
 #include <dirent.h>
 #include <sys/stat.h>
@@ -37,8 +38,15 @@ namespace xausky {
             size_t first = file.find_first_of('-');
             size_t last = file.find_last_of('-');
             string name = file.substr(first + 1, last - first -1);
+            string prefix = file.substr(0, first);
             string postfix = file.substr(last + 1, file.size() - last);
             int64_t pathId;
+            int32_t classId;
+            if(sscanf(prefix.c_str(),"+%X", &classId)!=1){
+                classId = -1;
+            } else {
+                __LIBUABE_DEBUG("attaches : %s, %ld", file.c_str(), classId);
+            }
             sscanf(postfix.c_str(), "%llu.dat", &pathId);
             map<string, map<int64_t, BinaryStream*>*>::iterator iterator = patch->find(name);
             map<int64_t, BinaryStream*>* mod;
@@ -48,7 +56,9 @@ namespace xausky {
             } else {
                 mod = iterator->second;
             }
-            (*mod)[pathId] = new BinaryStream(path + "/" + file, true);
+            BinaryStream* stream = new BinaryStream(path + "/" + file, true);
+            stream->classId = classId;
+            (*mod)[pathId] = stream;
         }
         return patch;
     }
@@ -61,15 +71,12 @@ namespace xausky {
             map<int64_t, BinaryStream*>::iterator patchiterator = patch->begin();
             while(patchiterator != patch->end()){
                 delete patchiterator->second;
-                printf("delete patchiterator second done.\n");
                 ++patchiterator;
             }
             }
             delete patch;
-            printf("delete patch done.\n");
             ++it;
         }
         delete mods;
-        printf("delete mods done.\n");
     }
 }

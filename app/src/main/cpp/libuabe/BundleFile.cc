@@ -139,7 +139,6 @@ namespace xausky {
     void BundleFile::patch(map<string, map<int64_t, BinaryStream*>*> &mods){
         for (std::list<MemoryFile*>::iterator it = files.begin(); it != files.end(); it++){
             MemoryFile* file = (*it);
-            printf("BundleFile::patch: %s\n", file->name.c_str());
             map<string, map<int64_t, BinaryStream*>*>::iterator modIterator = mods.find(file->name);
             map<int64_t, BinaryStream*>* mod = nullptr;
             if(modIterator != mods.end()){
@@ -151,7 +150,6 @@ namespace xausky {
                 delete file->stream;
                 file->stream = output;
             }
-            printf("BundleFile::patch: %s done\n", file->name.c_str());
         }
     }
 

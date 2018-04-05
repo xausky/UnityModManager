@@ -3,6 +3,8 @@
 #include "BinaryStream.hh"
 #include "BundleFile.hh"
 #include "Utils.hh"
+#include "LogUtils.hh"
+
 namespace xausky {
     char pathBuffer[PATH_BUFFER_SIZE];
     char dataBuffer[DATA_BUFFER_SIZE];
@@ -12,7 +14,6 @@ namespace xausky {
         size_t pos = filename.find_last_of('_');
         if(pos != string::npos){
             filename = filename.substr(0, pos);
-            __LIBUABE_LOG("filename:%s\n", filename.c_str());
         }
         sprintf(pathBuffer, "%s/%s", mods, filename.c_str());
         if(stat(pathBuffer,&modStat)==0){
