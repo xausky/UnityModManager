@@ -19,6 +19,7 @@
 - [x] bundle文件细粒度的资源修改
 - [x] rar,7z模组格式的支持
 - [x] 模组预览图片的支持
+- [x] 往bundle文件里面添加资源文件的支持
 - [ ] 外部目录模组和自动修改监控功能（主要提供模组制作者使用）
 
 ### [使用指引](https://github.com/xausky/UnityModManager/wiki/%E4%B8%BB%E9%A1%B5)
