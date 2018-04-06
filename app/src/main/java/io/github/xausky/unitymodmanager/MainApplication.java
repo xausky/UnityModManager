@@ -23,11 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import io.github.xausky.unitymodmanager.adapter.VisibilityAdapter;
-import io.github.xausky.unitymodmanager.delegate.MyAppRequestListener;
-import io.github.xausky.unitymodmanager.delegate.MyComponentDelegate;
-import io.github.xausky.unitymodmanager.delegate.MyPhoneInfoDelegate;
-import io.github.xausky.unitymodmanager.delegate.MyTaskDescriptionDelegate;
-import io.github.xausky.unitymodmanager.fragment.BaseFragment;
 import io.github.xausky.unitymodmanager.utils.ModUtils;
 
 /**
