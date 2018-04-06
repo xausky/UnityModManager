@@ -40,7 +40,7 @@
     <string name="attach_delete_success">删除附加组件成功</string>
     <string name="visibility_delete_success">移除可见性成功</string>
     <string name="banner_content_description">Unity</string>
-    <string name="nav_visibility">外部应用可见性</string>
+    <string name="nav_visibility">应用可见性</string>
     <string name="mod_file_delete_failed">警告，模组文件删除失败：</string>
     <string name="mod_delete_confirm">确定删除模组：%s?</string>
     <string name="store_mkdir_failed">创建目录失败，请确认赋予应用外部存储读写权限。</string>

@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 navigation(item.getItemId());
                 item.setChecked(true);
+                MainActivity.this.setTitle(getString(R.string.app_name) + "-" + item.getTitle());
                 return true;
             }
         });
@@ -81,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
         dialog.setMessage(getString(R.string.progress_dialog_message));
         dialog.setCancelable(false);
         homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
+        MainActivity.this.setTitle(getString(R.string.app_name) + "-" + getString(R.string.nav_home));
     }
 
     private void navigation(int item){
