@@ -5,6 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageParser;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.sip.SipRegistrationListener;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -40,6 +45,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import io.github.xausky.unitymodmanager.MainApplication;
 import io.github.xausky.unitymodmanager.R;
+import io.github.xausky.unitymodmanager.ShortcutActivity;
 import io.github.xausky.unitymodmanager.dialog.ApplicationChooseDialog;
 
 /**
@@ -215,7 +221,8 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                     }
                     HomeFragment.this.packageName = result.packageName;
                     HomeFragment.this.baseApkPath = apkPath;
-                    HomeFragment.this.apkPath = VirtualCore.get().getInstalledAppInfo(HomeFragment.this.packageName, 0).apkPath;
+                    InstalledAppInfo info = VirtualCore.get().getInstalledAppInfo(HomeFragment.this.packageName, 0);
+                    HomeFragment.this.apkPath = info.apkPath;
                     boolean commitResult = settings.edit()
                             .putString(PACKAGE_PREFERENCE_KEY, HomeFragment.this.packageName)
                             .putString(BASE_APK_PATH_PREFERENCE_KEY, HomeFragment.this.baseApkPath)
@@ -225,6 +232,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                     } else {
                         resultString = "Success";
                     }
+                    crateShortcut(info);
                 } else {
                     resultString = result.error;
                 }
@@ -238,6 +246,20 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 });
             }
         }.start();
+    }
+
+    private void crateShortcut(InstalledAppInfo info){
+        PackageManager manager = va.getPackageManager();
+        Intent shortcut = new Intent("com.android.launcher.action.INSTALL_SHORTCUT");
+        String name = manager.getApplicationLabel(info.getApplicationInfo(0)) + "[模组管理器]";
+        shortcut.putExtra(Intent.EXTRA_SHORTCUT_NAME, name);
+        BitmapDrawable icon = (BitmapDrawable)manager.getApplicationIcon(info.getApplicationInfo(0));
+        shortcut.putExtra(Intent.EXTRA_SHORTCUT_ICON, icon.getBitmap());
+        Intent launcherIntent = new Intent(Intent.ACTION_MAIN);
+        launcherIntent.setClass(context, ShortcutActivity.class);
+        launcherIntent.putExtra("io.github.xausky.unitymodmanager.launchPackage", info.packageName);
+        shortcut.putExtra(Intent.EXTRA_SHORTCUT_INTENT, launcherIntent);
+        context.sendBroadcast(shortcut);
     }
 
     @Override

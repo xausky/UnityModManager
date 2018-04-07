@@ -3,6 +3,7 @@ package io.github.xausky.unitymodmanager;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -25,8 +26,14 @@ import android.widget.Toast;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.ipc.VActivityManager;
 
-import java.io.File;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
+import io.github.xausky.unitymodmanager.adapter.VisibilityAdapter;
 import io.github.xausky.unitymodmanager.fragment.BaseFragment;
 import io.github.xausky.unitymodmanager.fragment.HomeFragment;
 import io.github.xausky.unitymodmanager.fragment.ModFragment;
@@ -45,6 +52,29 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        SharedPreferences preferences = this.getSharedPreferences("default", MODE_PRIVATE);
+        SharedPreferences visibilityPreferences = this.getSharedPreferences(VisibilityAdapter.VISIBILITY_SHARED_PREFERENCES_KEY, MODE_PRIVATE);
+        if(preferences.getBoolean("first", true)){
+            //微信和支付宝默认可见（用于氪金）
+            visibilityPreferences.edit()
+                    .putBoolean("com.eg.android.AlipayGphone", true)
+                    .putBoolean("com.tencent.mm", true).apply();
+            preferences.edit().putBoolean("first", false).apply();
+        }
+        InputStream mapInputStream = null;
+        try {
+            mapInputStream = this.getAssets().open("map.json");
+            byte[] bytes = new byte[mapInputStream.available()];
+            if(mapInputStream.read(bytes) == -1){
+                throw new IOException("map.json read failed.");
+            }
+            String json = new String(bytes);
+            ModUtils.map = new JSONObject(json);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         BaseFragment.initialize(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
