@@ -151,7 +151,9 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                                     data.setDownloadUrl(latestRelease.getJSONArray("assets").getJSONObject(0).getString("browser_download_url"));
                                     return data;
                                 } else {
-                                    HomeFragment.this.latestVersion.setCompoundDrawables(context.getResources().getDrawable(R.drawable.ic_check_circle), null, null, null);
+                                    Drawable check = context.getResources().getDrawable(R.drawable.ic_check_circle);
+                                    check.setBounds(0, 0, check.getMinimumWidth(), check.getMinimumHeight());
+                                    HomeFragment.this.latestVersion.setCompoundDrawables(check, null, null, null);
                                 }
                             }
                         } catch (JSONException e) {
