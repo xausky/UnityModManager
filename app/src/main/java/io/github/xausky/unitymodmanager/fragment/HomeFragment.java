@@ -63,6 +63,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     private TextView summary;
     private TextView clientState;
     private TextView currentVersion;
+    private String currentVersionString;
     private TextView latestVersion;
     private CardView clientStateCardView;
     private AttachFragment attachFragment;
@@ -104,13 +105,13 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             clientState = (TextView) view.findViewById(R.id.home_client_state);
             clientStateCardView = (CardView) view.findViewById(R.id.home_client_state_card_view);
             clientStateCardView.setOnClickListener(this);
-            String versionName = "unknown";
+            currentVersionString = "unknown";
             try {
-                versionName = "v" + context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+                currentVersionString = "v" + context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
-            currentVersion.setText(String.format(getText(R.string.home_current_version).toString(), versionName));
+            currentVersion.setText(String.format(getText(R.string.home_current_version).toString(), currentVersionString));
             checkVersion();
         }
         clientUpdate();
@@ -145,11 +146,10 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                                         HomeFragment.this.latestVersion.setText(textViewString);
                                     }
                                 });
-                                String currentVersion = HomeFragment.this.currentVersion.getText().toString();
-                                if(currentVersion.indexOf('-') > 0){
+                                if(currentVersionString.indexOf('-') > 0){
                                     return null;
                                 }
-                                if(!HomeFragment.this.currentVersion.getText().equals(latestVersion)){
+                                if(!currentVersionString.equals(latestVersion)){
                                     UIData data = UIData.create();
                                     data.setTitle("新版本发布:" + latestVersion);
                                     data.setContent("更新日志：\n" + latestRelease.getString("body") + "\n\n若更新失败可到B站找最新下载地址自行更新。");
