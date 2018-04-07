@@ -140,12 +140,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                             if(latestRelease != null){
                                 String latestVersion = latestRelease.getString("tag_name");
                                 final String textViewString = String.format(context.getString(R.string.home_latest_version), latestVersion);
-                                HomeFragment.this.latestVersion.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        HomeFragment.this.latestVersion.setText(textViewString);
-                                    }
-                                });
+                                HomeFragment.this.latestVersion.setText(textViewString);
                                 if(currentVersionString.indexOf('-') > 0){
                                     return null;
                                 }
@@ -155,6 +150,8 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                                     data.setContent("更新日志：\n" + latestRelease.getString("body") + "\n\n若更新失败可到B站找最新下载地址自行更新。");
                                     data.setDownloadUrl(latestRelease.getJSONArray("assets").getJSONObject(0).getString("browser_download_url"));
                                     return data;
+                                } else {
+                                    HomeFragment.this.latestVersion.setCompoundDrawables(context.getResources().getDrawable(R.drawable.ic_check_circle), null, null, null);
                                 }
                             }
                         } catch (JSONException e) {
