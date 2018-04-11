@@ -284,6 +284,8 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
         final File[] images = new File(mod.path + "/images").listFiles();
         if(images != null && images.length != 0){
             holder.icon.setImageDrawable(Drawable.createFromPath(images[0].getAbsolutePath()));
+        } else {
+            holder.icon.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_mod_icon_default));
         }
         holder.icon.setOnClickListener(new View.OnClickListener() {
             @Override
