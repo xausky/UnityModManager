@@ -6,11 +6,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.os.FileObserver;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,15 +30,22 @@ import com.hzy.libp7zip.P7ZipApi;
 import com.stfalcon.frescoimageviewer.ImageViewer;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.monitor.FileAlterationListener;
+import org.apache.commons.io.monitor.FileAlterationMonitor;
+import org.apache.commons.io.monitor.FileAlterationObserver;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+import io.github.xausky.unitymodmanager.MainApplication;
 import io.github.xausky.unitymodmanager.R;
 import io.github.xausky.unitymodmanager.dialog.ConfirmDialog;
 import io.github.xausky.unitymodmanager.dialog.PasswordDialog;
@@ -51,7 +61,7 @@ import static io.github.xausky.unitymodmanager.utils.NativeUtils.patch;
  * Created by xausky on 18-3-9.
  */
 
-public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> implements DialogInterface.OnClickListener {
+public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> implements DialogInterface.OnClickListener, FileAlterationListener {
     public static final String MODS_SHARED_PREFERENCES_KEY = "mods";
 
     private List<Mod> mods = new ArrayList<>();
@@ -59,15 +69,20 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
     private SharedPreferences settingPreferences;
     private Context context;
     private File storage;
+    private File externalCache;
     private OnDataChangeListener listener;
     private ConfirmDialog dialog;
     private int operationPosition;
     private int enableItemCount;
     private String defaultPassword;
     private PasswordDialog passwordDialog;
+    private FileAlterationMonitor monitor = new FileAlterationMonitor();
+    private Map<String, FileAlterationObserver> observers = new HashMap<>();
+    private long lastExternalChangeTime = -1;
 
-    public ModsAdapter(File storage, Context context) {
+    public ModsAdapter(File storage, File externalCache, Context context) {
         this.storage = storage;
+        this.externalCache = externalCache;
         this.preferences = context.getSharedPreferences(MODS_SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
         this.settingPreferences = context.getSharedPreferences(SettingFragment.SETTINGS_PREFERENCE_NAME, Context.MODE_PRIVATE);
         this.enableItemCount = 0;
@@ -78,22 +93,39 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
             return;
         }
         for (File file : modFiles) {
-            if (file.isDirectory()) {
-                String name = file.getName();
-                String path = file.getAbsolutePath();
-                Mod mod = new Mod(name,
-                        preferences.getBoolean(name + ":enable", false),
-                        preferences.getInt(name + ":order", Integer.MAX_VALUE),
-                        preferences.getInt(name + ":fileCount", -1),
-                        path);
-                if (mod.enable) {
-                    ++enableItemCount;
+            String name = file.getName();
+            String path = file.getAbsolutePath();
+            Mod mod = new Mod(name,
+                    preferences.getBoolean(name + ":enable", false),
+                    preferences.getInt(name + ":order", Integer.MAX_VALUE),
+                    preferences.getInt(name + ":fileCount", -1),
+                    path);
+            if (mod.enable) {
+                ++enableItemCount;
+                if(file.isFile()){
+                    try {
+                        String externalPath = FileUtils.readFileToString(file);
+                        FileAlterationObserver observer = new FileAlterationObserver(externalPath);
+                        observer.addListener(ModsAdapter.this);
+                        observers.put(mod.name,observer);
+                        monitor.addObserver(observer);
+                        Toast.makeText(context, "外部模组监视启动：" + mod.name, Toast.LENGTH_LONG).show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-                mods.add(mod);
             }
+            mods.add(mod);
         }
         Collections.sort(mods);
         updateSetting();
+        try {
+            monitor.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void updateSetting(){
@@ -253,6 +285,31 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
         process(path, iterator.next(), iterator, null, true);
     }
 
+    public void addExternalMod(String path, List<String> names) {
+        String name = names.get(0);
+        File targetFile = new File(storage.getAbsolutePath() + "/" + name);
+        File cacheFile = new File(externalCache.getAbsolutePath() + "/" + name);
+        File sourceFile = new File(path + name);
+        if (targetFile.exists()) {
+            Toast.makeText(context, String.format(context.getString(R.string.import_mod_exists), name), Toast.LENGTH_LONG).show();
+        }
+        if(cacheFile.exists()){
+            try {
+                FileUtils.deleteDirectory(cacheFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            FileUtils.write(targetFile, sourceFile.getAbsolutePath());
+            int result = ModUtils.Standardization(sourceFile, cacheFile);
+            mods.add(new Mod(name, false, Integer.MAX_VALUE, result, targetFile.getAbsolutePath()));
+            notifyDataSetChanged();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void setListener(OnDataChangeListener listener) {
         this.listener = listener;
     }
@@ -266,6 +323,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         final Mod mod = mods.get(position);
+        final File file = new File(mod.path);
         holder.name.setText(mod.name);
         holder.content.setText(String.format(context.getString(R.string.mod_list_item_content), mod.fileCount));
         holder.aSwitch.setChecked(mod.enable);
@@ -278,31 +336,59 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
                     if (listener != null) {
                         listener.onDataChange();
                     }
-                }
-            }
-        });
-        final File[] images = new File(mod.path + "/images").listFiles();
-        if(images != null && images.length != 0){
-            holder.icon.setImageDrawable(Drawable.createFromPath(images[0].getAbsolutePath()));
-        } else {
-            holder.icon.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_mod_icon_default));
-        }
-        holder.icon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(images != null && images.length != 0){
-                    List<String> files = new ArrayList<>();
-                    for(File image: images){
-                        files.add(image.toURI().toString());
+                    if(file.isFile()){
+                        if(mod.enable){
+                            try {
+                                String externalPath = FileUtils.readFileToString(file);
+                                FileAlterationObserver observer = new FileAlterationObserver(externalPath);
+                                observer.addListener(ModsAdapter.this);
+                                observers.put(mod.name,observer);
+                                monitor.addObserver(observer);
+                                Toast.makeText(context, "外部模组监视启动：" + mod.name, Toast.LENGTH_LONG).show();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            FileAlterationObserver observer = observers.get(mod.name);
+                            if(observer != null){
+                                monitor.removeObserver(observer);
+                                observers.remove(mod.name);
+                            }
+                            Toast.makeText(context, "外部模组监视关闭：" + mod.name, Toast.LENGTH_LONG).show();
+                        }
                     }
-                    new ImageViewer.Builder<String>(context, files)
-                            .setStartPosition(0)
-                            .show();
-                } else {
-                    Toast.makeText(context, "模组内没有可供预览的图片。", Toast.LENGTH_LONG).show();
                 }
             }
         });
+        if(file.isDirectory()){
+            final File[] images = new File(mod.path + "/images").listFiles();
+            if(images != null && images.length != 0){
+                holder.icon.setImageDrawable(Drawable.createFromPath(images[0].getAbsolutePath()));
+            } else {
+                holder.icon.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_mod_icon_default));
+            }
+            holder.icon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(images != null && images.length != 0){
+                        List<String> files = new ArrayList<>();
+                        for(File image: images){
+                            files.add(image.toURI().toString());
+                        }
+                        new ImageViewer.Builder<String>(context, files)
+                                .setStartPosition(0)
+                                .show();
+                    } else {
+                        Toast.makeText(context, "模组内没有可供预览的图片。", Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+        } else {
+            holder.icon.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_folder_special));
+            holder.icon.setOnClickListener(null);
+        }
     }
 
     @Override
@@ -314,8 +400,21 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
     public void onClick(DialogInterface dialog, int which) {
         if (which == DialogInterface.BUTTON_POSITIVE) {
             Mod mod = mods.get(operationPosition);
+            File targetFile = new File(storage.getAbsolutePath() + "/" + mod.name);
             try {
-                FileUtils.deleteDirectory(new File(storage.getAbsolutePath() + "/" + mod.name));
+                if(targetFile.isDirectory()){
+                    FileUtils.deleteDirectory(targetFile);
+                } else {
+                    FileUtils.forceDelete(targetFile);
+                    if(mod.enable){
+                        FileAlterationObserver observer = observers.get(mod.name);
+                        if(observer != null){
+                            monitor.removeObserver(observer);
+                            observers.remove(mod.name);
+                        }
+                        Toast.makeText(context, "外部模组监视关闭：" + mod.name, Toast.LENGTH_LONG).show();
+                    }
+                }
                 mods.remove(mod);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -323,6 +422,54 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
             }
         }
         ModsAdapter.this.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onStart(FileAlterationObserver fileAlterationObserver) {
+
+    }
+
+    @Override
+    public void onDirectoryCreate(File file) {
+
+    }
+
+    @Override
+    public void onDirectoryChange(File file) {
+
+    }
+
+    @Override
+    public void onDirectoryDelete(File file) {
+
+    }
+
+    @Override
+    public void onFileCreate(File file) {
+        long current = System.currentTimeMillis();
+        if(current - lastExternalChangeTime > 3000){
+            listener.onExternalChange();
+        }
+        lastExternalChangeTime = current;
+    }
+
+    @Override
+    public void onFileChange(File file) {
+        long current = System.currentTimeMillis();
+        if(current - lastExternalChangeTime > 3000){
+            listener.onExternalChange();
+        }
+        lastExternalChangeTime = current;
+    }
+
+    @Override
+    public void onFileDelete(File file) {
+
+    }
+
+    @Override
+    public void onStop(FileAlterationObserver fileAlterationObserver) {
+
     }
 
 
@@ -382,6 +529,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
 
     public interface OnDataChangeListener {
         void onDataChange();
+        void onExternalChange();
     }
 
 }

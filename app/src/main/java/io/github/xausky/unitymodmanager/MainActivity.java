@@ -93,8 +93,20 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     fragment.OnActionButtonClick();
                 }catch (UnsupportedOperationException e){
-                    Snackbar.make(view, "不支持的操作", Snackbar.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, "不支持的操作", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+        actionButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                BaseFragment fragment = (BaseFragment)BaseFragment.fragment(currentNavigation);
+                try {
+                    fragment.OnActionButtonLongClick();
+                }catch (UnsupportedOperationException e){
+                    Toast.makeText(MainActivity.this, "不支持的操作", Toast.LENGTH_SHORT).show();
+                }
+                return true;
             }
         });
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -134,14 +146,18 @@ public class MainActivity extends AppCompatActivity {
                 drawerLayout.openDrawer(GravityCompat.START);
                 break;
             case R.id.menu_launch_game:
-                if(homeFragment.apkPath == null || homeFragment.baseApkPath == null || !new File(homeFragment.baseApkPath).exists()){
-                    Toast.makeText(this, "请先到主页安装客户端，并且保证安装源不被卸载或者删除。", Toast.LENGTH_LONG).show();
-                    break;
-                }
-                new PatchApkTask(dialog).execute();
+                launch();
                 break;
         }
         return true;
+    }
+
+    public void launch(){
+        if(homeFragment.apkPath == null || homeFragment.baseApkPath == null || !new File(homeFragment.baseApkPath).exists()){
+            Toast.makeText(this, "请先到主页安装客户端，并且保证安装源不被卸载或者删除。", Toast.LENGTH_LONG).show();
+        } else {
+            new PatchApkTask(dialog).execute();
+        }
     }
 
     @Override
