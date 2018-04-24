@@ -49,6 +49,8 @@
         android:layout_toLeftOf="@+id/mod_list_item_switch"
         android:layout_toRightOf="@+id/mod_list_item_icon"
         android:layout_toStartOf="@+id/mod_list_item_switch"
+        android:drawableStart="@drawable/ic_file"
+        android:drawableLeft="@drawable/ic_file"
         android:gravity="center_vertical"
         android:text="@android:string/unknownName"
         android:textSize="12sp" />
