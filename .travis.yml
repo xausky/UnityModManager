@@ -8,7 +8,7 @@ before_script:
 - export ANDROID_NDK_HOME="$PWD/android-ndk-r16b"
 android:
   components:
-  - build-tools-26.0.2
+  - build-tools-27.0.3
   - android-27
 script:
 - echo apiSecret=$FABRIC_APP_SECRET > app/fabric.properties
