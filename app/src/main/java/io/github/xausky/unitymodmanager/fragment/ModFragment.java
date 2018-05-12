@@ -112,6 +112,10 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
 
     @Override
     public void OnActionButtonClick() {
+        if(ModUtils.map == null){
+            Toast.makeText(context, "请先安装客户端以生成索引。", Toast.LENGTH_LONG).show();
+            return;
+        }
         ExFilePicker filePicker = new ExFilePicker();
         filePicker.setShowOnlyExtensions("zip", "rar", "7z");
         filePicker.setCanChooseOnlyOneItem(false);
@@ -120,6 +124,10 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
 
     @Override
     public void OnActionButtonLongClick() {
+        if(ModUtils.map == null){
+            Toast.makeText(context, "请先安装客户端以生成索引。", Toast.LENGTH_LONG).show();
+            return;
+        }
         ExFilePicker filePicker = new ExFilePicker();
         filePicker.setShowOnlyExtensions();
         filePicker.setCanChooseOnlyOneItem(true);

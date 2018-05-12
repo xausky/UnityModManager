@@ -61,20 +61,6 @@ public class MainActivity extends AppCompatActivity {
                     .putBoolean("com.tencent.mm", true).apply();
             preferences.edit().putBoolean("first", false).apply();
         }
-        InputStream mapInputStream = null;
-        try {
-            mapInputStream = this.getAssets().open("map.json");
-            byte[] bytes = new byte[mapInputStream.available()];
-            if(mapInputStream.read(bytes) == -1){
-                throw new IOException("map.json read failed.");
-            }
-            String json = new String(bytes);
-            ModUtils.map = new JSONObject(json);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
         BaseFragment.initialize(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

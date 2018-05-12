@@ -22,7 +22,7 @@
         </activity>
         <activity android:name=".ShortcutActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
         <meta-data

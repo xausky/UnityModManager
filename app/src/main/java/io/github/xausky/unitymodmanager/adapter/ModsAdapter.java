@@ -192,7 +192,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
             File temp = new File(context.getCacheDir().getAbsolutePath() + "/" + System.currentTimeMillis());
             try {
                 FileUtils.forceMkdir(temp);
-                int p7zip = P7ZipApi.executeCommand(String.format("7z x -aoa -o%s -p%s %s", temp.getAbsolutePath(), password, sourceFile.getAbsolutePath()));
+                int p7zip = P7ZipApi.executeCommand(String.format("7z x '%s' '-o%s' '-p%s' -aoa", sourceFile.getAbsolutePath(), temp.getAbsolutePath(), password));
                 if(p7zip == 0){
                     result = ModUtils.Standardization(temp, targetFile);
                 }
@@ -231,7 +231,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
                 }
                 break;
             case RESULT_STATE_INTERNAL_ERROR:
-                Toast.makeText(context, String.format("模组[%s]解压错误，请确定模组文件是Zip文件。", name), Toast.LENGTH_LONG).show();
+                Toast.makeText(context, String.format("模组[%s]解压错误，请确认模组文件未损坏。", name), Toast.LENGTH_LONG).show();
                 try {
                     FileUtils.deleteDirectory(targetFile);
                 } catch (Exception e) {

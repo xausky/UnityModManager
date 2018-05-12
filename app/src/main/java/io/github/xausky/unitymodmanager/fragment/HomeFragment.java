@@ -1,18 +1,24 @@
 package io.github.xausky.unitymodmanager.fragment;
 
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageParser;
+import android.content.pm.ShortcutManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.sip.SipRegistrationListener;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.pm.ShortcutInfoCompat;
+import android.support.v4.content.pm.ShortcutManagerCompat;
+import android.support.v4.graphics.drawable.IconCompat;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,6 +41,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -47,15 +55,17 @@ import io.github.xausky.unitymodmanager.MainApplication;
 import io.github.xausky.unitymodmanager.R;
 import io.github.xausky.unitymodmanager.ShortcutActivity;
 import io.github.xausky.unitymodmanager.dialog.ApplicationChooseDialog;
+import io.github.xausky.unitymodmanager.utils.ModUtils;
+import io.github.xausky.unitymodmanager.utils.NativeUtils;
 
 /**
  * Created by xausky on 18-3-3.
  */
 
 public class HomeFragment extends BaseFragment implements View.OnClickListener, ApplicationChooseDialog.OnApplicationChooseDialogResultListener{
-    private static final String PACKAGE_PREFERENCE_KEY = "PACKAGE_PREFERENCE_KEY";
-    private static final String BASE_APK_PATH_PREFERENCE_KEY = "BASE_APK_PATH_PREFERENCE_KEY";
-    private static final String ALL_APPLICATION_PACKAGE_REGEX = "^.*$";
+    public static final String PACKAGE_PREFERENCE_KEY = "PACKAGE_PREFERENCE_KEY";
+    public static final String BASE_APK_PATH_PREFERENCE_KEY = "BASE_APK_PATH_PREFERENCE_KEY";
+    public static final String ALL_APPLICATION_PACKAGE_REGEX = "^.*$";
     public String packageName;
     public String apkPath;
     public String baseApkPath;
@@ -177,6 +187,31 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             apkPath = installedAppInfo.apkPath;
             clientState.setText(String.format(getText(R.string.home_client_installed).toString(), versionName));
             clientState.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_check),null, null, null);
+            InputStream mapInputStream = null;
+            try {
+                File map = new File(this.context.getFilesDir() + "/map.json");
+                if(map.exists()){
+                    mapInputStream = new FileInputStream(map);
+                    byte[] bytes = new byte[mapInputStream.available()];
+                    if(mapInputStream.read(bytes) == -1){
+                        throw new IOException("map.json read failed.");
+                    }
+                    String json = new String(bytes);
+                    ModUtils.map = new JSONObject(json);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }finally {
+                if(mapInputStream != null){
+                    try {
+                        mapInputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         } else {
             clientState.setText(getText(R.string.home_client_uninstalled));
             clientState.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_clear),null, null, null);
@@ -212,28 +247,27 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             @Override
             public void run() {
                 Log.d(MainApplication.LOG_TAG, apkPath);
-                final InstallResult result = VirtualCore.get().installPackage(apkPath, InstallStrategy.UPDATE_IF_EXIST);
                 final String resultString;
-                if(result.isSuccess){
-                    if(modFragment.getEnableItemCount() > 0){
-                        modFragment.setNeedPatch(true);
-                    }
-                    HomeFragment.this.packageName = result.packageName;
-                    HomeFragment.this.baseApkPath = apkPath;
-                    InstalledAppInfo info = VirtualCore.get().getInstalledAppInfo(HomeFragment.this.packageName, 0);
-                    HomeFragment.this.apkPath = info.apkPath;
-                    boolean commitResult = settings.edit()
-                            .putString(PACKAGE_PREFERENCE_KEY, HomeFragment.this.packageName)
-                            .putString(BASE_APK_PATH_PREFERENCE_KEY, HomeFragment.this.baseApkPath)
-                            .commit();
-                    if(!commitResult){
-                        resultString = "SharedPreferences commit failed";
+                if(NativeUtils.GenerateMapFile(apkPath, HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/map.json") == NativeUtils.RESULT_STATE_OK){
+                    final InstallResult result = VirtualCore.get().installPackage(apkPath, InstallStrategy.UPDATE_IF_EXIST);
+                    if(result.isSuccess){
+                        if(modFragment.getEnableItemCount() > 0){
+                            modFragment.setNeedPatch(true);
+                        }
+                        HomeFragment.this.packageName = result.packageName;
+                        HomeFragment.this.baseApkPath = apkPath;
+                        InstalledAppInfo info = VirtualCore.get().getInstalledAppInfo(HomeFragment.this.packageName, 0);
+                        HomeFragment.this.apkPath = info.apkPath;
+                        settings.edit()
+                                .putString(PACKAGE_PREFERENCE_KEY, HomeFragment.this.packageName)
+                                .putString(BASE_APK_PATH_PREFERENCE_KEY, HomeFragment.this.baseApkPath)
+                                .apply();
+                        resultString = "安装成功，可以在设置界面创建快捷方式。";
                     } else {
-                        resultString = "Success";
+                        resultString = result.error;
                     }
-                    crateShortcut(info);
                 } else {
-                    resultString = result.error;
+                    resultString = "生成映射文件失败。";
                 }
                 progressDialog.dismiss();
                 HomeFragment.this.view.post(new Runnable() {
@@ -247,18 +281,21 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         }.start();
     }
 
-    private void crateShortcut(InstalledAppInfo info){
-        PackageManager manager = va.getPackageManager();
-        Intent shortcut = new Intent("com.android.launcher.action.INSTALL_SHORTCUT");
-        String name = manager.getApplicationLabel(info.getApplicationInfo(0)) + "[模组管理器]";
-        shortcut.putExtra(Intent.EXTRA_SHORTCUT_NAME, name);
-        BitmapDrawable icon = (BitmapDrawable)manager.getApplicationIcon(info.getApplicationInfo(0));
-        shortcut.putExtra(Intent.EXTRA_SHORTCUT_ICON, icon.getBitmap());
-        Intent launcherIntent = new Intent(Intent.ACTION_MAIN);
-        launcherIntent.setClass(context, ShortcutActivity.class);
-        launcherIntent.putExtra("io.github.xausky.unitymodmanager.launchPackage", info.packageName);
-        shortcut.putExtra(Intent.EXTRA_SHORTCUT_INTENT, launcherIntent);
-        context.sendBroadcast(shortcut);
+    public void crateShortcut(InstalledAppInfo info){
+        if (ShortcutManagerCompat.isRequestPinShortcutSupported(context)) {
+            PackageManager manager = va.getPackageManager();
+            String name = manager.getApplicationLabel(info.getApplicationInfo(0)) + "[模组管理器]";
+            BitmapDrawable icon = (BitmapDrawable)manager.getApplicationIcon(info.getApplicationInfo(0));
+            Intent shortcutInfoIntent = new Intent(Intent.ACTION_VIEW);
+            shortcutInfoIntent.setClass(context, ShortcutActivity.class);
+            shortcutInfoIntent.putExtra("io.github.xausky.unitymodmanager.launchPackage", info.packageName);
+            ShortcutInfoCompat shortcutInfo = new ShortcutInfoCompat.Builder(context, name)
+                    .setIcon(IconCompat.createWithBitmap(icon.getBitmap()))
+                    .setShortLabel(name)
+                    .setIntent(shortcutInfoIntent)
+                    .build();
+            ShortcutManagerCompat.requestPinShortcut(context, shortcutInfo, null);
+        }
     }
 
     @Override

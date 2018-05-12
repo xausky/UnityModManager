@@ -23,6 +23,14 @@ extern "C" {
 JNIEXPORT jint JNICALL Java_io_github_xausky_unitymodmanager_utils_NativeUtils_patch
   (JNIEnv *, jclass, jstring, jstring, jstring);
 
+/*
+ * Class:     io_github_xausky_unitymodmanager_utils_NativeUtils
+ * Method:    GenerateMapFile
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_io_github_xausky_unitymodmanager_utils_NativeUtils_GenerateMapFile
+  (JNIEnv *, jclass, jstring, jstring);
+
 #ifdef __cplusplus
 }
 #endif

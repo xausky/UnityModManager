@@ -11,7 +11,8 @@ using namespace std;
 namespace xausky {
     class ZipFile {
         public:
-        static int patch(string zipPath, string modsPath, string outPath);
+        static int patch(string zipPath, string modsPath, string outputPath);
+        static int GenerateMapFile(string inputPath, string outputPath);
     };
 }
 #endif

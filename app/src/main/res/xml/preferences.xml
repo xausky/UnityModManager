@@ -9,4 +9,8 @@
         android:key="setting_export_apk"
         android:title="导出整合APK文件"
         android:summary="点击将导出已安装补丁的APK文件到内部存储根目录的out.apk"/>
+    <Preference
+        android:key="create_shortcut"
+        android:title="创建游戏快捷方式"
+        android:summary="创建游戏快捷方式可以从桌面直接进入虚拟环境内游戏，无需先打开管理器" />
 </PreferenceScreen>

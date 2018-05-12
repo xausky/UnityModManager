@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.lody.virtual.client.core.VirtualCore;
+
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -52,6 +54,13 @@ public class SettingFragment extends PreferenceFragmentCompat {
                 Toast.makeText(this.getContext(), "请先到主页安装客户端，并且保证安装源不被卸载或者删除。", Toast.LENGTH_LONG).show();
             } else {
                 new ExportApkTask(dialog).execute();
+            }
+        } else if(preference.getKey().equals("create_shortcut")){
+            HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
+            if(homeFragment.apkPath == null || homeFragment.baseApkPath == null || !new File(homeFragment.baseApkPath).exists()){
+                Toast.makeText(this.getContext(), "请先到主页安装客户端，并且保证安装源不被卸载或者删除。", Toast.LENGTH_LONG).show();
+            } else {
+                homeFragment.crateShortcut(VirtualCore.get().getInstalledAppInfo(homeFragment.packageName,0));
             }
         }
         return super.onPreferenceTreeClick(preference);

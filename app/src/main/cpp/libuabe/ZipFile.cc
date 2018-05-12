@@ -81,4 +81,50 @@ namespace xausky {
         mz_zip_writer_end(&out);
         return RESULT_STATE_OK;
     }
+    int ZipFile::GenerateMapFile(string zipPath, string outPath){
+        mz_zip_archive zip;
+        memset(&zip, 0, sizeof(mz_zip_archive));
+        FILE* out = fopen(outPath.c_str(), "w");
+        fputs("{\n", out);
+        if(out == NULL){
+            __LIBUABE_LOG("map file output open failed!\n");
+            return RESULT_STATE_INTERNAL_ERROR;
+        }
+        if (!mz_zip_reader_init_file(&zip, zipPath.c_str(), 0))
+        {
+            __LIBUABE_LOG("mz_zip_reader_init_file() failed!\n");
+            return RESULT_STATE_INTERNAL_ERROR;
+        }
+        for (mz_uint i = 0; i < mz_zip_reader_get_num_files(&zip); i++)
+        {
+            if(!mz_zip_reader_is_file_a_directory(&zip, i)){
+                mz_zip_archive_file_stat stat;
+                if (!mz_zip_reader_file_stat(&zip, i, &stat))
+                {
+                    __LIBUABE_LOG("mz_zip_reader_file_stat() failed!\n");
+                    mz_zip_reader_end(&zip);
+                    fclose(out);
+                    return RESULT_STATE_INTERNAL_ERROR;
+                }
+                string filename = stat.m_filename;
+                size_t pos = filename.find_last_of('_');
+                if(pos != string::npos){
+                    filename = filename.substr(0, pos);
+                }
+                string key = filename;
+                pos = filename.find_last_of('/');
+                if(pos != string::npos){
+                    pos = filename.find_last_of('/',pos - 1);
+                    if(pos != string::npos){
+                        key = filename.substr(pos + 1);
+                    }
+                }
+                fprintf(out, "\"%s\":\"%s\",\n", key.c_str(), filename.c_str());
+            }
+        }
+        fputs("\"null\":\"null\"\n}", out);
+        mz_zip_reader_end(&zip);
+        fclose(out);
+        return RESULT_STATE_OK;
+    }
 }
