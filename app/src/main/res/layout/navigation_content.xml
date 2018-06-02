@@ -5,6 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -15,13 +16,13 @@
         android:background="@color/colorPrimary"/>
     </android.support.design.widget.AppBarLayout>
 
-    <LinearLayout
+    <FrameLayout
         android:orientation="horizontal"
         android:id="@+id/fragment_container"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </LinearLayout>
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/action_button"
@@ -30,7 +31,8 @@
         android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/ic_add"
+        app:layout_behavior="io.github.xausky.unitymodmanager.utils.FabBehavior"
         app:layout_anchor="@+id/fragment_container"
-        app:layout_anchorGravity="bottom|center" />
+        app:layout_anchorGravity="right|bottom" />
 
 </android.support.design.widget.CoordinatorLayout>

@@ -66,7 +66,6 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
 
     private List<Mod> mods = new ArrayList<>();
     private SharedPreferences preferences;
-    private SharedPreferences settingPreferences;
     private Context context;
     private File storage;
     private File externalCache;
@@ -74,7 +73,6 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
     private ConfirmDialog dialog;
     private int operationPosition;
     private int enableItemCount;
-    private String defaultPassword;
     private PasswordDialog passwordDialog;
     private FileAlterationMonitor monitor = new FileAlterationMonitor();
     private Map<String, FileAlterationObserver> observers = new HashMap<>();
@@ -84,7 +82,6 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
         this.storage = storage;
         this.externalCache = externalCache;
         this.preferences = context.getSharedPreferences(MODS_SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
-        this.settingPreferences = context.getSharedPreferences(SettingFragment.SETTINGS_PREFERENCE_NAME, Context.MODE_PRIVATE);
         this.enableItemCount = 0;
         File[] modFiles = storage.listFiles();
         if(modFiles == null){
@@ -120,16 +117,11 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
             mods.add(mod);
         }
         Collections.sort(mods);
-        updateSetting();
         try {
             monitor.start();
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public void updateSetting(){
-        this.defaultPassword = settingPreferences.getString("setting_default_password", null);
     }
 
     public int getEnableItemCount() {
@@ -244,38 +236,34 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
                 }
                 break;
             case NativeUtils.RESULT_STATE_PASSWORD_ERROR:
-                if(password == null && this.defaultPassword != null){
-                    process(path, name, iterator, this.defaultPassword, false);
-                } else {
-                    this.passwordDialog.show();
-                    this.passwordDialog.setTitle(String.format("请输入模组[%s]的解压密码", name));
-                    if(password != null){
-                        this.passwordDialog.setTitle(String.format("请输入模组[%s]的解压密码，尝试过的错误密码:%s", name, password));
-                    }
-                    this.passwordDialog.setPositiveListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            ModsAdapter.this.passwordDialog.hide();
-                            process(path, name, iterator, ModsAdapter.this.passwordDialog.edit.getText().toString(), false);
-                        }
-                    });
-                    this.passwordDialog.setNegativeListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            ModsAdapter.this.passwordDialog.hide();
-                            try {
-                                FileUtils.deleteDirectory(targetFile);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            if (iterator.hasNext()) {
-                                process(path, iterator.next(), iterator, null, true);
-                            } else {
-                                notifyApply();
-                            }
-                        }
-                    });
+                this.passwordDialog.show();
+                this.passwordDialog.setTitle(String.format("请输入模组[%s]的解压密码", name));
+                if(password != null){
+                    this.passwordDialog.setTitle(String.format("请输入模组[%s]的解压密码，尝试过的错误密码:%s", name, password));
                 }
+                this.passwordDialog.setPositiveListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ModsAdapter.this.passwordDialog.hide();
+                        process(path, name, iterator, ModsAdapter.this.passwordDialog.edit.getText().toString(), false);
+                    }
+                });
+                this.passwordDialog.setNegativeListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ModsAdapter.this.passwordDialog.hide();
+                        try {
+                            FileUtils.deleteDirectory(targetFile);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        if (iterator.hasNext()) {
+                            process(path, iterator.next(), iterator, null, true);
+                        } else {
+                            notifyApply();
+                        }
+                    }
+                });
                 break;
         }
     }

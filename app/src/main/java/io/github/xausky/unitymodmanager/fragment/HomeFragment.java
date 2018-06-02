@@ -35,6 +35,7 @@ import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.remote.InstallResult;
 import com.lody.virtual.remote.InstalledAppInfo;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -69,6 +70,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     public String packageName;
     public String apkPath;
     public String baseApkPath;
+    public boolean rootModel;
     private View view;
     private TextView summary;
     private TextView clientState;
@@ -96,8 +98,9 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        rootModel = settings.getBoolean("root_model", false);
         context = inflater.getContext();
-        dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, true, true);
+        dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, !rootModel, true);
         dialog.setListener(this);
         progressDialog = new ProgressDialog(context);
         progressDialog.setTitle(R.string.progress_dialog_title);
@@ -181,40 +184,52 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     }
 
     private void clientUpdate(){
-        InstalledAppInfo installedAppInfo = va.getInstalledAppInfo(packageName, 0);
-        if(installedAppInfo != null){
-            String versionName = installedAppInfo.getPackageInfo(0).versionName;
-            apkPath = installedAppInfo.apkPath;
+        String versionName = null;
+        if(rootModel){
+            try {
+                versionName = context.getPackageManager().getPackageInfo(packageName,0).versionName;
+                apkPath = context.getPackageManager().getApplicationInfo(packageName, 0).sourceDir;
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+        }else {
+            InstalledAppInfo installedAppInfo = va.getInstalledAppInfo(packageName, 0);
+            if(installedAppInfo != null){
+                versionName = installedAppInfo.getPackageInfo(0).versionName;
+                apkPath = installedAppInfo.apkPath;
+            }
+        }
+        if(versionName != null){
             clientState.setText(String.format(getText(R.string.home_client_installed).toString(), versionName));
             clientState.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_check),null, null, null);
-            InputStream mapInputStream = null;
-            try {
-                File map = new File(this.context.getFilesDir() + "/map.json");
-                if(map.exists()){
-                    mapInputStream = new FileInputStream(map);
-                    byte[] bytes = new byte[mapInputStream.available()];
-                    if(mapInputStream.read(bytes) == -1){
-                        throw new IOException("map.json read failed.");
-                    }
-                    String json = new String(bytes);
-                    ModUtils.map = new JSONObject(json);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }finally {
-                if(mapInputStream != null){
-                    try {
-                        mapInputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
         } else {
             clientState.setText(getText(R.string.home_client_uninstalled));
             clientState.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_clear),null, null, null);
+        }
+        InputStream mapInputStream = null;
+        try {
+            File map = new File(this.context.getFilesDir() + "/map.json");
+            if(map.exists()){
+                mapInputStream = new FileInputStream(map);
+                byte[] bytes = new byte[mapInputStream.available()];
+                if(mapInputStream.read(bytes) == -1){
+                    throw new IOException("map.json read failed.");
+                }
+                String json = new String(bytes);
+                ModUtils.map = new JSONObject(json);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }finally {
+            if(mapInputStream != null){
+                try {
+                    mapInputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         String summaryString = String.format(getString(R.string.home_summary_context),
                 modFragment.getEnableItemCount(),
@@ -241,7 +256,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         super.onDestroyView();
     }
 
-    private void clientInstall(final String apkPath){
+    private void clientInstall(final String apkPath, final String packageName){
         progressDialog.show();
         new Thread(){
             @Override
@@ -249,23 +264,38 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 Log.d(MainApplication.LOG_TAG, apkPath);
                 final String resultString;
                 if(NativeUtils.GenerateMapFile(apkPath, HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/map.json") == NativeUtils.RESULT_STATE_OK){
-                    final InstallResult result = VirtualCore.get().installPackage(apkPath, InstallStrategy.UPDATE_IF_EXIST);
-                    if(result.isSuccess){
-                        if(modFragment.getEnableItemCount() > 0){
-                            modFragment.setNeedPatch(true);
+                    if(rootModel){
+                        String result = "安装失败";
+                        try {
+                            String basePath = HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/base.apk";
+                            FileUtils.copyFile(new File(apkPath), new File(basePath));
+                            HomeFragment.this.packageName = packageName;
+                            HomeFragment.this.baseApkPath = basePath;
+                            HomeFragment.this.apkPath = apkPath;
+                            result = "安装成功";
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                        HomeFragment.this.packageName = result.packageName;
-                        HomeFragment.this.baseApkPath = apkPath;
-                        InstalledAppInfo info = VirtualCore.get().getInstalledAppInfo(HomeFragment.this.packageName, 0);
-                        HomeFragment.this.apkPath = info.apkPath;
-                        settings.edit()
-                                .putString(PACKAGE_PREFERENCE_KEY, HomeFragment.this.packageName)
-                                .putString(BASE_APK_PATH_PREFERENCE_KEY, HomeFragment.this.baseApkPath)
-                                .apply();
-                        resultString = "安装成功，可以在设置界面创建快捷方式。";
+                        resultString = result;
                     } else {
-                        resultString = result.error;
+                        final InstallResult result = VirtualCore.get().installPackage(apkPath, InstallStrategy.UPDATE_IF_EXIST);
+                        if(result.isSuccess){
+                            if(modFragment.getEnableItemCount() > 0){
+                                modFragment.setNeedPatch(true);
+                            }
+                            HomeFragment.this.packageName = result.packageName;
+                            HomeFragment.this.baseApkPath = apkPath;
+                            InstalledAppInfo info = VirtualCore.get().getInstalledAppInfo(HomeFragment.this.packageName, 0);
+                            HomeFragment.this.apkPath = info.apkPath;
+                            resultString = "安装成功，可以在设置界面创建快捷方式。";
+                        } else {
+                            resultString = result.error;
+                        }
                     }
+                    settings.edit()
+                            .putString(PACKAGE_PREFERENCE_KEY, HomeFragment.this.packageName)
+                            .putString(BASE_APK_PATH_PREFERENCE_KEY, HomeFragment.this.baseApkPath)
+                            .apply();
                 } else {
                     resultString = "生成映射文件失败。";
                 }
@@ -300,7 +330,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
 
     @Override
     public void OnApplicationChooseDialogResult(String packageName, String apkPath) {
-        clientInstall(apkPath);
+        clientInstall(apkPath, packageName);
         dialog.hide();
     }
 }

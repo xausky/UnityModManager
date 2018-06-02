@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.lody.virtual.client.core.VirtualCore;
+import com.topjohnwu.superuser.Shell;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.monitor.FileAlterationObserver;
@@ -101,7 +102,6 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
         view = inflater.inflate(R.layout.mod_fragment, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.mod_list);
         adapter.setRecyclerView(recyclerView);
-        adapter.updateSetting();
         return view;
     }
 
@@ -170,49 +170,60 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
         });
     }
 
-    public int patch(String apkPath, String baseApkPath){
-        List<Mod> mods = adapter.getMods();
-        File fusionFile = new File(getBase().getCacheDir().getAbsolutePath() + "/fusion");
+    public int patch(String apkPath, String baseApkPath, boolean rootModel){
+        if(rootModel){
+            //使用Root权限暂时禁用SELinux，并且修改目标APK权限为666。
+            Shell.Sync.su("setenforce 0", "chmod 666 " + apkPath);
+        }
         try {
-            FileUtils.deleteDirectory(fusionFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.d(MainApplication.LOG_TAG, "deleteFile Failed: " + fusionFile);
-            return ModUtils.RESULT_STATE_INTERNAL_ERROR;
-        }
-        if(!fusionFile.mkdir()){
-            Log.d(MainApplication.LOG_TAG, "mkdir Failed: " + fusionFile);
-            return ModUtils.RESULT_STATE_INTERNAL_ERROR;
-        }
-        for(Mod mod : mods){
-            if(mod.enable){
-                File modFile = new File(storage.getAbsolutePath() + "/" + mod.name);
-                try {
-                    if(modFile.isFile()){
-                        File externalFile = new File(FileUtils.readFileToString(modFile));
-                        int result = ModUtils.Standardization(externalFile, fusionFile);
-                        mod.fileCount = result;
-                    } else {
-                        FileUtils.copyDirectory(modFile, fusionFile);
+            List<Mod> mods = adapter.getMods();
+            File fusionFile = new File(getBase().getCacheDir().getAbsolutePath() + "/fusion");
+            try {
+                FileUtils.deleteDirectory(fusionFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.d(MainApplication.LOG_TAG, "deleteFile Failed: " + fusionFile);
+                return ModUtils.RESULT_STATE_INTERNAL_ERROR;
+            }
+            if(!fusionFile.mkdir()){
+                Log.d(MainApplication.LOG_TAG, "mkdir Failed: " + fusionFile);
+                return ModUtils.RESULT_STATE_INTERNAL_ERROR;
+            }
+            for(Mod mod : mods){
+                if(mod.enable){
+                    File modFile = new File(storage.getAbsolutePath() + "/" + mod.name);
+                    try {
+                        if(modFile.isFile()){
+                            File externalFile = new File(FileUtils.readFileToString(modFile));
+                            int result = ModUtils.Standardization(externalFile, fusionFile);
+                            mod.fileCount = result;
+                        } else {
+                            FileUtils.copyDirectory(modFile, fusionFile);
+                        }
+                    } catch (IOException e) {
+                        Log.d(MainApplication.LOG_TAG, "Copy Mod Directory File Failed: " + e.getMessage());
+                        return ModUtils.RESULT_STATE_INTERNAL_ERROR;
                     }
-                } catch (IOException e) {
-                    Log.d(MainApplication.LOG_TAG, "Copy Mod Directory File Failed: " + e.getMessage());
-                    return ModUtils.RESULT_STATE_INTERNAL_ERROR;
                 }
             }
-        }
-        int result = NativeUtils.patch(baseApkPath, apkPath, fusionFile.getAbsolutePath());
-        if(result != NativeUtils.RESULT_STATE_OK){
-            Log.d(MainApplication.LOG_TAG, "Patch APK File Failed: " + result + ",apkPath:" + apkPath + ",baseApkPath:" + baseApkPath);
-            return result;
-        }
-        adapter.notifyApply();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                adapter.notifyDataSetChanged();
+            int result = NativeUtils.patch(baseApkPath, apkPath, fusionFile.getAbsolutePath());
+            if(result != NativeUtils.RESULT_STATE_OK){
+                Log.d(MainApplication.LOG_TAG, "Patch APK File Failed: " + result + ",apkPath:" + apkPath + ",baseApkPath:" + baseApkPath);
+                return result;
             }
-        });
-        return NativeUtils.RESULT_STATE_OK;
+            adapter.notifyApply();
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    adapter.notifyDataSetChanged();
+                }
+            });
+            return NativeUtils.RESULT_STATE_OK;
+        }finally {
+            if(rootModel){
+                //使用Root权限重新启用SELinux，并且修改目标APK权限回644。
+                Shell.Sync.su("setenforce 0", "chmod 644 " + apkPath);
+            }
+        }
     }
 }

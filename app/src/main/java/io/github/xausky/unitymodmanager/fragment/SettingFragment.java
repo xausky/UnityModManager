@@ -4,8 +4,10 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.Preference;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceScreen;
 import android.support.annotation.Nullable;
-import android.support.v7.preference.PreferenceFragmentCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,12 +29,13 @@ import static io.github.xausky.unitymodmanager.utils.ModUtils.RESULT_STATE_INTER
  * Created by xausky on 18-3-3.
  */
 
-public class SettingFragment extends PreferenceFragmentCompat {
+public class SettingFragment extends PreferenceFragment {
     public static final String SETTINGS_PREFERENCE_NAME = "settings";
     private ProgressDialog dialog;
 
     @Override
-    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         this.getPreferenceManager().setSharedPreferencesName(SETTINGS_PREFERENCE_NAME);
         this.addPreferencesFromResource(R.xml.preferences);
     }
@@ -47,23 +50,23 @@ public class SettingFragment extends PreferenceFragmentCompat {
     }
 
     @Override
-    public boolean onPreferenceTreeClick(android.support.v7.preference.Preference preference) {
+    public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
         if(preference.getKey().equals("setting_export_apk")){
             HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
             if(homeFragment.apkPath == null || homeFragment.baseApkPath == null || !new File(homeFragment.baseApkPath).exists()){
-                Toast.makeText(this.getContext(), "请先到主页安装客户端，并且保证安装源不被卸载或者删除。", Toast.LENGTH_LONG).show();
+                Toast.makeText(this.getActivity(), "请先到主页安装客户端，并且保证安装源不被卸载或者删除。", Toast.LENGTH_LONG).show();
             } else {
                 new ExportApkTask(dialog).execute();
             }
         } else if(preference.getKey().equals("create_shortcut")){
             HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
             if(homeFragment.apkPath == null || homeFragment.baseApkPath == null || !new File(homeFragment.baseApkPath).exists()){
-                Toast.makeText(this.getContext(), "请先到主页安装客户端，并且保证安装源不被卸载或者删除。", Toast.LENGTH_LONG).show();
+                Toast.makeText(this.getActivity(), "请先到主页安装客户端，并且保证安装源不被卸载或者删除。", Toast.LENGTH_LONG).show();
             } else {
                 homeFragment.crateShortcut(VirtualCore.get().getInstalledAppInfo(homeFragment.packageName,0));
             }
         }
-        return super.onPreferenceTreeClick(preference);
+        return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
 
     static class ExportApkTask extends AsyncTask<Object, Object, Integer> {
@@ -85,7 +88,7 @@ public class SettingFragment extends PreferenceFragmentCompat {
             ModFragment modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
             HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
             if (modFragment.isNeedPatch()) {
-                result = modFragment.patch(homeFragment.apkPath, homeFragment.baseApkPath);
+                result = modFragment.patch(homeFragment.apkPath, homeFragment.baseApkPath, homeFragment.rootModel);
             }
             if (result == ModUtils.RESULT_STATE_OK) {
                 String exportPath = Environment.getExternalStorageDirectory() + "/out.apk";

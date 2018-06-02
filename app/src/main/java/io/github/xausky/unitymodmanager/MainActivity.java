@@ -1,21 +1,17 @@
 package io.github.xausky.unitymodmanager;
 
-import android.Manifest;
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -26,12 +22,7 @@ import android.widget.Toast;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.ipc.VActivityManager;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 
 import io.github.xausky.unitymodmanager.adapter.VisibilityAdapter;
 import io.github.xausky.unitymodmanager.fragment.BaseFragment;
@@ -115,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void navigation(int item){
         Fragment fragment = BaseFragment.fragment(item);
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
+        getFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
         if(fragment instanceof BaseFragment){
             actionButton.setVisibility(((BaseFragment)fragment).actionButtonVisibility());
         } else {
@@ -172,11 +163,16 @@ public class MainActivity extends AppCompatActivity {
             ModFragment modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
             HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
             if (modFragment.isNeedPatch()) {
-                result = modFragment.patch(homeFragment.apkPath, homeFragment.baseApkPath);
+                result = modFragment.patch(homeFragment.apkPath, homeFragment.baseApkPath, homeFragment.rootModel);
             }
             if (result == ModUtils.RESULT_STATE_OK) {
-                Intent intent = VirtualCore.get().getLaunchIntent(homeFragment.packageName, 0);
-                VActivityManager.get().startActivity(intent, 0);
+                if(homeFragment.rootModel){
+                    Intent intent = dialog.getContext().getPackageManager().getLaunchIntentForPackage(homeFragment.packageName);
+                    dialog.getContext().startActivity(intent);
+                } else {
+                    Intent intent = VirtualCore.get().getLaunchIntent(homeFragment.packageName, 0);
+                    VActivityManager.get().startActivity(intent, 0);
+                }
             }
             return result;
         }
