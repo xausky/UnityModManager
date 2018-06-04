@@ -8,9 +8,9 @@ using namespace std;
 namespace xausky {
     class Utils {
         public:
-        static void PrintByte(char* data, int len);
-        static void MakeFolder(string path);
-        static list<string> ListFolderFiles(string path);
+        static void CopyFile(string target, string origin);
+        static void MakeFileFolder(string target);
+        static list<string> ListFolderFiles(string path, bool recursive);
         static map<string, map<int64_t, BinaryStream*>*>* MakeBundlePatch(string path);
         static void FreeBundlePatch(map<string, map<int64_t, BinaryStream*>*>* mods);
     };

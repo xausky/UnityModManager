@@ -1,27 +1,19 @@
 package io.github.xausky.unitymodmanager.adapter;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
-import android.os.FileObserver;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,7 +22,6 @@ import com.hzy.libp7zip.P7ZipApi;
 import com.stfalcon.frescoimageviewer.ImageViewer;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.monitor.FileAlterationListener;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
@@ -45,17 +36,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import io.github.xausky.unitymodmanager.MainApplication;
 import io.github.xausky.unitymodmanager.R;
 import io.github.xausky.unitymodmanager.dialog.ConfirmDialog;
 import io.github.xausky.unitymodmanager.dialog.PasswordDialog;
 import io.github.xausky.unitymodmanager.domain.Mod;
-import io.github.xausky.unitymodmanager.fragment.SettingFragment;
 import io.github.xausky.unitymodmanager.utils.ModUtils;
 import io.github.xausky.unitymodmanager.utils.NativeUtils;
 
 import static io.github.xausky.unitymodmanager.utils.NativeUtils.RESULT_STATE_INTERNAL_ERROR;
-import static io.github.xausky.unitymodmanager.utils.NativeUtils.patch;
 
 /**
  * Created by xausky on 18-3-9.

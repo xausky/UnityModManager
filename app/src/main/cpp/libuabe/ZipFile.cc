@@ -44,7 +44,7 @@ namespace xausky {
         }
         mz_zip_writer_add_from_zip_reader(out, zip,i);
     }
-    int ZipFile::patch(string zipPath, string modsPath, string outPath){
+    int ZipFile::Patch(string zipPath, string modsPath, string outPath){
         mz_zip_archive zip;
         mz_zip_archive out;
         memset(&zip, 0, sizeof(mz_zip_archive));
@@ -85,7 +85,6 @@ namespace xausky {
         mz_zip_archive zip;
         memset(&zip, 0, sizeof(mz_zip_archive));
         FILE* out = fopen(outPath.c_str(), "w");
-        fputs("{\n", out);
         if(out == NULL){
             __LIBUABE_LOG("map file output open failed!\n");
             return RESULT_STATE_INTERNAL_ERROR;
@@ -95,6 +94,7 @@ namespace xausky {
             __LIBUABE_LOG("mz_zip_reader_init_file() failed!\n");
             return RESULT_STATE_INTERNAL_ERROR;
         }
+        fputs("{\n", out);
         for (mz_uint i = 0; i < mz_zip_reader_get_num_files(&zip); i++)
         {
             if(!mz_zip_reader_is_file_a_directory(&zip, i)){

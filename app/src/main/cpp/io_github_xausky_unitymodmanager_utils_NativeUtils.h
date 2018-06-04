@@ -17,19 +17,36 @@ extern "C" {
 #define io_github_xausky_unitymodmanager_utils_NativeUtils_RESULT_STATE_FILE_CONFLICT -3L
 /*
  * Class:     io_github_xausky_unitymodmanager_utils_NativeUtils
- * Method:    patch
+ * Method:    PatchApk
  * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_io_github_xausky_unitymodmanager_utils_NativeUtils_patch
+JNIEXPORT jint JNICALL Java_io_github_xausky_unitymodmanager_utils_NativeUtils_PatchApk
   (JNIEnv *, jclass, jstring, jstring, jstring);
 
 /*
  * Class:     io_github_xausky_unitymodmanager_utils_NativeUtils
- * Method:    GenerateMapFile
+ * Method:    GenerateApkMapFile
  * Signature: (Ljava/lang/String;Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_io_github_xausky_unitymodmanager_utils_NativeUtils_GenerateMapFile
+JNIEXPORT jint JNICALL Java_io_github_xausky_unitymodmanager_utils_NativeUtils_GenerateApkMapFile
   (JNIEnv *, jclass, jstring, jstring);
+
+/*
+ * Class:     io_github_xausky_unitymodmanager_utils_NativeUtils
+ * Method:    PatchFolder
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_io_github_xausky_unitymodmanager_utils_NativeUtils_PatchFolder
+  (JNIEnv *, jclass, jstring, jstring, jstring);
+
+/*
+ * Class:     io_github_xausky_unitymodmanager_utils_NativeUtils
+ * Method:    GenerateFolderMapFile
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_io_github_xausky_unitymodmanager_utils_NativeUtils_GenerateFolderMapFile
+  (JNIEnv *, jclass, jstring, jstring);
+
 
 #ifdef __cplusplus
 }

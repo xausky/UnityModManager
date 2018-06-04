@@ -1,5 +1,5 @@
-#ifndef XAUSKY_ZIP_FILE_HH
-#define XAUSKY_ZIP_FILE_HH
+#ifndef XAUSKY_FOLDER_FILE_HH
+#define XAUSKY_FOLDER_FILE_HH
 #include <string>
 using namespace std;
 #define DATA_BUFFER_SIZE (1024*1024*100)
@@ -7,9 +7,9 @@ using namespace std;
 #define RESULT_STATE_OK (0)
 #define RESULT_STATE_INTERNAL_ERROR (-1)
 namespace xausky {
-    class ZipFile {
-        public:
-        static int Patch(string zipPath, string modsPath, string outputPath);
+    class FolderFile {
+    public:
+        static int Patch(string targetPath, string modsPath, string backupPath);
         static int GenerateMapFile(string inputPath, string outputPath);
     };
 }

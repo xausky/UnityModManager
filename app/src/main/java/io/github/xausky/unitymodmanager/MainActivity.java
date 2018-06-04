@@ -44,14 +44,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         SharedPreferences preferences = this.getSharedPreferences("default", MODE_PRIVATE);
-        SharedPreferences visibilityPreferences = this.getSharedPreferences(VisibilityAdapter.VISIBILITY_SHARED_PREFERENCES_KEY, MODE_PRIVATE);
-        if(preferences.getBoolean("first", true)){
-            //微信和支付宝默认可见（用于氪金）
-            visibilityPreferences.edit()
-                    .putBoolean("com.eg.android.AlipayGphone", true)
-                    .putBoolean("com.tencent.mm", true).apply();
-            preferences.edit().putBoolean("first", false).apply();
-        }
         BaseFragment.initialize(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

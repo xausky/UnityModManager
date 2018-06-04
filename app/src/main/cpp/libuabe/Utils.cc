@@ -4,35 +4,68 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
+#include <libgen.h>
+
+#define PATH_BUFFER_SIZE (1024)
+
 namespace xausky {
-    void Utils::PrintByte(char* data, int len){
-        putchar('[');
-        for(int i=0; i<len; ++i){
-            printf("%02X",(unsigned char)data[i]);
-            if(len != i-1){
-                putchar(',');
-            }
+
+    void MakeFolder(const char *target) {
+        char buffer[PATH_BUFFER_SIZE];
+        if((strcmp(target,".") == 0) || (strcmp(target,"/")==0)) {
+            return;
         }
-        puts("]\n");
+        if(access(target,F_OK) == 0) {
+            return;
+        } else {
+            strcpy(buffer,target);
+            dirname(buffer);
+            MakeFolder(buffer);
+        }
+        if(mkdir(target,777) == -1){
+            return;
+        }
     }
-    void Utils::MakeFolder(string path){
-        mkdir(path.c_str(), 0777);
+
+    void Utils::MakeFileFolder(string target) {
+        char buffer[PATH_BUFFER_SIZE];
+        dirname(buffer);
+        MakeFolder(buffer);
     }
-    list<string> Utils::ListFolderFiles(string path){
+
+
+    void Utils::CopyFile(string target, string origin) {
+        ifstream input(origin.c_str(), ios::binary | ios::in ) ;
+        ofstream output(target.c_str(), ios::binary | ios::out ) ;
+        output<<input;
+    }
+
+    list<string> Utils::ListFolderFiles(string path, bool recursive){
         list<string> result;
-        DIR *folder = opendir(path.c_str());
-        struct dirent *rent = NULL;
-        while((rent = readdir(folder)) != NULL){
-            if(rent->d_type == DT_REG){
-                result.push_back(string(rent->d_name));
+        list<string> folders;
+        folders.push_back("");
+        while (!folders.empty()){
+            string current = folders.back();folders.pop_back();
+            DIR *folder = opendir((path + "/" + current).c_str());
+            struct dirent *rent = NULL;
+            while((rent = readdir(folder)) != NULL){
+                if(strcmp(rent->d_name,".")==0 || strcmp(rent->d_name,"..")==0){
+                    continue;
+                }
+                if(rent->d_type == DT_REG){
+                    result.push_back(current + string(rent->d_name));
+                } else if(rent->d_type == DT_DIR && recursive){
+                    folders.push_back(current + string(rent->d_name) + '/');
+                }
             }
+            closedir(folder);
         }
-        closedir(folder);
         return result;
     }
     map<string, map<int64_t, BinaryStream*>*>* Utils::MakeBundlePatch(string path){
         map<string, map<int64_t, BinaryStream*>*>* patch = new map<string, map<int64_t, BinaryStream*>*>();
-        list<string> files = ListFolderFiles(path);
+        list<string> files = ListFolderFiles(path, false);
         for (list<string>::iterator it = files.begin(); it != files.end(); it++){
             string file = (*it);
             size_t first = file.find_first_of('-');
@@ -44,15 +77,13 @@ namespace xausky {
             int32_t classId;
             if(sscanf(prefix.c_str(),"+%X", &classId)!=1){
                 classId = -1;
-            } else {
-                __LIBUABE_DEBUG("attaches : %s, %ld", file.c_str(), classId);
             }
             sscanf(postfix.c_str(), "%llu.dat", &pathId);
             map<string, map<int64_t, BinaryStream*>*>::iterator iterator = patch->find(name);
             map<int64_t, BinaryStream*>* mod;
             if(iterator == patch->end()){
                 mod = new map<int64_t, BinaryStream*>();
-                patch->insert(pair<string, map<int64_t, BinaryStream*>*>(string(name), mod));
+                patch->insert(pair<string, map<int64_t, BinaryStream*>*>(name, mod));
             } else {
                 mod = iterator->second;
             }

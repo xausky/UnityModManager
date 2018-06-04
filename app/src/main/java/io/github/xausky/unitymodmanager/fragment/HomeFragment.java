@@ -71,6 +71,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     public String apkPath;
     public String baseApkPath;
     public boolean rootModel;
+    public boolean persistentDataPathSupport;
     private View view;
     private TextView summary;
     private TextView clientState;
@@ -78,6 +79,8 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     private String currentVersionString;
     private TextView latestVersion;
     private CardView clientStateCardView;
+    private CardView mapFileCardView;
+    private TextView mapFile;
     private AttachFragment attachFragment;
     private VisibilityFragment visibilityFragment;
     private ModFragment modFragment;
@@ -99,6 +102,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         rootModel = settings.getBoolean("root_model", false);
+        persistentDataPathSupport = settings.getBoolean("persistent_data_path_support", false);
         context = inflater.getContext();
         dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, !rootModel, true);
         dialog.setListener(this);
@@ -118,6 +122,9 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             clientState = (TextView) view.findViewById(R.id.home_client_state);
             clientStateCardView = (CardView) view.findViewById(R.id.home_client_state_card_view);
             clientStateCardView.setOnClickListener(this);
+            mapFileCardView = view.findViewById(R.id.home_map_file_card_view);
+            mapFile = view.findViewById(R.id.home_map_file);
+            mapFileCardView.setOnClickListener(this);
             currentVersionString = "unknown";
             try {
                 currentVersionString = "v" + context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
@@ -208,15 +215,27 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         }
         InputStream mapInputStream = null;
         try {
-            File map = new File(this.context.getFilesDir() + "/map.json");
-            if(map.exists()){
-                mapInputStream = new FileInputStream(map);
+            File apkJson = new File(this.context.getFilesDir() + "/apk.json");
+            if(apkJson.exists()){
+                mapInputStream = new FileInputStream(apkJson);
                 byte[] bytes = new byte[mapInputStream.available()];
                 if(mapInputStream.read(bytes) == -1){
-                    throw new IOException("map.json read failed.");
+                    throw new IOException("apk.json read failed.");
                 }
                 String json = new String(bytes);
-                ModUtils.map = new JSONObject(json);
+                ModUtils.apkMap = new JSONObject(json);
+                mapFile.setText(String.format(context.getString(R.string.map_file_size), ModUtils.apkMap.length()));
+                mapFile.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_check),null, null, null);
+            }
+            File persistentJson = new File(this.context.getFilesDir() + "/persistent.json");
+            if(apkJson.exists() && persistentDataPathSupport){
+                mapInputStream = new FileInputStream(persistentJson);
+                byte[] bytes = new byte[mapInputStream.available()];
+                if(mapInputStream.read(bytes) == -1){
+                    throw new IOException("persistent.json read failed.");
+                }
+                String json = new String(bytes);
+                ModUtils.persistentMap = new JSONObject(json);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -242,7 +261,21 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
 
     @Override
     public void onClick(View v) {
-        dialog.show();
+        if(v.equals(clientStateCardView)){
+            dialog.show();
+        } else {
+            if(apkPath == null){
+                Toast.makeText(context, "请先安装客户端和下载热更新资源。", Toast.LENGTH_LONG).show();
+            }
+            NativeUtils.GenerateApkMapFile(apkPath, HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/apk.json");
+            if(persistentDataPathSupport){
+                String path = context.getExternalFilesDir(null).getParentFile().getParentFile().getAbsolutePath() + "/" + packageName + "/files";
+                Log.d(MainApplication.LOG_TAG, "persistentDataPathSupport:" + path);
+                NativeUtils.GenerateFolderMapFile(path, HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/persistent.json");
+            }
+            clientUpdate();
+            Toast.makeText(context, "映射文件生成成功。", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -263,7 +296,6 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             public void run() {
                 Log.d(MainApplication.LOG_TAG, apkPath);
                 final String resultString;
-                if(NativeUtils.GenerateMapFile(apkPath, HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/map.json") == NativeUtils.RESULT_STATE_OK){
                     if(rootModel){
                         String result = "安装失败";
                         try {
@@ -296,9 +328,6 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                             .putString(PACKAGE_PREFERENCE_KEY, HomeFragment.this.packageName)
                             .putString(BASE_APK_PATH_PREFERENCE_KEY, HomeFragment.this.baseApkPath)
                             .apply();
-                } else {
-                    resultString = "生成映射文件失败。";
-                }
                 progressDialog.dismiss();
                 HomeFragment.this.view.post(new Runnable() {
                     @Override

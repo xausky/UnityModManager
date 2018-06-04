@@ -51,4 +51,6 @@
     <string name="progress_dialog_message">正在操作</string>
     <string name="please_input_password">请输入解压密码</string>
     <string name="mod_list_item_content">%d</string>
+    <string name="home_map_file">点击生成映射文件(外部资源需要先自行下载好)</string>
+    <string name="map_file_size">映射文件记录:%d，点击重新生成。</string>
 </resources>

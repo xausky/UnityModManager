@@ -112,7 +112,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
 
     @Override
     public void OnActionButtonClick() {
-        if(ModUtils.map == null){
+        if(ModUtils.apkMap == null){
             Toast.makeText(context, "请先安装客户端以生成索引。", Toast.LENGTH_LONG).show();
             return;
         }
@@ -124,7 +124,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
 
     @Override
     public void OnActionButtonLongClick() {
-        if(ModUtils.map == null){
+        if(ModUtils.apkMap == null){
             Toast.makeText(context, "请先安装客户端以生成索引。", Toast.LENGTH_LONG).show();
             return;
         }
@@ -172,10 +172,11 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
 
     public int patch(String apkPath, String baseApkPath, boolean rootModel){
         if(rootModel){
-            //使用Root权限暂时禁用SELinux，并且修改目标APK权限为666。
+            //暂时禁用SELinux，并且修改目标APK权限为666。
             Shell.Sync.su("setenforce 0", "chmod 666 " + apkPath);
         }
         try {
+            Log.d(MainApplication.LOG_TAG, "patch: apkPath=" + apkPath + ", baseApkPath=" + baseApkPath + ", rootModel=" + rootModel);
             List<Mod> mods = adapter.getMods();
             File fusionFile = new File(getBase().getCacheDir().getAbsolutePath() + "/fusion");
             try {
@@ -206,7 +207,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
                     }
                 }
             }
-            int result = NativeUtils.patch(baseApkPath, apkPath, fusionFile.getAbsolutePath());
+            int result = NativeUtils.PatchApk(baseApkPath, apkPath, fusionFile.getAbsolutePath());
             if(result != NativeUtils.RESULT_STATE_OK){
                 Log.d(MainApplication.LOG_TAG, "Patch APK File Failed: " + result + ",apkPath:" + apkPath + ",baseApkPath:" + baseApkPath);
                 return result;
@@ -221,8 +222,8 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
             return NativeUtils.RESULT_STATE_OK;
         }finally {
             if(rootModel){
-                //使用Root权限重新启用SELinux，并且修改目标APK权限回644。
-                Shell.Sync.su("setenforce 0", "chmod 644 " + apkPath);
+                //修改目标APK权限回644，并且重新启用SELinux。
+                Shell.Sync.su("chmod 644 " + apkPath, "setenforce 0");
             }
         }
     }

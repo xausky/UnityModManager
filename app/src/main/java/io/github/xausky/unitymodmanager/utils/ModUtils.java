@@ -20,7 +20,8 @@ import io.github.xausky.unitymodmanager.MainApplication;
 public class ModUtils {
     public static final int RESULT_STATE_OK = 0;
     public static final int RESULT_STATE_INTERNAL_ERROR = -1;
-    public static JSONObject map;
+    public static JSONObject apkMap;
+    public static JSONObject persistentMap;
     public static Set<String> supportImageType = new TreeSet<>();
 
     static {
@@ -39,7 +40,7 @@ public class ModUtils {
             String path = null;
             String name = file.getName();
             try {
-                path = map.getString(input.getName() + "/" + name);
+                path = apkMap.getString(input.getName() + "/" + name);
                 Log.d(MainApplication.LOG_TAG, "Standardization: " + path);
             } catch (JSONException e) {
                 //ignore
