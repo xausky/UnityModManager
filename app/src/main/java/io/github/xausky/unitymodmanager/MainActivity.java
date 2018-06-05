@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void launch(){
-        if(homeFragment.apkPath == null || homeFragment.baseApkPath == null || !new File(homeFragment.baseApkPath).exists()){
+        if(homeFragment.apkModifyModel != HomeFragment.APK_MODIFY_MODEL_NONE && (homeFragment.apkPath == null || homeFragment.baseApkPath == null || !new File(homeFragment.baseApkPath).exists())){
             Toast.makeText(this, "请先到主页安装客户端，并且保证安装源不被卸载或者删除。", Toast.LENGTH_LONG).show();
         } else {
             new PatchApkTask(dialog).execute();
@@ -155,10 +155,10 @@ public class MainActivity extends AppCompatActivity {
             ModFragment modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
             HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
             if (modFragment.isNeedPatch()) {
-                result = modFragment.patch(homeFragment.apkPath, homeFragment.baseApkPath, homeFragment.rootModel);
+                result = modFragment.patch(homeFragment.apkPath, homeFragment.baseApkPath, homeFragment.persistentPath, homeFragment.backupPath, homeFragment.apkModifyModel, homeFragment.persistentSupport);
             }
             if (result == ModUtils.RESULT_STATE_OK) {
-                if(homeFragment.rootModel){
+                if(homeFragment.apkModifyModel != HomeFragment.APK_MODIFY_MODEL_VIRTUAL){
                     Intent intent = dialog.getContext().getPackageManager().getLaunchIntentForPackage(homeFragment.packageName);
                     dialog.getContext().startActivity(intent);
                 } else {

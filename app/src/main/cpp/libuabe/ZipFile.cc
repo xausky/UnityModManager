@@ -94,7 +94,6 @@ namespace xausky {
             __LIBUABE_LOG("mz_zip_reader_init_file() failed!\n");
             return RESULT_STATE_INTERNAL_ERROR;
         }
-        fputs("{\n", out);
         for (mz_uint i = 0; i < mz_zip_reader_get_num_files(&zip); i++)
         {
             if(!mz_zip_reader_is_file_a_directory(&zip, i)){
@@ -119,10 +118,9 @@ namespace xausky {
                         key = filename.substr(pos + 1);
                     }
                 }
-                fprintf(out, "\"%s\":\"%s\",\n", key.c_str(), filename.c_str());
+                fprintf(out, "%s:%s\n", key.c_str(), filename.c_str());
             }
         }
-        fputs("\"null\":\"null\"\n}", out);
         mz_zip_reader_end(&zip);
         fclose(out);
         return RESULT_STATE_OK;

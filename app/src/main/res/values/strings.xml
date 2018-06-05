@@ -52,5 +52,15 @@
     <string name="please_input_password">请输入解压密码</string>
     <string name="mod_list_item_content">%d</string>
     <string name="home_map_file">点击生成映射文件(外部资源需要先自行下载好)</string>
-    <string name="map_file_size">映射文件记录:%d，点击重新生成。</string>
+    <string name="map_file_size">映射文件记录(点击重新生成):%d</string>
+    <string-array name="apk_modify_model">
+        <item>不修改</item>
+        <item>虚拟环境模式</item>
+        <item>Root权限模式(慎用)</item>
+    </string-array>
+    <string-array name="apk_modify_model_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 </resources>

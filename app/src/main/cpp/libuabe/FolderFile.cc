@@ -8,6 +8,7 @@ namespace xausky {
     char FolderPathBuffer[PATH_BUFFER_SIZE];
 
     void RestoreTarget(string targetPath, string backupPath){
+        __LIBUABE_LOG("RestoreTarget: targetPath=%s,backupPath=%s\n", targetPath.c_str(), backupPath.c_str());
         list<string> files = Utils::ListFolderFiles(backupPath, true);
         for (list<string>::iterator it = files.begin(); it != files.end(); it++){
             Utils::CopyFile(targetPath + '/' + *it, backupPath + '/' + *it);
@@ -21,13 +22,15 @@ namespace xausky {
 
     void PatchFile(string filename, string targetPath, string modsPath, string backupPath){
         struct stat modStat;
-        size_t pos = filename.find_last_of('_');
+        string matchName = filename;
+        size_t pos = matchName.find_last_of('_');
         if(pos != string::npos){
-            filename = filename.substr(0, pos);
+            matchName = matchName.substr(0, pos);
         }
-        sprintf(FolderPathBuffer, "%s/%s", modsPath.c_str(), filename.c_str());
+        sprintf(FolderPathBuffer, "%s/%s", modsPath.c_str(), matchName.c_str());
         if(stat(FolderPathBuffer,&modStat)==0){
             if(S_ISDIR(modStat.st_mode)){
+                __LIBUABE_LOG("bundle patch: %s\n", matchName.c_str());
                 BackupFile(filename, targetPath, backupPath);
                 BinaryStream bundle(targetPath + '/' + filename, true);
                 BinaryStream patchedBundle(targetPath + '/' + filename, true);
@@ -37,11 +40,10 @@ namespace xausky {
                 bundleFile.patch(*patch);
                 bundleFile.save(patchedBundle);
                 Utils::FreeBundlePatch(patch);
-                __LIBUABE_LOG("bundle patch: %s\n", filename.c_str());
             }else if(S_ISREG(modStat.st_mode)){
+                __LIBUABE_LOG("copy patch: %s\n", filename.c_str());
                 BackupFile(filename, targetPath, backupPath);
                 Utils::CopyFile(targetPath + '/' + filename, FolderPathBuffer);
-                __LIBUABE_LOG("copy patch: %s\n", filename.c_str());
                 return;
             }
         }
@@ -57,17 +59,14 @@ namespace xausky {
     }
 
     int FolderFile::GenerateMapFile(string inputPath, string outputPath){
-        __LIBUABE_LOG("GenerateMapFile:inputPath=%s, outputPath=%s", inputPath.c_str(), outputPath.c_str());
         list<string> files = Utils::ListFolderFiles(inputPath, true);
         FILE* out = fopen(outputPath.c_str(), "w");
-        fputs("{\n", out);
         if(out == NULL){
             __LIBUABE_LOG("map file output open failed!\n");
             return RESULT_STATE_INTERNAL_ERROR;
         }
         for (list<string>::iterator it = files.begin(); it != files.end(); it++){
             string filename = *it;
-            __LIBUABE_LOG("GenerateMapFile:filename=%s", filename.c_str());
             size_t pos = filename.find_last_of('_');
             if(pos != string::npos){
                 filename = filename.substr(0, pos);
@@ -80,9 +79,8 @@ namespace xausky {
                     key = filename.substr(pos + 1);
                 }
             }
-            fprintf(out, "\"%s\":\"%s\",\n", key.c_str(), filename.c_str());
+            fprintf(out, "%s:%s\n", key.c_str(), filename.c_str());
         }
-        fputs("\"null\":\"null\"\n}", out);
         fclose(out);
         return RESULT_STATE_OK;
     }

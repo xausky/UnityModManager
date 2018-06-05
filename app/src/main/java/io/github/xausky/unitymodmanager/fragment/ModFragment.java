@@ -112,7 +112,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
 
     @Override
     public void OnActionButtonClick() {
-        if(ModUtils.apkMap == null){
+        if(ModUtils.map == null){
             Toast.makeText(context, "请先安装客户端以生成索引。", Toast.LENGTH_LONG).show();
             return;
         }
@@ -124,7 +124,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
 
     @Override
     public void OnActionButtonLongClick() {
-        if(ModUtils.apkMap == null){
+        if(ModUtils.map == null){
             Toast.makeText(context, "请先安装客户端以生成索引。", Toast.LENGTH_LONG).show();
             return;
         }
@@ -170,13 +170,13 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
         });
     }
 
-    public int patch(String apkPath, String baseApkPath, boolean rootModel){
-        if(rootModel){
+    public int patch(String apkPath, String baseApkPath, String persistentPath, String backupPath,  int apkModifyModel, boolean persistentSupport){
+        if(apkModifyModel == HomeFragment.APK_MODIFY_MODEL_ROOT){
             //暂时禁用SELinux，并且修改目标APK权限为666。
             Shell.Sync.su("setenforce 0", "chmod 666 " + apkPath);
         }
         try {
-            Log.d(MainApplication.LOG_TAG, "patch: apkPath=" + apkPath + ", baseApkPath=" + baseApkPath + ", rootModel=" + rootModel);
+            Log.d(MainApplication.LOG_TAG, "patch: apkPath=" + apkPath + ", baseApkPath=" + baseApkPath + ", apkModifyModel=" + apkModifyModel);
             List<Mod> mods = adapter.getMods();
             File fusionFile = new File(getBase().getCacheDir().getAbsolutePath() + "/fusion");
             try {
@@ -207,10 +207,19 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
                     }
                 }
             }
-            int result = NativeUtils.PatchApk(baseApkPath, apkPath, fusionFile.getAbsolutePath());
-            if(result != NativeUtils.RESULT_STATE_OK){
-                Log.d(MainApplication.LOG_TAG, "Patch APK File Failed: " + result + ",apkPath:" + apkPath + ",baseApkPath:" + baseApkPath);
-                return result;
+            if(apkModifyModel != HomeFragment.APK_MODIFY_MODEL_NONE){
+                int result = NativeUtils.PatchApk(baseApkPath, apkPath, fusionFile.getAbsolutePath());
+                if(result != NativeUtils.RESULT_STATE_OK){
+                    Log.d(MainApplication.LOG_TAG, "Patch APK File Failed: " + result + ",apkPath:" + apkPath + ",baseApkPath:" + baseApkPath);
+                    return result;
+                }
+            }
+            if(persistentSupport){
+                int result = NativeUtils.PatchFolder(persistentPath,fusionFile.getAbsolutePath(), backupPath);
+                if(result != NativeUtils.RESULT_STATE_OK){
+                    Log.d(MainApplication.LOG_TAG, "Patch Persistent Folder Failed: " + result + ",persistentPath=" + persistentPath + ",backupPath=" + backupPath);
+                    return result;
+                }
             }
             adapter.notifyApply();
             handler.post(new Runnable() {
@@ -221,7 +230,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
             });
             return NativeUtils.RESULT_STATE_OK;
         }finally {
-            if(rootModel){
+            if(apkModifyModel == HomeFragment.APK_MODIFY_MODEL_ROOT){
                 //修改目标APK权限回644，并且重新启用SELinux。
                 Shell.Sync.su("chmod 644 " + apkPath, "setenforce 0");
             }

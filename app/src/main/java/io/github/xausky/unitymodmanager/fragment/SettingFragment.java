@@ -88,7 +88,7 @@ public class SettingFragment extends PreferenceFragment {
             ModFragment modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
             HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
             if (modFragment.isNeedPatch()) {
-                result = modFragment.patch(homeFragment.apkPath, homeFragment.baseApkPath, homeFragment.rootModel);
+                result = modFragment.patch(homeFragment.apkPath, homeFragment.baseApkPath, homeFragment.persistentPath, homeFragment.backupPath, homeFragment.apkModifyModel, homeFragment.persistentSupport);
             }
             if (result == ModUtils.RESULT_STATE_OK) {
                 String exportPath = Environment.getExternalStorageDirectory() + "/out.apk";

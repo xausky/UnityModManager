@@ -19,18 +19,19 @@ namespace xausky {
         if(access(target,F_OK) == 0) {
             return;
         } else {
-            strcpy(buffer,target);
-            dirname(buffer);
+            char * dir = dirname(target);
+            strcpy(buffer, dir);
             MakeFolder(buffer);
         }
-        if(mkdir(target,777) == -1){
+        if(mkdir(target,0700) == -1){
             return;
         }
     }
 
     void Utils::MakeFileFolder(string target) {
         char buffer[PATH_BUFFER_SIZE];
-        dirname(buffer);
+        char * dir = dirname(target.c_str());
+        strcpy(buffer, dir);
         MakeFolder(buffer);
     }
 
@@ -38,7 +39,7 @@ namespace xausky {
     void Utils::CopyFile(string target, string origin) {
         ifstream input(origin.c_str(), ios::binary | ios::in ) ;
         ofstream output(target.c_str(), ios::binary | ios::out ) ;
-        output<<input;
+        output<<input.rdbuf();
     }
 
     list<string> Utils::ListFolderFiles(string path, bool recursive){

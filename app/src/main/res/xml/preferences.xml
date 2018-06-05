@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:key="apk_modify_model"
+        android:title="APK内资源修改方式"
+        android:summary="选择修改APK内资源的方式，不修改模式表示不修改APK资源，可以继续使用持久化资源补丁。"
+        android:defaultValue="1"
+        android:entries="@array/apk_modify_model"
+        android:entryValues="@array/apk_modify_model_values"/>
     <SwitchPreference
-        android:key="persistent_data_path_support"
-        android:title="SD卡的Unity资源补丁支持"
+        android:key="persistent_support"
+        android:defaultValue="false"
+        android:title="持久化Unity资源补丁支持"
         android:summary="Unity的PersistentDataPath路径的资源补丁支持，比如《崩坏3》2.3版本的九游服。" />
-    <SwitchPreference
-        android:key="root_model"
-        android:title="启用Root模式"
-        android:summary="启用Root模式，具有更强的兼容性，目前存在设备重启应用消失问题，重新安装APK可以解决，慎用。" />
     <Preference
         android:key="setting_export_apk"
         android:title="导出整合APK文件"
@@ -16,4 +20,5 @@
         android:key="create_shortcut"
         android:title="创建游戏快捷方式"
         android:summary="创建游戏快捷方式可以从桌面直接进入虚拟环境内游戏，无需先打开管理器。" />
+
 </PreferenceScreen>

@@ -44,11 +44,14 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -58,6 +61,7 @@ import io.github.xausky.unitymodmanager.ShortcutActivity;
 import io.github.xausky.unitymodmanager.dialog.ApplicationChooseDialog;
 import io.github.xausky.unitymodmanager.utils.ModUtils;
 import io.github.xausky.unitymodmanager.utils.NativeUtils;
+import ru.bartwell.exfilepicker.utils.Utils;
 
 /**
  * Created by xausky on 18-3-3.
@@ -67,11 +71,16 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     public static final String PACKAGE_PREFERENCE_KEY = "PACKAGE_PREFERENCE_KEY";
     public static final String BASE_APK_PATH_PREFERENCE_KEY = "BASE_APK_PATH_PREFERENCE_KEY";
     public static final String ALL_APPLICATION_PACKAGE_REGEX = "^.*$";
+    public static final int APK_MODIFY_MODEL_NONE = 0;
+    public static final int APK_MODIFY_MODEL_VIRTUAL = 1;
+    public static final int APK_MODIFY_MODEL_ROOT = 2;
     public String packageName;
     public String apkPath;
     public String baseApkPath;
-    public boolean rootModel;
-    public boolean persistentDataPathSupport;
+    public String backupPath;
+    public String persistentPath;
+    public int apkModifyModel;
+    public boolean persistentSupport;
     private View view;
     private TextView summary;
     private TextView clientState;
@@ -101,10 +110,10 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        rootModel = settings.getBoolean("root_model", false);
-        persistentDataPathSupport = settings.getBoolean("persistent_data_path_support", false);
+        apkModifyModel = Integer.valueOf(settings.getString("apk_modify_model", "1"));
+        persistentSupport = settings.getBoolean("persistent_support", false);
         context = inflater.getContext();
-        dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, !rootModel, true);
+        dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, apkModifyModel == APK_MODIFY_MODEL_VIRTUAL, true);
         dialog.setListener(this);
         progressDialog = new ProgressDialog(context);
         progressDialog.setTitle(R.string.progress_dialog_title);
@@ -192,7 +201,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
 
     private void clientUpdate(){
         String versionName = null;
-        if(rootModel){
+        if(apkModifyModel == APK_MODIFY_MODEL_ROOT || apkModifyModel == APK_MODIFY_MODEL_NONE){
             try {
                 versionName = context.getPackageManager().getPackageInfo(packageName,0).versionName;
                 apkPath = context.getPackageManager().getApplicationInfo(packageName, 0).sourceDir;
@@ -206,6 +215,14 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 apkPath = installedAppInfo.apkPath;
             }
         }
+        persistentPath = context.getExternalFilesDir(null).getParentFile().getParentFile().getAbsolutePath() + "/" + packageName + "/files";
+        backupPath = context.getFilesDir().getAbsolutePath() + "/backup";
+        File backup = new File(backupPath);
+        if(!backup.exists()){
+            if(!backup.mkdirs()){
+                Toast.makeText(context, "创建备份目录失败", Toast.LENGTH_LONG).show();
+            }
+        }
         if(versionName != null){
             clientState.setText(String.format(getText(R.string.home_client_installed).toString(), versionName));
             clientState.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_check),null, null, null);
@@ -213,42 +230,80 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             clientState.setText(getText(R.string.home_client_uninstalled));
             clientState.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_clear),null, null, null);
         }
-        InputStream mapInputStream = null;
-        try {
-            File apkJson = new File(this.context.getFilesDir() + "/apk.json");
-            if(apkJson.exists()){
-                mapInputStream = new FileInputStream(apkJson);
-                byte[] bytes = new byte[mapInputStream.available()];
-                if(mapInputStream.read(bytes) == -1){
-                    throw new IOException("apk.json read failed.");
+        ModUtils.map = new HashMap<>();
+        File persistentMap = new File(this.context.getFilesDir() + "/persistent.map");
+        if(persistentMap.exists() && persistentSupport){
+            FileReader reader = null;
+            BufferedReader bufferedReader = null;
+            try {
+                reader = new FileReader(persistentMap);
+                bufferedReader = new BufferedReader(reader);
+                String line = null;
+                while ((line = bufferedReader.readLine()) != null) {
+                    String[] column = line.split(":");
+                    if(column.length == 2) {
+                        ModUtils.map.put(column[0], column[1]);
+                    }
                 }
-                String json = new String(bytes);
-                ModUtils.apkMap = new JSONObject(json);
-                mapFile.setText(String.format(context.getString(R.string.map_file_size), ModUtils.apkMap.length()));
-                mapFile.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_check),null, null, null);
-            }
-            File persistentJson = new File(this.context.getFilesDir() + "/persistent.json");
-            if(apkJson.exists() && persistentDataPathSupport){
-                mapInputStream = new FileInputStream(persistentJson);
-                byte[] bytes = new byte[mapInputStream.available()];
-                if(mapInputStream.read(bytes) == -1){
-                    throw new IOException("persistent.json read failed.");
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }finally {
+                if(bufferedReader != null) {
+                    try {
+                        bufferedReader.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
                 }
-                String json = new String(bytes);
-                ModUtils.persistentMap = new JSONObject(json);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }finally {
-            if(mapInputStream != null){
-                try {
-                    mapInputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if(reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
                 }
             }
+        }
+        File apkMap = new File(this.context.getFilesDir() + "/apk.map");
+        if(apkMap.exists() && apkModifyModel != APK_MODIFY_MODEL_NONE) {
+            FileReader reader = null;
+            BufferedReader bufferedReader = null;
+            try {
+                reader = new FileReader(apkMap);
+                bufferedReader = new BufferedReader(reader);
+                String line = null;
+                while ((line = bufferedReader.readLine()) != null) {
+                    String[] column = line.split(":");
+                    if(column.length == 2) {
+                        ModUtils.map.put(column[0], column[1]);
+                    }
+                }
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }finally {
+                if(bufferedReader != null) {
+                    try {
+                        bufferedReader.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+                if(reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        }
+        mapFile.setText(String.format(context.getString(R.string.map_file_size), ModUtils.map.size()));
+        if(ModUtils.map.size() > 0){
+            mapFile.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_check),null, null, null);
         }
         String summaryString = String.format(getString(R.string.home_summary_context),
                 modFragment.getEnableItemCount(),
@@ -267,14 +322,19 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             if(apkPath == null){
                 Toast.makeText(context, "请先安装客户端和下载热更新资源。", Toast.LENGTH_LONG).show();
             }
-            NativeUtils.GenerateApkMapFile(apkPath, HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/apk.json");
-            if(persistentDataPathSupport){
-                String path = context.getExternalFilesDir(null).getParentFile().getParentFile().getAbsolutePath() + "/" + packageName + "/files";
-                Log.d(MainApplication.LOG_TAG, "persistentDataPathSupport:" + path);
-                NativeUtils.GenerateFolderMapFile(path, HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/persistent.json");
+            if(apkModifyModel != APK_MODIFY_MODEL_NONE){
+                NativeUtils.GenerateApkMapFile(apkPath, HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/apk.map");
+            }
+            if(persistentSupport){
+                Log.d(MainApplication.LOG_TAG, "persistentSupport:" + persistentPath);
+                NativeUtils.GenerateFolderMapFile(persistentPath, HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/persistent.map");
             }
             clientUpdate();
-            Toast.makeText(context, "映射文件生成成功。", Toast.LENGTH_SHORT).show();
+            if(persistentSupport || apkModifyModel != APK_MODIFY_MODEL_NONE){
+                Toast.makeText(context, "映射文件生成成功。", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "请确保至少有一个修改源。", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -296,13 +356,15 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             public void run() {
                 Log.d(MainApplication.LOG_TAG, apkPath);
                 final String resultString;
-                    if(rootModel){
+                    if(apkModifyModel == APK_MODIFY_MODEL_ROOT || apkModifyModel == APK_MODIFY_MODEL_NONE){
                         String result = "安装失败";
                         try {
                             String basePath = HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/base.apk";
-                            FileUtils.copyFile(new File(apkPath), new File(basePath));
+                            if(apkModifyModel == APK_MODIFY_MODEL_ROOT){
+                                FileUtils.copyFile(new File(apkPath), new File(basePath));
+                                HomeFragment.this.baseApkPath = basePath;
+                            }
                             HomeFragment.this.packageName = packageName;
-                            HomeFragment.this.baseApkPath = basePath;
                             HomeFragment.this.apkPath = apkPath;
                             result = "安装成功";
                         } catch (IOException e) {

@@ -3,7 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -51,7 +57,7 @@
                 android:drawableLeft="@drawable/ic_clear"
                 android:gravity="center"
                 android:layout_width="wrap_content"
-                android:layout_height="24dp"
+                android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:text="@string/home_client_uninstalled" />
     </android.support.v7.widget.CardView>
@@ -68,9 +74,8 @@
             android:layout_gravity="center"
             android:drawableStart="@drawable/ic_clear"
             android:drawableLeft="@drawable/ic_clear"
-            android:gravity="center"
             android:layout_width="wrap_content"
-            android:layout_height="24dp"
+            android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:text="@string/home_map_file" />
     </android.support.v7.widget.CardView>
@@ -86,5 +91,6 @@
             android:layout_margin="10dp"
             android:text="@android:string/unknownName" />
     </android.support.v7.widget.CardView>
-
+    </LinearLayout>
+</ScrollView>
 </LinearLayout>

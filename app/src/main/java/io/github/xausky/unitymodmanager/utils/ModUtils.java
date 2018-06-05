@@ -8,6 +8,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -20,8 +22,7 @@ import io.github.xausky.unitymodmanager.MainApplication;
 public class ModUtils {
     public static final int RESULT_STATE_OK = 0;
     public static final int RESULT_STATE_INTERNAL_ERROR = -1;
-    public static JSONObject apkMap;
-    public static JSONObject persistentMap;
+    public static Map<String, String> map;
     public static Set<String> supportImageType = new TreeSet<>();
 
     static {
@@ -39,12 +40,7 @@ public class ModUtils {
         for(File file : files){
             String path = null;
             String name = file.getName();
-            try {
-                path = apkMap.getString(input.getName() + "/" + name);
-                Log.d(MainApplication.LOG_TAG, "Standardization: " + path);
-            } catch (JSONException e) {
-                //ignore
-            }
+            path = map.get(input.getName() + "/" + name);
             if(path != null){
                 try {
                     if(file.isDirectory()){
