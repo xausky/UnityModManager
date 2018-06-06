@@ -53,6 +53,9 @@
     <string name="mod_list_item_content">%d</string>
     <string name="home_map_file">点击生成映射文件(外部资源需要先自行下载好)</string>
     <string name="map_file_size">映射文件记录(点击重新生成):%d</string>
+    <string name="mod_info_description">简介:\n%s</string>
+    <string name="mod_info_name">%s</string>
+    <string name="mod_info_author">作者:%s</string>
     <string-array name="apk_modify_model">
         <item>不修改</item>
         <item>虚拟环境模式</item>

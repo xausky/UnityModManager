@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,17 +20,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hzy.libp7zip.P7ZipApi;
-import com.stfalcon.frescoimageviewer.ImageViewer;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.monitor.FileAlterationListener;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,6 +41,7 @@ import java.util.Map;
 
 import io.github.xausky.unitymodmanager.R;
 import io.github.xausky.unitymodmanager.dialog.ConfirmDialog;
+import io.github.xausky.unitymodmanager.dialog.ModInfoDialog;
 import io.github.xausky.unitymodmanager.dialog.PasswordDialog;
 import io.github.xausky.unitymodmanager.domain.Mod;
 import io.github.xausky.unitymodmanager.utils.ModUtils;
@@ -348,16 +352,33 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
             holder.icon.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if(images != null && images.length != 0){
-                        List<String> files = new ArrayList<>();
-                        for(File image: images){
-                            files.add(image.toURI().toString());
+                    FileInputStream inputStream = null;
+                    JSONObject info = null;
+                    try {
+                        inputStream = new FileInputStream(mod.path + "/info.json");
+                        byte[] bytes = new byte[inputStream.available()];
+                        if(inputStream.read(bytes) == -1){
+                            throw new IOException("map.json read failed.");
                         }
-                        new ImageViewer.Builder<String>(context, files)
-                                .setStartPosition(0)
-                                .show();
+                        String json = new String(bytes);
+                        info = new JSONObject(json);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } finally {
+                        if(inputStream != null){
+                            try {
+                                inputStream.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    if((images == null || images.length == 0) &&  info == null){
+                        Toast.makeText(context, "模组内没有可供查看的信息。", Toast.LENGTH_LONG).show();
                     } else {
-                        Toast.makeText(context, "模组内没有可供预览的图片。", Toast.LENGTH_LONG).show();
+                        new ModInfoDialog(context, images, info).show();
                     }
                 }
             });
