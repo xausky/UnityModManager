@@ -3,7 +3,9 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1"/>
-	<title>微信弹出遮罩</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <title>Unity模组管理器自动导入</title>
 </head>
 <body>
 	<style type="text/css">
@@ -12,10 +14,14 @@
 	.test{height: 600px; max-width: 600px; font-size: 40px;}
 	</style>
     <img height="200" width="200" src="icon.png">
-    <p>这是Unity模组管理器的自动模组导入兼容页面，如果已经安装模组管理器应该会自动启动并且导入。</p>
-    <p>若没有安装可以在<a href="https://fir.im/hcl7">https://fir.im/hcl7</a>下载安装。</p>
-    <p>请使用系统自带浏览器打开，如果不行推荐使用Chrome浏览器。</p>
-	<script type="text/javascript">
+    <h1>Unity模组管理器自动导入</h1>
+    <a id="btn-import" type="button" class="btn btn-default">点击导入模组</a>
+    <a href="https://fir.im/hcl7" type="button" class="btn btn-default">点击下载模组管理器</a>
+    <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
 		function is_weixin() {
 		    var ua = navigator.userAgent.toLowerCase();
 		    if (ua.match(/MicroMessenger/i) == "micromessenger") {
@@ -55,11 +61,8 @@
 			loadHtml();
 			loadStyleText(cssText);
 		} else {
-            var startTime = Date.now();
-            var ifr = document.createElement('iframe');
-            ifr.src="umm://import?url=" + GetQueryString('url');
-            ifr.style.display = 'none';
-            document.body.appendChild(ifr);
+            var importBtn = document.getElementById('btn-import');
+            importBtn.href = "umm://import?url=" + GetQueryString('url');
 		}
 	</script>
 </body>
