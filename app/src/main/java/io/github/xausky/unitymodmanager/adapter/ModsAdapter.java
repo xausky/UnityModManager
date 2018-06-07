@@ -10,6 +10,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +40,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import io.github.xausky.unitymodmanager.MainApplication;
 import io.github.xausky.unitymodmanager.R;
 import io.github.xausky.unitymodmanager.dialog.ConfirmDialog;
 import io.github.xausky.unitymodmanager.dialog.ModInfoDialog;
@@ -261,6 +263,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
     }
 
     public void addMods(String path, List<String> names) {
+        Log.d(MainApplication.LOG_TAG, String.format("addMods:path=%s,names[0]=%s", path, names.get(0)));
         Iterator<String> iterator = names.iterator();
         process(path, iterator.next(), iterator, null, true);
     }

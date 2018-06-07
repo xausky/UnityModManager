@@ -56,11 +56,11 @@ dependencies {
     implementation 'com.hzy:libp7zip:1.5.0'
     implementation 'com.github.topjohnwu:libsu:1.1.1'
     implementation 'com.daimajia.slider:library:1.1.5'
+    implementation 'com.github.xausky:VirtualApp:99d8e8050f'
     implementation 'com.github.medyo:android-about-page:1.2.2'
-    implementation 'com.allenliu.versionchecklib:library:2.0.3'
-    implementation 'com.github.bartwell:ExFilePicker:master-SNAPSHOT'
+    implementation 'com.github.bartwell:ExFilePicker:0c5a7c83ae'
+    implementation 'com.github.xausky:CheckVersionLib:abf99da29f'
 
-    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.2'
-    implementation 'com.crashlytics.sdk.android:answers:1.4.1'
-    implementation project(':libva')
+    implementation 'com.crashlytics.sdk.android:answers:1.4.2'
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.3'
 }

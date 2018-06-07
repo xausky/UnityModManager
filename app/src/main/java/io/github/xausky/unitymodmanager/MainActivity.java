@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,6 +15,7 @@ import android.support.v7.app.ActionBar;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private int currentNavigation;
     private ProgressDialog dialog;
     private HomeFragment homeFragment;
+    private ModFragment modFragment;
 
 
     @Override
@@ -87,13 +90,25 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-        navigation(R.id.nav_home);
         dialog = new ProgressDialog(this);
         dialog.setTitle(R.string.progress_dialog_title);
         dialog.setMessage(getString(R.string.progress_dialog_message));
         dialog.setCancelable(false);
-        homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
-        MainActivity.this.setTitle(getString(R.string.app_name) + "-" + getString(R.string.nav_home));
+
+        Intent intent = getIntent();
+        String scheme = intent.getScheme();
+        Uri uri = intent.getData();
+        if("umm".equals(scheme) && uri != null && "import".equals(uri.getHost())){
+            modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
+            modFragment.url = uri.getQueryParameter("url");
+            MainActivity.this.setTitle(getString(R.string.app_name) + "-" + getString(R.string.nav_mod));
+            navigation(R.id.nav_mod);
+        } else {
+            homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
+            MainActivity.this.setTitle(getString(R.string.app_name) + "-" + getString(R.string.nav_home));
+            navigation(R.id.nav_home);
+        }
+        Log.d(MainApplication.LOG_TAG, "scheme:" + scheme);
     }
 
     private void navigation(int item){
