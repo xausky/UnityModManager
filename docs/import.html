@@ -60,15 +60,6 @@
             ifr.src="umm://import?url=" + GetQueryString('url');
             ifr.style.display = 'none';
             document.body.appendChild(ifr);
-            var t = setTimeout(function() {
-                var endTime = Date.now();
-                if (!startTime || endTime - startTime < 600 + 200) {
-                    window.location = 'https://fir.im/hcl7';
-                }
-            }, 600);
-            window.onblur = function() {
-                clearTimeout(t);
-            }
 		}
 	</script>
 </body>
