@@ -51,18 +51,13 @@
             var head=document.getElementsByTagName("head")[0]; //head标签之间加上style样式
             head.appendChild(style); 
 	    }
-	    function GetQueryString(name) {
-            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-            var r = window.location.search.substr(1).match(reg);
-            if (r != null) return unescape(r[2]); return null;
-        }
 	    var cssText = "#weixin-tip{position: fixed; left:0; top:0; background: rgba(0,0,0,0.8); filter:alpha(opacity=80); width: 100%; height:100%; z-index: 100;} #weixin-tip p{text-align: center; margin-top: 10%; padding:0 5%;}";
 		if(isWeixin){
 			loadHtml();
 			loadStyleText(cssText);
 		} else {
             var importBtn = document.getElementById('btn-import');
-            importBtn.href = "umm://import?url=" + decodeURI(GetQueryString('url'));
+            importBtn.href = "umm://import?url=" + window.location.href.split('?')[1].split('=')[1];
 		}
 	</script>
 </body>
