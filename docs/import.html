@@ -62,7 +62,7 @@
 			loadStyleText(cssText);
 		} else {
             var importBtn = document.getElementById('btn-import');
-            importBtn.href = "umm://import?url=" + GetQueryString('url');
+            importBtn.href = "umm://import?url=" + decodeURI(GetQueryString('url'));
 		}
 	</script>
 </body>
