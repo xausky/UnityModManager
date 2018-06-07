@@ -17,7 +17,7 @@
         ExFilePicker，
         android-about-page，
         CheckVersionLib，
-        FrescoImageViewer。
+        AndroidImageSlider。
     </string>
     <string name="home_summary_context">
         已启用模组数量：%d\n已安装模组数量：%d\n已安装附加组件数量：%d\n可见的外部程序数量：%d\n虚拟环境已安装应用数量：%d

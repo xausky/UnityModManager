@@ -1,1 +1,1 @@
-include ':libva', ':app'
+include ':app'
