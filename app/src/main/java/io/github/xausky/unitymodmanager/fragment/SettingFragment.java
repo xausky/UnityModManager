@@ -53,15 +53,23 @@ public class SettingFragment extends PreferenceFragment {
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
         if(preference.getKey().equals("setting_export_apk")){
             HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
+            if(homeFragment.apkModifyModel == HomeFragment.APK_MODIFY_MODEL_NONE){
+                Toast.makeText(this.getActivity(), R.string.none_modify_export, Toast.LENGTH_LONG).show();
+                return super.onPreferenceTreeClick(preferenceScreen, preference);
+            }
             if(homeFragment.apkPath == null || homeFragment.baseApkPath == null || !new File(homeFragment.baseApkPath).exists()){
-                Toast.makeText(this.getActivity(), "请先到主页安装客户端，并且保证安装源不被卸载或者删除。", Toast.LENGTH_LONG).show();
+                Toast.makeText(this.getActivity(), R.string.install_source_not_found, Toast.LENGTH_LONG).show();
             } else {
                 new ExportApkTask(dialog).execute();
             }
         } else if(preference.getKey().equals("create_shortcut")){
             HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
+            if(homeFragment.apkModifyModel != HomeFragment.APK_MODIFY_MODEL_VIRTUAL){
+                Toast.makeText(this.getActivity(), R.string.no_virtual_model_shortcut, Toast.LENGTH_LONG).show();
+                return super.onPreferenceTreeClick(preferenceScreen, preference);
+            }
             if(homeFragment.apkPath == null || homeFragment.baseApkPath == null || !new File(homeFragment.baseApkPath).exists()){
-                Toast.makeText(this.getActivity(), "请先到主页安装客户端，并且保证安装源不被卸载或者删除。", Toast.LENGTH_LONG).show();
+                Toast.makeText(this.getActivity(), R.string.install_source_not_found, Toast.LENGTH_LONG).show();
             } else {
                 homeFragment.crateShortcut(VirtualCore.get().getInstalledAppInfo(homeFragment.packageName,0));
             }
@@ -109,9 +117,9 @@ public class SettingFragment extends PreferenceFragment {
             if (result == ModUtils.RESULT_STATE_OK) {
                 modFragment.setNeedPatch(false);
                 String exportPath = Environment.getExternalStorageDirectory() + "/out.apk";
-                Toast.makeText(modFragment.getBase(), "导出整合包成功=>" + exportPath, Toast.LENGTH_LONG).show();
+                Toast.makeText(modFragment.getBase(), modFragment.getBase().getString(R.string.package_export_success,exportPath), Toast.LENGTH_LONG).show();
             } else if (result == RESULT_STATE_INTERNAL_ERROR) {
-                Toast.makeText(modFragment.getBase(), "导出整合包失败，请确保程序可以读写外部存储。", Toast.LENGTH_LONG).show();
+                Toast.makeText(modFragment.getBase(), R.string.package_export_failed, Toast.LENGTH_LONG).show();
             }
         }
     }

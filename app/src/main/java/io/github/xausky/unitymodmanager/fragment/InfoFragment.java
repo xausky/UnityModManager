@@ -20,9 +20,9 @@ public class InfoFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         return new AboutPage(inflater.getContext())
                 .setDescription(getString(R.string.info_context_text))
-                .addEmail("xausky@163.com", "我的邮箱")
-                .addWebsite("https://space.bilibili.com/8419077/", "我的B站")
-                .addGitHub("xausky", "我的Github")
+                .addEmail("xausky@163.com", getString(R.string.my_email))
+                .addWebsite("https://space.bilibili.com/8419077/", getString(R.string.my_bilibili))
+                .addGitHub("xausky", getString(R.string.my_github))
                 .create();
     }
 }

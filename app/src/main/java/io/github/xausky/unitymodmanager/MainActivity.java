@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     fragment.OnActionButtonClick();
                 }catch (UnsupportedOperationException e){
-                    Toast.makeText(MainActivity.this, "不支持的操作", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, R.string.unsupport_operation, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     fragment.OnActionButtonLongClick();
                 }catch (UnsupportedOperationException e){
-                    Toast.makeText(MainActivity.this, "不支持的操作", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, R.string.unsupport_operation, Toast.LENGTH_SHORT).show();
                 }
                 return true;
             }
@@ -95,16 +95,18 @@ public class MainActivity extends AppCompatActivity {
         dialog.setMessage(getString(R.string.progress_dialog_message));
         dialog.setCancelable(false);
 
+        modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
+        homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
+        homeFragment.ImportMapFile();
+
         Intent intent = getIntent();
         String scheme = intent.getScheme();
         Uri uri = intent.getData();
         if("umm".equals(scheme) && uri != null && "import".equals(uri.getHost())){
-            modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
             modFragment.url = uri.getQueryParameter("url");
             MainActivity.this.setTitle(getString(R.string.app_name) + "-" + getString(R.string.nav_mod));
             navigation(R.id.nav_mod);
         } else {
-            homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
             MainActivity.this.setTitle(getString(R.string.app_name) + "-" + getString(R.string.nav_home));
             navigation(R.id.nav_home);
         }
@@ -138,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void launch(){
         if(homeFragment.apkModifyModel != HomeFragment.APK_MODIFY_MODEL_NONE && (homeFragment.apkPath == null || homeFragment.baseApkPath == null || !new File(homeFragment.baseApkPath).exists())){
-            Toast.makeText(this, "请先到主页安装客户端，并且保证安装源不被卸载或者删除。", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.install_source_not_found, Toast.LENGTH_LONG).show();
         } else {
             new PatchApkTask(dialog).execute();
         }
@@ -191,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
             if (result == ModUtils.RESULT_STATE_OK) {
                 modFragment.setNeedPatch(false);
             } else if (result == ModUtils.RESULT_STATE_INTERNAL_ERROR) {
-                Toast.makeText(modFragment.getBase(), "安装模组失败", Toast.LENGTH_LONG).show();
+                Toast.makeText(modFragment.getBase(), R.string.install_mods_failed, Toast.LENGTH_LONG).show();
             }
         }
     }

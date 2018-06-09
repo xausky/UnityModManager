@@ -11,10 +11,6 @@ extern "C" {
 #define io_github_xausky_unitymodmanager_utils_NativeUtils_RESULT_STATE_OK 0L
 #undef io_github_xausky_unitymodmanager_utils_NativeUtils_RESULT_STATE_INTERNAL_ERROR
 #define io_github_xausky_unitymodmanager_utils_NativeUtils_RESULT_STATE_INTERNAL_ERROR -1L
-#undef io_github_xausky_unitymodmanager_utils_NativeUtils_RESULT_STATE_PASSWORD_ERROR
-#define io_github_xausky_unitymodmanager_utils_NativeUtils_RESULT_STATE_PASSWORD_ERROR -2L
-#undef io_github_xausky_unitymodmanager_utils_NativeUtils_RESULT_STATE_FILE_CONFLICT
-#define io_github_xausky_unitymodmanager_utils_NativeUtils_RESULT_STATE_FILE_CONFLICT -3L
 /*
  * Class:     io_github_xausky_unitymodmanager_utils_NativeUtils
  * Method:    PatchApk

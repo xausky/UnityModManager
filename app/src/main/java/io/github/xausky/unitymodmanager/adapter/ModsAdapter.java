@@ -79,7 +79,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
         this.enableItemCount = 0;
         File[] modFiles = storage.listFiles();
         if(modFiles == null){
-            Toast.makeText(context, "应用没有读写手机存储权限，请到手机权限管理界面给予，否则无法运行。", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, R.string.no_storage_permissions, Toast.LENGTH_LONG).show();
             ((Activity)context).finish();
             return;
         }
@@ -100,7 +100,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
                         observer.addListener(ModsAdapter.this);
                         observers.put(mod.name,observer);
                         monitor.addObserver(observer);
-                        Toast.makeText(context, "外部模组监视启动：" + mod.name, Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, context.getString(R.string.external_mods_observer_start, mod.name), Toast.LENGTH_LONG).show();
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (Exception e) {
@@ -184,7 +184,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
                 }
                 FileUtils.deleteDirectory(temp);
                 if(p7zip == 2){
-                    result = NativeUtils.RESULT_STATE_PASSWORD_ERROR;
+                    result = ModUtils.RESULT_STATE_PASSWORD_ERROR;
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -203,19 +203,6 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
             }
         }
         switch (result) {
-            case NativeUtils.RESULT_STATE_FILE_CONFLICT:
-                Toast.makeText(context, String.format("模组[%s]内部存在文件冲突，如要强制安装请到设置开启强制安装选项。", name), Toast.LENGTH_LONG).show();
-                try {
-                    FileUtils.deleteDirectory(targetFile);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if (iterator.hasNext()) {
-                    process(path, iterator.next(), iterator, null, true);
-                } else {
-                    notifyApply();
-                }
-                break;
             case RESULT_STATE_INTERNAL_ERROR:
                 Toast.makeText(context, String.format("模组[%s]解压错误，请确认模组文件未损坏。", name), Toast.LENGTH_LONG).show();
                 try {
@@ -229,12 +216,9 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
                     notifyApply();
                 }
                 break;
-            case NativeUtils.RESULT_STATE_PASSWORD_ERROR:
+            case ModUtils.RESULT_STATE_PASSWORD_ERROR:
                 this.passwordDialog.show();
-                this.passwordDialog.setTitle(String.format("请输入模组[%s]的解压密码", name));
-                if(password != null){
-                    this.passwordDialog.setTitle(String.format("请输入模组[%s]的解压密码，尝试过的错误密码:%s", name, password));
-                }
+                this.passwordDialog.setTitle(context.getString(R.string.input_mod_password, name, password));
                 this.passwordDialog.setPositiveListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -327,7 +311,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
                                 observer.addListener(ModsAdapter.this);
                                 observers.put(mod.name,observer);
                                 monitor.addObserver(observer);
-                                Toast.makeText(context, "外部模组监视启动：" + mod.name, Toast.LENGTH_LONG).show();
+                                Toast.makeText(context, context.getString(R.string.external_mods_observer_start, mod.name), Toast.LENGTH_LONG).show();
                             } catch (IOException e) {
                                 e.printStackTrace();
                             } catch (Exception e) {
@@ -339,7 +323,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
                                 monitor.removeObserver(observer);
                                 observers.remove(mod.name);
                             }
-                            Toast.makeText(context, "外部模组监视关闭：" + mod.name, Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, context.getString(R.string.external_mods_observer_stop, mod.name), Toast.LENGTH_LONG).show();
                         }
                     }
                 }
@@ -379,7 +363,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
                         }
                     }
                     if((images == null || images.length == 0) &&  info == null){
-                        Toast.makeText(context, "模组内没有可供查看的信息。", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, R.string.no_preview_info_in_mod, Toast.LENGTH_LONG).show();
                     } else {
                         new ModInfoDialog(context, images, info).show();
                     }
@@ -412,13 +396,13 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
                             monitor.removeObserver(observer);
                             observers.remove(mod.name);
                         }
-                        Toast.makeText(context, "外部模组监视关闭：" + mod.name, Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, context.getString(R.string.external_mods_observer_stop, mod.name), Toast.LENGTH_LONG).show();
                     }
                 }
                 mods.remove(mod);
             } catch (Exception e) {
                 e.printStackTrace();
-                Toast.makeText(context, context.getString(R.string.mod_file_delete_failed) + mod.name, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.mod_file_delete_failed, mod.name), Toast.LENGTH_SHORT).show();
             }
         }
         ModsAdapter.this.notifyDataSetChanged();

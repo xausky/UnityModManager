@@ -2,23 +2,23 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <ListPreference
         android:key="apk_modify_model"
-        android:title="APK内资源修改方式"
-        android:summary="选择修改APK内资源的方式，不修改模式表示不修改APK资源，可以继续使用持久化资源补丁。"
+        android:title="@string/apk_modify_model_title"
+        android:summary="@string/apk_modify_model_summary"
         android:defaultValue="1"
         android:entries="@array/apk_modify_model"
         android:entryValues="@array/apk_modify_model_values"/>
     <SwitchPreference
         android:key="persistent_support"
         android:defaultValue="false"
-        android:title="持久化Unity资源补丁支持"
-        android:summary="Unity的PersistentDataPath路径的资源补丁支持，比如《崩坏3》2.3版本的九游服。" />
+        android:title="@string/persistent_support_title"
+        android:summary="@string/persistent_support_summary" />
     <Preference
         android:key="setting_export_apk"
-        android:title="导出整合APK文件"
-        android:summary="点击将导出已安装补丁的APK文件到内部存储根目录的out.apk。"/>
+        android:title="@string/setting_export_apk_title"
+        android:summary="@string/setting_export_apk_summary"/>
     <Preference
         android:key="create_shortcut"
-        android:title="创建游戏快捷方式"
-        android:summary="创建游戏快捷方式可以从桌面直接进入虚拟环境内游戏，无需先打开管理器。" />
+        android:title="@string/create_shortcut_title"
+        android:summary="@string/create_shortcut_summary" />
 
 </PreferenceScreen>

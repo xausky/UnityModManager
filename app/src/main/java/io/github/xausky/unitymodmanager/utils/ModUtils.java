@@ -22,6 +22,7 @@ import io.github.xausky.unitymodmanager.MainApplication;
 public class ModUtils {
     public static final int RESULT_STATE_OK = 0;
     public static final int RESULT_STATE_INTERNAL_ERROR = -1;
+    public static final int RESULT_STATE_PASSWORD_ERROR = -2;
     public static Map<String, String> map;
     public static Set<String> supportImageType = new TreeSet<>();
 

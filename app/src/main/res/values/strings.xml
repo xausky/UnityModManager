@@ -22,10 +22,6 @@
     <string name="home_summary_context">
         已启用模组数量：%d\n已安装模组数量：%d\n已安装附加组件数量：%d\n可见的外部程序数量：%d\n虚拟环境已安装应用数量：%d
     </string>
-    <string name="setting_force_mode">强制模式</string>
-    <string name="setting_force_mode_summary">忽略所有模组文件冲突，按照优先级强制覆盖安装。</string>
-    <string name="setting_default_password">默认解压密码</string>
-    <string name="setting_default_password_summary">当模组文件是加密的压缩文件时会先尝试此密码。</string>
     <string name="home_latest_version">最新版本：%s</string>
     <string name="home_latest_version_default">最新版本：.....</string>
     <string name="home_current_version">当前版本：%s</string>
@@ -43,7 +39,7 @@
     <string name="visibility_delete_success">移除可见性成功</string>
     <string name="banner_content_description">Unity</string>
     <string name="nav_visibility">应用可见性</string>
-    <string name="mod_file_delete_failed">警告，模组文件删除失败：</string>
+    <string name="mod_file_delete_failed">警告，模组文件删除失败：%s</string>
     <string name="mod_delete_confirm">确定删除模组：%s?</string>
     <string name="store_mkdir_failed">创建目录失败，请确认赋予应用外部存储读写权限。</string>
     <string name="import_mod_exists">同名模组%s已存在，跳过导入。</string>
@@ -56,6 +52,46 @@
     <string name="mod_info_description">简介:\n%s</string>
     <string name="mod_info_name">%s</string>
     <string name="mod_info_author">作者:%s</string>
+    <string name="install_source_not_found">请先到主页安装客户端，并且保证安装源不被卸载或者删除。</string>
+    <string name="unsupport_operation">不支持的操作</string>
+    <string name="install_mods_failed">安装模组失败</string>
+    <string name="no_storage_permissions">应用没有读写手机存储权限，请到手机权限管理界面给予，否则无法运行。</string>
+    <string name="external_mods_observer_start">外部模组监视启动：%s</string>
+    <string name="external_mods_observer_stop">外部模组监视停止：%s</string>
+    <string name="no_preview_info_in_mod">模组内没有可供查看的信息。</string>
+    <string name="input_mod_password">请输入模组[%s]的解压密码，尝试过的错误密码:%s</string>
+    <string name="choose_client">请选择客户端</string>
+    <string name="choose_in_file">从文件选择</string>
+    <string name="skip">跳过</string>
+    <string name="new_version_release">新版本发布:%s</string>
+    <string name="update_logs">更新日志：%s \n\n若更新失败可到B站找最新下载地址自行更新。</string>
+    <string name="install_failed">安装失败</string>
+    <string name="install_success">安装成功</string>
+    <string name="install_success_create_shortcut">安装成功，可以在设置界面创建快捷方式。</string>
+    <string name="shortcut_postfix">[模组管理器]</string>
+    <string name="create_backup_folder_failed">创建备份目录失败</string>
+    <string name="install_client_download_resource">请先安装客户端和下载热更新资源。</string>
+    <string name="map_file_generate_success">映射文件生成成功。</string>
+    <string name="confirm_modify_source">请确保至少有一个修改源。</string>
+    <string name="my_email">我的邮箱</string>
+    <string name="my_bilibili">我的B站</string>
+    <string name="my_github">我的Github</string>
+    <string name="install_client_and_generate_map_file_first">请先安装客户端以生成索引。</string>
+    <string name="external_mod_import_model">外部模组目录导入模式，非模组开发者不推荐使用。</string>
+    <string name="checked_external_mod_changed">检测到外部模组改变，重新启动游戏。</string>
+    <string name="import_mod">导入模组</string>
+    <string name="package_export_success">导出整合包成功->%s></string>
+    <string name="package_export_failed">导出整合包失败，请确保程序可以读写外部存储。</string>
+    <string name="apk_modify_model_title">APK内资源修改方式</string>
+    <string name="apk_modify_model_summary">选择修改APK内资源的方式，不修改模式表示不修改APK资源，可以继续使用持久化资源补丁。</string>
+    <string name="persistent_support_title">持久化Unity资源补丁支持</string>
+    <string name="persistent_support_summary">Unity的PersistentDataPath路径的资源补丁支持，比如《崩坏3》2.3版本的九游服。</string>
+    <string name="setting_export_apk_title">导出整合APK文件</string>
+    <string name="setting_export_apk_summary">点击将导出已安装补丁的APK文件到内部存储根目录的out.apk。</string>
+    <string name="create_shortcut_title">创建游戏快捷方式</string>
+    <string name="create_shortcut_summary">创建游戏快捷方式可以从桌面直接进入虚拟环境内游戏，无需先打开管理器。</string>
+    <string name="none_modify_export">不修改APK模式无法导出整合包</string>
+    <string name="no_virtual_model_shortcut">非虚拟环境模式无法创建快捷方式，直接使用原图标启动即可。</string>
     <string-array name="apk_modify_model">
         <item>不修改</item>
         <item>虚拟环境模式</item>

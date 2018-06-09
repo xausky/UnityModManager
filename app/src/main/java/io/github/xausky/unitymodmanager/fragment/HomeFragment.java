@@ -104,6 +104,8 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         settings = base.getSharedPreferences(SettingFragment.SETTINGS_PREFERENCE_NAME, Context.MODE_PRIVATE);
         packageName = settings.getString(PACKAGE_PREFERENCE_KEY, null);
         baseApkPath = settings.getString(BASE_APK_PATH_PREFERENCE_KEY, null);
+        apkModifyModel = Integer.valueOf(settings.getString("apk_modify_model", "1"));
+        persistentSupport = settings.getBoolean("persistent_support", false);
         return super.setBase(base);
     }
 
@@ -175,8 +177,8 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                                 }
                                 if(!currentVersionString.equals(latestVersion)){
                                     UIData data = UIData.create();
-                                    data.setTitle("新版本发布:" + latestVersion);
-                                    data.setContent("更新日志：\n" + latestRelease.getString("body") + "\n\n若更新失败可到B站找最新下载地址自行更新。");
+                                    data.setTitle(getString(R.string.new_version_release, latestVersion));
+                                    data.setContent(getString(R.string.update_logs, latestRelease.getString("body")));
                                     data.setDownloadUrl(latestRelease.getJSONArray("assets").getJSONObject(0).getString("browser_download_url"));
                                     return data;
                                 } else {
@@ -199,39 +201,9 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 .excuteMission(context);
     }
 
-    private void clientUpdate(){
-        String versionName = null;
-        if(apkModifyModel == APK_MODIFY_MODEL_ROOT || apkModifyModel == APK_MODIFY_MODEL_NONE){
-            try {
-                versionName = context.getPackageManager().getPackageInfo(packageName,0).versionName;
-                apkPath = context.getPackageManager().getApplicationInfo(packageName, 0).sourceDir;
-            } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
-            }
-        }else {
-            InstalledAppInfo installedAppInfo = va.getInstalledAppInfo(packageName, 0);
-            if(installedAppInfo != null){
-                versionName = installedAppInfo.getPackageInfo(0).versionName;
-                apkPath = installedAppInfo.apkPath;
-            }
-        }
-        persistentPath = context.getExternalFilesDir(null).getParentFile().getParentFile().getAbsolutePath() + "/" + packageName + "/files";
-        backupPath = context.getFilesDir().getAbsolutePath() + "/backup";
-        File backup = new File(backupPath);
-        if(!backup.exists()){
-            if(!backup.mkdirs()){
-                Toast.makeText(context, "创建备份目录失败", Toast.LENGTH_LONG).show();
-            }
-        }
-        if(versionName != null){
-            clientState.setText(String.format(getText(R.string.home_client_installed).toString(), versionName));
-            clientState.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_check),null, null, null);
-        } else {
-            clientState.setText(getText(R.string.home_client_uninstalled));
-            clientState.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_clear),null, null, null);
-        }
+    public void ImportMapFile(){
         ModUtils.map = new HashMap<>();
-        File persistentMap = new File(this.context.getFilesDir() + "/persistent.map");
+        File persistentMap = new File(getBase().getFilesDir() + "/persistent.map");
         if(persistentMap.exists() && persistentSupport){
             FileReader reader = null;
             BufferedReader bufferedReader = null;
@@ -266,7 +238,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 }
             }
         }
-        File apkMap = new File(this.context.getFilesDir() + "/apk.map");
+        File apkMap = new File(this.getBase().getFilesDir() + "/apk.map");
         if(apkMap.exists() && apkModifyModel != APK_MODIFY_MODEL_NONE) {
             FileReader reader = null;
             BufferedReader bufferedReader = null;
@@ -301,6 +273,39 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 }
             }
         }
+    }
+
+    private void clientUpdate(){
+        String versionName = null;
+        if(apkModifyModel == APK_MODIFY_MODEL_ROOT || apkModifyModel == APK_MODIFY_MODEL_NONE){
+            try {
+                versionName = context.getPackageManager().getPackageInfo(packageName,0).versionName;
+                apkPath = context.getPackageManager().getApplicationInfo(packageName, 0).sourceDir;
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+        }else {
+            InstalledAppInfo installedAppInfo = va.getInstalledAppInfo(packageName, 0);
+            if(installedAppInfo != null){
+                versionName = installedAppInfo.getPackageInfo(0).versionName;
+                apkPath = installedAppInfo.apkPath;
+            }
+        }
+        persistentPath = context.getExternalFilesDir(null).getParentFile().getParentFile().getAbsolutePath() + "/" + packageName + "/files";
+        backupPath = context.getFilesDir().getAbsolutePath() + "/backup";
+        File backup = new File(backupPath);
+        if(!backup.exists()){
+            if(!backup.mkdirs()){
+                Toast.makeText(context, R.string.create_backup_folder_failed, Toast.LENGTH_LONG).show();
+            }
+        }
+        if(versionName != null){
+            clientState.setText(String.format(getText(R.string.home_client_installed).toString(), versionName));
+            clientState.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_check),null, null, null);
+        } else {
+            clientState.setText(getText(R.string.home_client_uninstalled));
+            clientState.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_clear),null, null, null);
+        }
         mapFile.setText(String.format(context.getString(R.string.map_file_size), ModUtils.map.size()));
         if(ModUtils.map.size() > 0){
             mapFile.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_check),null, null, null);
@@ -320,7 +325,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             dialog.show();
         } else {
             if(apkPath == null){
-                Toast.makeText(context, "请先安装客户端和下载热更新资源。", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, R.string.install_client_download_resource, Toast.LENGTH_LONG).show();
             }
             if(apkModifyModel != APK_MODIFY_MODEL_NONE){
                 NativeUtils.GenerateApkMapFile(apkPath, HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/apk.map");
@@ -329,11 +334,12 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 Log.d(MainApplication.LOG_TAG, "persistentSupport:" + persistentPath);
                 NativeUtils.GenerateFolderMapFile(persistentPath, HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/persistent.map");
             }
+            ImportMapFile();
             clientUpdate();
             if(persistentSupport || apkModifyModel != APK_MODIFY_MODEL_NONE){
-                Toast.makeText(context, "映射文件生成成功。", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, R.string.map_file_generate_success, Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(context, "请确保至少有一个修改源。", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, R.string.confirm_modify_source, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -357,7 +363,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 Log.d(MainApplication.LOG_TAG, apkPath);
                 final String resultString;
                     if(apkModifyModel == APK_MODIFY_MODEL_ROOT || apkModifyModel == APK_MODIFY_MODEL_NONE){
-                        String result = "安装失败";
+                        String result = getString(R.string.install_failed);
                         try {
                             String basePath = HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/base.apk";
                             if(apkModifyModel == APK_MODIFY_MODEL_ROOT){
@@ -366,7 +372,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                             }
                             HomeFragment.this.packageName = packageName;
                             HomeFragment.this.apkPath = apkPath;
-                            result = "安装成功";
+                            result = getString(R.string.install_success);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -381,7 +387,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                             HomeFragment.this.baseApkPath = apkPath;
                             InstalledAppInfo info = VirtualCore.get().getInstalledAppInfo(HomeFragment.this.packageName, 0);
                             HomeFragment.this.apkPath = info.apkPath;
-                            resultString = "安装成功，可以在设置界面创建快捷方式。";
+                            resultString = getString(R.string.install_success_create_shortcut);
                         } else {
                             resultString = result.error;
                         }
@@ -405,7 +411,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     public void crateShortcut(InstalledAppInfo info){
         if (ShortcutManagerCompat.isRequestPinShortcutSupported(context)) {
             PackageManager manager = va.getPackageManager();
-            String name = manager.getApplicationLabel(info.getApplicationInfo(0)) + "[模组管理器]";
+            String name = manager.getApplicationLabel(info.getApplicationInfo(0)) + getString(R.string.shortcut_postfix);
             BitmapDrawable icon = (BitmapDrawable)manager.getApplicationIcon(info.getApplicationInfo(0));
             Intent shortcutInfoIntent = new Intent(Intent.ACTION_VIEW);
             shortcutInfoIntent.setClass(context, ShortcutActivity.class);

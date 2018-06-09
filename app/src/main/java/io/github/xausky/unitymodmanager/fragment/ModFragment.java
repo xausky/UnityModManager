@@ -108,7 +108,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
             AllenVersionChecker
                     .getInstance()
                     .downloadOnly(
-                            UIData.create().setDownloadUrl(url).setTitle("导入模组").setContent("确认导入："+url)
+                            UIData.create().setDownloadUrl(url).setTitle(getString(R.string.import_mod)).setContent(url)
                     ).setAutoInstall(false).setShowNotification(false).setApkDownloadListener(new APKDownloadListener() {
                 @Override
                 public void onDownloading(int progress) {
@@ -140,7 +140,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
     @Override
     public void OnActionButtonClick() {
         if(ModUtils.map == null){
-            Toast.makeText(context, "请先安装客户端以生成索引。", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, R.string.install_client_and_generate_map_file_first, Toast.LENGTH_LONG).show();
             return;
         }
         ExFilePicker filePicker = new ExFilePicker();
@@ -152,14 +152,14 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
     @Override
     public void OnActionButtonLongClick() {
         if(ModUtils.map == null){
-            Toast.makeText(context, "请先安装客户端以生成索引。", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, R.string.install_client_and_generate_map_file_first, Toast.LENGTH_LONG).show();
             return;
         }
         ExFilePicker filePicker = new ExFilePicker();
         filePicker.setShowOnlyExtensions();
         filePicker.setCanChooseOnlyOneItem(true);
         filePicker.start(this, EXTERNAL_MOD_FILE_PICKER_RESULT);
-        Toast.makeText(context, "外部模组目录导入模式，非模组开发者不推荐使用。", Toast.LENGTH_LONG).show();
+        Toast.makeText(context, R.string.external_mod_import_model, Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -187,7 +187,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
         handler.post(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(context, "检测到外部模组改变，重新启动游戏。", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, R.string.checked_external_mod_changed, Toast.LENGTH_LONG).show();
                 HomeFragment fragment = (HomeFragment)BaseFragment.fragment(R.id.nav_home);
                 VirtualCore.get().killApp(fragment.packageName, 0);
                 MainActivity activity = (MainActivity)context;

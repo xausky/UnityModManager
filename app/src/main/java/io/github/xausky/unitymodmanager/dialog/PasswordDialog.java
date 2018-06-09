@@ -19,8 +19,8 @@ public class PasswordDialog extends AlertDialog {
         edit = new EditText(context);
         setView(edit);
         setTitle(context.getString(R.string.please_input_password));
-        setButton(BUTTON_POSITIVE, "确定", (OnClickListener) null);
-        setButton(BUTTON_NEGATIVE, "跳过", (OnClickListener) null);
+        setButton(BUTTON_POSITIVE, context.getString(R.string.confirm), (OnClickListener) null);
+        setButton(BUTTON_NEGATIVE, context.getString(R.string.skip), (OnClickListener) null);
     }
     public void setPositiveListener(View.OnClickListener listener){
         getButton(BUTTON_POSITIVE).setOnClickListener(listener);
