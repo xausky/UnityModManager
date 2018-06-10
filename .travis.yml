@@ -1,6 +1,5 @@
 language: android
 before_script:
-- echo $encrypted_d5896aca80a4_key $encrypted_d5896aca80a4_iv
 - openssl aes-256-cbc -K $encrypted_d5896aca80a4_key -iv $encrypted_d5896aca80a4_iv
   -in xausky.jks.enc -out ../xausky.jks -d
 - curl -L https://dl.google.com/android/repository/android-ndk-r16b-linux-x86_64.zip
