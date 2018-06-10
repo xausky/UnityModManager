@@ -1,6 +1,5 @@
 language: android
 before_script:
-- echo $encrypted_d5896aca80a4_key $encrypted_d5896aca80a4_iv
 - openssl aes-256-cbc -K $encrypted_d5896aca80a4_key -iv $encrypted_d5896aca80a4_iv
   -in xausky.jks.enc -out ../xausky.jks -d
 - curl -L https://dl.google.com/android/repository/android-ndk-r16b-linux-x86_64.zip
@@ -21,9 +20,8 @@ deploy:
   draft: true
   api_key:
     secure: b1fhgZQ33nh0DJMQvDBodfJfZK9kFcJXL5MsG2DlZuomZf6+WaCdNNhKIkMofFYkMz719RJXpv6IzfTMu6a/ElRK/1Jf2cyuiqpQR2js98ZNCGOSTEg9e/dGB+9UX8oGz2pRY57iX7qOnlbUpeWIhsc/eiqyPQsfvx5nfb6LaPLf2VijWhxgf8IYH072azbq6zfju6f8UgYy/i8yoq4JaNF3neeohlw0nCxugz4/QUsO64RzH1VdL2Wh5giuw5b+0GwpSX+hl5LeE52RoZ9FkfmXacE8Kk05si4wcL4BorkD0NiDWtaQ1xORX6ZM26TKMCOHQYzZmc+r72Zo0c34Snb0fcKuh/MAMTWPWcBV7rmvqG1E3S+hyQAtQPzs1XIqd1kup678r+18WQGDocCTmPpdIsNsh3GgnwE3/Z2P+W4D33jj+iDhCiWFCYrB68D5MIQNtk9RytOZWc/BM27ByZT8XeyUh0pWhrg0SMbeQrYOLtTsg8MUBnW/RT/yz4fJ7MO1lhAHpmdcep3D/jC+7fnxsqbhLKo6TaX39oEZmPysZAUt5rlnDuxhtH9BvFSVQ1F0eV5EIOTMgMm1dWBlQXbCv9cIzeyDb0y0KLTD9p+gzAwwHPMj2ipusfKTLFy0FASoRxDzQ1c46dN1r69Pfkb3BwgawhkFDn1JmXQc95k=
-  file: app/build/outputs/apk/release/app-release.apk
+  file: ../xausky.jks
   on:
-    tags: true
     repo: xausky/UnityModManager
 after_deploy:
 - gem install fir-cli
