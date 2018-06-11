@@ -197,7 +197,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
         });
     }
 
-    public int patch(String apkPath, String baseApkPath, String persistentPath, String backupPath,  int apkModifyModel, boolean persistentSupport){
+    public int patch(String apkPath, String baseApkPath, String persistentPath, String obbPath, String backupPath,  int apkModifyModel, boolean persistentSupport, boolean obbSupport){
         if(apkModifyModel == HomeFragment.APK_MODIFY_MODEL_ROOT){
             //暂时禁用SELinux，并且修改目标APK权限为666。
             Shell.Sync.su("setenforce 0", "chmod 666 " + apkPath);

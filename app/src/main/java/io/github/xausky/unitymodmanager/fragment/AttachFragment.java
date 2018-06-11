@@ -36,12 +36,16 @@ public class AttachFragment extends BaseFragment implements ApplicationChooseDia
     private HomeFragment homeFragment;
     private VirtualCore va;
 
-
-
-    public AttachFragment() {
+    @Override
+    public BaseFragment setBase(Context base) {
         va = VirtualCore.get();
         homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
-        adapter = new AttachesAdapter(va, homeFragment.packageName);
+        if(homeFragment.apkModifyModel == HomeFragment.APK_MODIFY_MODEL_VIRTUAL){
+            adapter = new AttachesAdapter(va, homeFragment.packageName);
+        } else {
+            adapter = new AttachesAdapter(va, null);
+        }
+        return super.setBase(base);
     }
 
     public int getItemCount(){
@@ -59,7 +63,7 @@ public class AttachFragment extends BaseFragment implements ApplicationChooseDia
         progressDialog.setCancelable(false);
         dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, true, true);
         dialog.setListener(this);
-        attaches = (RecyclerView) view.findViewById(R.id.attach_list);
+        attaches = view.findViewById(R.id.attach_list);
         adapter.setRecyclerView(attaches);
         return view;
     }

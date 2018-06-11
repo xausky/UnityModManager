@@ -79,8 +79,10 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     public String baseApkPath;
     public String backupPath;
     public String persistentPath;
+    public String obbPath;
     public int apkModifyModel;
     public boolean persistentSupport;
+    public boolean obbSupport;
     private View view;
     private TextView summary;
     private TextView clientState;
@@ -106,6 +108,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         baseApkPath = settings.getString(BASE_APK_PATH_PREFERENCE_KEY, null);
         apkModifyModel = Integer.valueOf(settings.getString("apk_modify_model", "1"));
         persistentSupport = settings.getBoolean("persistent_support", false);
+        obbSupport = settings.getBoolean("obb_support", false);
         return super.setBase(base);
     }
 
@@ -114,6 +117,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         apkModifyModel = Integer.valueOf(settings.getString("apk_modify_model", "1"));
         persistentSupport = settings.getBoolean("persistent_support", false);
+        obbSupport = settings.getBoolean("obb_support", false);
         context = inflater.getContext();
         dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, apkModifyModel == APK_MODIFY_MODEL_VIRTUAL, true);
         dialog.setListener(this);
@@ -238,6 +242,41 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 }
             }
         }
+        File obbMap = new File(getBase().getFilesDir() + "/obb.map");
+        if(obbMap.exists() && obbSupport){
+            FileReader reader = null;
+            BufferedReader bufferedReader = null;
+            try {
+                reader = new FileReader(obbMap);
+                bufferedReader = new BufferedReader(reader);
+                String line = null;
+                while ((line = bufferedReader.readLine()) != null) {
+                    String[] column = line.split(":");
+                    if(column.length == 2) {
+                        ModUtils.map.put(column[0], column[1]);
+                    }
+                }
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }finally {
+                if(bufferedReader != null) {
+                    try {
+                        bufferedReader.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+                if(reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        }
         File apkMap = new File(this.getBase().getFilesDir() + "/apk.map");
         if(apkMap.exists() && apkModifyModel != APK_MODIFY_MODEL_NONE) {
             FileReader reader = null;
@@ -277,9 +316,11 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
 
     private void clientUpdate(){
         String versionName = null;
+        int versionCode = 0;
         if(apkModifyModel == APK_MODIFY_MODEL_ROOT || apkModifyModel == APK_MODIFY_MODEL_NONE){
             try {
                 versionName = context.getPackageManager().getPackageInfo(packageName,0).versionName;
+                versionCode = context.getPackageManager().getPackageInfo(packageName,0).versionCode;
                 apkPath = context.getPackageManager().getApplicationInfo(packageName, 0).sourceDir;
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
@@ -288,9 +329,11 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             InstalledAppInfo installedAppInfo = va.getInstalledAppInfo(packageName, 0);
             if(installedAppInfo != null){
                 versionName = installedAppInfo.getPackageInfo(0).versionName;
+                versionCode = installedAppInfo.getPackageInfo(0).versionCode;
                 apkPath = installedAppInfo.apkPath;
             }
         }
+        obbPath = context.getObbDir().getParentFile().getAbsolutePath() + "/" + packageName + "/main." + versionCode + '.' + packageName + ".obb";
         persistentPath = context.getExternalFilesDir(null).getParentFile().getParentFile().getAbsolutePath() + "/" + packageName + "/files";
         backupPath = context.getFilesDir().getAbsolutePath() + "/backup";
         File backup = new File(backupPath);
@@ -335,9 +378,13 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 Log.d(MainApplication.LOG_TAG, "persistentSupport:" + persistentPath);
                 NativeUtils.GenerateFolderMapFile(persistentPath, HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/persistent.map");
             }
+            if(obbSupport){
+                Log.d(MainApplication.LOG_TAG, "obbSupport:" + obbPath);
+                NativeUtils.GenerateApkMapFile(obbPath, HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/obb.map");
+            }
             ImportMapFile();
             clientUpdate();
-            if(persistentSupport || apkModifyModel != APK_MODIFY_MODEL_NONE){
+            if(persistentSupport || apkModifyModel != APK_MODIFY_MODEL_NONE || obbSupport){
                 Toast.makeText(context, R.string.map_file_generate_success, Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(context, R.string.confirm_modify_source, Toast.LENGTH_SHORT).show();

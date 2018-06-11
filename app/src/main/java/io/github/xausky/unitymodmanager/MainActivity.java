@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
             ModFragment modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
             HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
             if (modFragment.isNeedPatch()) {
-                result = modFragment.patch(homeFragment.apkPath, homeFragment.baseApkPath, homeFragment.persistentPath, homeFragment.backupPath, homeFragment.apkModifyModel, homeFragment.persistentSupport);
+                result = modFragment.patch(homeFragment.apkPath, homeFragment.baseApkPath, homeFragment.persistentPath, homeFragment.obbPath, homeFragment.backupPath, homeFragment.apkModifyModel, homeFragment.persistentSupport, homeFragment.obbSupport);
             }
             if (result == ModUtils.RESULT_STATE_OK) {
                 if(homeFragment.apkModifyModel != HomeFragment.APK_MODIFY_MODEL_VIRTUAL){
