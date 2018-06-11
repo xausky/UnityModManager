@@ -10,14 +10,9 @@
     <string name="info_context_text">
         This program is open source under the GPL agreement at Github and should not be used for commercial purposes.\n
         The birth of this program is inseparable from the following open source projects:\n
-        UnityStudio，
-        miniz，
-        VirtualApp，
-        AndroidP7zip，
-        ExFilePicker，
-        android-about-page，
-        CheckVersionLib，
-        AndroidImageSlider。
+        UnityStudio, miniz, VirtualApp, AndroidP7zip, ExFilePicker, android-about-page, CheckVersionLib, AndroidImageSlider. \n
+        Thanks to the following translator:\n
+        Traditional Chinese - 栗子
     </string>
     <string name="home_summary_context">
         Enable mod：%d\nInstalled mod：%d\nInstalled attach：%d\nVisible applications：%d\nApplications in VirtualApp：%d

@@ -5,6 +5,8 @@
 #include "Utils.hh"
 #include "LogUtils.hh"
 
+#include <sys/stat.h>
+
 namespace xausky {
     char pathBuffer[PATH_BUFFER_SIZE];
     char dataBuffer[DATA_BUFFER_SIZE];

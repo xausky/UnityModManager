@@ -326,6 +326,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         } else {
             if(apkPath == null){
                 Toast.makeText(context, R.string.install_client_download_resource, Toast.LENGTH_LONG).show();
+                return;
             }
             if(apkModifyModel != APK_MODIFY_MODEL_NONE){
                 NativeUtils.GenerateApkMapFile(apkPath, HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/apk.map");
