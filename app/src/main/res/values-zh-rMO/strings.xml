@@ -97,4 +97,7 @@
         <item>1</item>
         <item>2</item>
     </string-array>
+    <string name="obb_support_title">安卓OBB資源文件補丁支持</string>
+    <string name="obb_support_summary">安卓OBB資源文件補丁支持，比如《崩壞3》的日服，東南亞服，全球服。</string>
+    <string name="apk_none_obb_support">在不修改APK模式下使用Obb支持可能導致遊戲無法啟動。</string>
 </resources>

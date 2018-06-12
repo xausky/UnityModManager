@@ -21,9 +21,12 @@ import com.lody.virtual.client.core.VirtualCore;
 import com.topjohnwu.superuser.Shell;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Collections;
@@ -197,7 +200,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
         });
     }
 
-    public int patch(String apkPath, String baseApkPath, String persistentPath, String obbPath, String backupPath,  int apkModifyModel, boolean persistentSupport, boolean obbSupport){
+    public int patch(String apkPath, String baseApkPath, String persistentPath, String obbPath, String baseObbPath, String backupPath,  int apkModifyModel, boolean persistentSupport, boolean obbSupport){
         if(apkModifyModel == HomeFragment.APK_MODIFY_MODEL_ROOT){
             //暂时禁用SELinux，并且修改目标APK权限为666。
             Shell.Sync.su("setenforce 0", "chmod 666 " + apkPath);
@@ -232,6 +235,24 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
                         Log.d(MainApplication.LOG_TAG, "Copy Mod Directory File Failed: " + e.getMessage());
                         return ModUtils.RESULT_STATE_INTERNAL_ERROR;
                     }
+                }
+            }
+            if(obbSupport){
+                int result = NativeUtils.PatchApk(baseObbPath, obbPath, fusionFile.getAbsolutePath());
+                if(result != NativeUtils.RESULT_STATE_OK){
+                    Log.d(MainApplication.LOG_TAG, "Patch Obb File Failed: " + result + ",obbPath:" + apkPath + ",baseObbPath:" + baseApkPath);
+                    return result;
+                }
+                try {
+                    InputStream inputStream = context.getAssets().open("settings.xml");
+                    String settings = IOUtils.toString(inputStream);
+                    inputStream.close();
+                    settings = settings.replace("$CHECKSUM", ModUtils.checkSum(obbPath));
+                    File out = new File(fusionFile.getAbsolutePath() + "/assets/bin/Data/settings.xml");
+                    out.getParentFile().mkdirs();
+                    FileUtils.write(out, settings);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
             if(apkModifyModel != HomeFragment.APK_MODIFY_MODEL_NONE){

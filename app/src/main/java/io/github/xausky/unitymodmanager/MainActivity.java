@@ -142,6 +142,9 @@ public class MainActivity extends AppCompatActivity {
         if(homeFragment.apkModifyModel != HomeFragment.APK_MODIFY_MODEL_NONE && (homeFragment.apkPath == null || homeFragment.baseApkPath == null || !new File(homeFragment.baseApkPath).exists())){
             Toast.makeText(this, R.string.install_source_not_found, Toast.LENGTH_LONG).show();
         } else {
+            if(homeFragment.apkModifyModel == HomeFragment.APK_MODIFY_MODEL_NONE && homeFragment.obbSupport){
+                Toast.makeText(this, R.string.apk_none_obb_support, Toast.LENGTH_LONG).show();
+            }
             new PatchApkTask(dialog).execute();
         }
     }
@@ -172,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
             ModFragment modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
             HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
             if (modFragment.isNeedPatch()) {
-                result = modFragment.patch(homeFragment.apkPath, homeFragment.baseApkPath, homeFragment.persistentPath, homeFragment.obbPath, homeFragment.backupPath, homeFragment.apkModifyModel, homeFragment.persistentSupport, homeFragment.obbSupport);
+                result = modFragment.patch(homeFragment.apkPath, homeFragment.baseApkPath, homeFragment.persistentPath, homeFragment.obbPath, homeFragment.baseObbPath, homeFragment.backupPath, homeFragment.apkModifyModel, homeFragment.persistentSupport, homeFragment.obbSupport);
             }
             if (result == ModUtils.RESULT_STATE_OK) {
                 if(homeFragment.apkModifyModel != HomeFragment.APK_MODIFY_MODEL_VIRTUAL){

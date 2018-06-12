@@ -80,7 +80,7 @@
     <string name="apk_modify_model_title">APK resource modification model</string>
     <string name="apk_modify_model_summary">Choose how to modify the resources in the APK. If you do not modify the mode, you do not modify the APK resource. You can continue to use persistent resource patches.</string>
     <string name="persistent_support_title">Persistent resource patch support</string>
-    <string name="persistent_support_summary">Unity\'s PersistentDataPath path provides resource patch support, such as "honkai impact 3" UC version.</string>
+    <string name="persistent_support_summary">Unity\'s PersistentDataPath path provides resource patch support, such as \"Honkai Impact 3\" UC version.</string>
     <string name="setting_export_apk_title">Export Integration APK file</string>
     <string name="setting_export_apk_summary">Click to export the patched APK file to out.apk in the internal storage root directory.</string>
     <string name="create_shortcut_title">Create a game shortcut</string>
@@ -97,4 +97,7 @@
         <item>1</item>
         <item>2</item>
     </string-array>
+    <string name="obb_support_title">Android OBB resource file patch support</string>
+    <string name="obb_support_summary">Android OBB resource file patch support, such as \"Honkai Impact 3\" day service, Southeast Asia service, global service.</string>
+    <string name="apk_none_obb_support">Using Obb support without modifying the APK mode may cause the game to fail to start.</string>
 </resources>

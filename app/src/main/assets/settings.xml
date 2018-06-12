@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+  <integer name="splash_mode">1</integer>
+  <bool name="useObb">True</bool>
+  <bool name="showSplash">True</bool>
+  <bool name="$CHECKSUM">True</bool>
+</settings>

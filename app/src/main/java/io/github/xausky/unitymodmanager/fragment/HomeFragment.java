@@ -67,7 +67,7 @@ import ru.bartwell.exfilepicker.utils.Utils;
  * Created by xausky on 18-3-3.
  */
 
-public class HomeFragment extends BaseFragment implements View.OnClickListener, ApplicationChooseDialog.OnApplicationChooseDialogResultListener{
+public class HomeFragment extends BaseFragment implements View.OnClickListener, ApplicationChooseDialog.OnApplicationChooseDialogResultListener {
     public static final String PACKAGE_PREFERENCE_KEY = "PACKAGE_PREFERENCE_KEY";
     public static final String BASE_APK_PATH_PREFERENCE_KEY = "BASE_APK_PATH_PREFERENCE_KEY";
     public static final String ALL_APPLICATION_PACKAGE_REGEX = "^.*$";
@@ -80,6 +80,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     public String backupPath;
     public String persistentPath;
     public String obbPath;
+    public String baseObbPath;
     public int apkModifyModel;
     public boolean persistentSupport;
     public boolean obbSupport;
@@ -105,7 +106,6 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     public BaseFragment setBase(Context base) {
         settings = base.getSharedPreferences(SettingFragment.SETTINGS_PREFERENCE_NAME, Context.MODE_PRIVATE);
         packageName = settings.getString(PACKAGE_PREFERENCE_KEY, null);
-        baseApkPath = settings.getString(BASE_APK_PATH_PREFERENCE_KEY, null);
         apkModifyModel = Integer.valueOf(settings.getString("apk_modify_model", "1"));
         persistentSupport = settings.getBoolean("persistent_support", false);
         obbSupport = settings.getBoolean("obb_support", false);
@@ -125,7 +125,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         progressDialog.setTitle(R.string.progress_dialog_title);
         progressDialog.setMessage(getString(R.string.progress_dialog_message));
         progressDialog.setCancelable(false);
-        if(view == null){
+        if (view == null) {
             view = inflater.inflate(R.layout.home_fragment, container, false);
             attachFragment = (AttachFragment) BaseFragment.fragment(R.id.nav_attach);
             visibilityFragment = (VisibilityFragment) BaseFragment.fragment(R.id.nav_visibility);
@@ -153,7 +153,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         return view;
     }
 
-    private void checkVersion(){
+    private void checkVersion() {
         AllenVersionChecker
                 .getInstance()
                 .requestVersion()
@@ -165,21 +165,21 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                         try {
                             JSONArray array = new JSONArray(result);
                             JSONObject latestRelease = null;
-                            for(int i =0; i < array.length(); ++ i){
+                            for (int i = 0; i < array.length(); ++i) {
                                 JSONObject release = array.getJSONObject(i);
-                                if(!release.getBoolean("prerelease")){
+                                if (!release.getBoolean("prerelease")) {
                                     latestRelease = release;
                                     break;
                                 }
                             }
-                            if(latestRelease != null){
+                            if (latestRelease != null) {
                                 String latestVersion = latestRelease.getString("tag_name");
                                 final String textViewString = String.format(context.getString(R.string.home_latest_version), latestVersion);
                                 HomeFragment.this.latestVersion.setText(textViewString);
-                                if(currentVersionString.indexOf('-') > 0){
+                                if (currentVersionString.indexOf('-') > 0) {
                                     return null;
                                 }
-                                if(!currentVersionString.equals(latestVersion)){
+                                if (!currentVersionString.equals(latestVersion)) {
                                     UIData data = UIData.create();
                                     data.setTitle(getString(R.string.new_version_release, latestVersion));
                                     data.setContent(getString(R.string.update_logs, latestRelease.getString("body")));
@@ -205,10 +205,10 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 .excuteMission(context);
     }
 
-    public void ImportMapFile(){
+    public void ImportMapFile() {
         ModUtils.map = new HashMap<>();
         File persistentMap = new File(getBase().getFilesDir() + "/persistent.map");
-        if(persistentMap.exists() && persistentSupport){
+        if (persistentMap.exists() && persistentSupport) {
             FileReader reader = null;
             BufferedReader bufferedReader = null;
             try {
@@ -217,7 +217,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 String line = null;
                 while ((line = bufferedReader.readLine()) != null) {
                     String[] column = line.split(":");
-                    if(column.length == 2) {
+                    if (column.length == 2) {
                         ModUtils.map.put(column[0], column[1]);
                     }
                 }
@@ -225,15 +225,15 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 e1.printStackTrace();
             } catch (IOException e1) {
                 e1.printStackTrace();
-            }finally {
-                if(bufferedReader != null) {
+            } finally {
+                if (bufferedReader != null) {
                     try {
                         bufferedReader.close();
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
                 }
-                if(reader != null) {
+                if (reader != null) {
                     try {
                         reader.close();
                     } catch (IOException e1) {
@@ -243,7 +243,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             }
         }
         File obbMap = new File(getBase().getFilesDir() + "/obb.map");
-        if(obbMap.exists() && obbSupport){
+        if (obbMap.exists() && obbSupport) {
             FileReader reader = null;
             BufferedReader bufferedReader = null;
             try {
@@ -252,7 +252,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 String line = null;
                 while ((line = bufferedReader.readLine()) != null) {
                     String[] column = line.split(":");
-                    if(column.length == 2) {
+                    if (column.length == 2) {
                         ModUtils.map.put(column[0], column[1]);
                     }
                 }
@@ -260,15 +260,15 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 e1.printStackTrace();
             } catch (IOException e1) {
                 e1.printStackTrace();
-            }finally {
-                if(bufferedReader != null) {
+            } finally {
+                if (bufferedReader != null) {
                     try {
                         bufferedReader.close();
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
                 }
-                if(reader != null) {
+                if (reader != null) {
                     try {
                         reader.close();
                     } catch (IOException e1) {
@@ -278,7 +278,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             }
         }
         File apkMap = new File(this.getBase().getFilesDir() + "/apk.map");
-        if(apkMap.exists() && apkModifyModel != APK_MODIFY_MODEL_NONE) {
+        if (apkMap.exists() && apkModifyModel != APK_MODIFY_MODEL_NONE) {
             FileReader reader = null;
             BufferedReader bufferedReader = null;
             try {
@@ -287,7 +287,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 String line = null;
                 while ((line = bufferedReader.readLine()) != null) {
                     String[] column = line.split(":");
-                    if(column.length == 2) {
+                    if (column.length == 2) {
                         ModUtils.map.put(column[0], column[1]);
                     }
                 }
@@ -295,15 +295,15 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 e1.printStackTrace();
             } catch (IOException e1) {
                 e1.printStackTrace();
-            }finally {
-                if(bufferedReader != null) {
+            } finally {
+                if (bufferedReader != null) {
                     try {
                         bufferedReader.close();
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
                 }
-                if(reader != null) {
+                if (reader != null) {
                     try {
                         reader.close();
                     } catch (IOException e1) {
@@ -314,20 +314,20 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         }
     }
 
-    private void clientUpdate(){
+    private void clientUpdate() {
         String versionName = null;
         int versionCode = 0;
-        if(apkModifyModel == APK_MODIFY_MODEL_ROOT || apkModifyModel == APK_MODIFY_MODEL_NONE){
+        if (apkModifyModel == APK_MODIFY_MODEL_ROOT || apkModifyModel == APK_MODIFY_MODEL_NONE) {
             try {
-                versionName = context.getPackageManager().getPackageInfo(packageName,0).versionName;
-                versionCode = context.getPackageManager().getPackageInfo(packageName,0).versionCode;
+                versionName = context.getPackageManager().getPackageInfo(packageName, 0).versionName;
+                versionCode = context.getPackageManager().getPackageInfo(packageName, 0).versionCode;
                 apkPath = context.getPackageManager().getApplicationInfo(packageName, 0).sourceDir;
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
-        }else {
+        } else {
             InstalledAppInfo installedAppInfo = va.getInstalledAppInfo(packageName, 0);
-            if(installedAppInfo != null){
+            if (installedAppInfo != null) {
                 versionName = installedAppInfo.getPackageInfo(0).versionName;
                 versionCode = installedAppInfo.getPackageInfo(0).versionCode;
                 apkPath = installedAppInfo.apkPath;
@@ -335,23 +335,25 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         }
         obbPath = context.getObbDir().getParentFile().getAbsolutePath() + "/" + packageName + "/main." + versionCode + '.' + packageName + ".obb";
         persistentPath = context.getExternalFilesDir(null).getParentFile().getParentFile().getAbsolutePath() + "/" + packageName + "/files";
+        baseApkPath = context.getFilesDir().getAbsolutePath() + "/base.apk";
+        baseObbPath = context.getFilesDir().getAbsolutePath() + "/base.obb";
         backupPath = context.getFilesDir().getAbsolutePath() + "/backup";
         File backup = new File(backupPath);
-        if(!backup.exists()){
-            if(!backup.mkdirs()){
+        if (!backup.exists()) {
+            if (!backup.mkdirs()) {
                 Toast.makeText(context, R.string.create_backup_folder_failed, Toast.LENGTH_LONG).show();
             }
         }
-        if(versionName != null){
+        if (versionName != null) {
             clientState.setText(String.format(getText(R.string.home_client_installed).toString(), versionName));
-            clientState.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_check),null, null, null);
+            clientState.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context, R.drawable.ic_check), null, null, null);
         } else {
             clientState.setText(getText(R.string.home_client_uninstalled));
-            clientState.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_clear),null, null, null);
+            clientState.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context, R.drawable.ic_clear), null, null, null);
         }
         mapFile.setText(String.format(context.getString(R.string.map_file_size), ModUtils.map.size()));
-        if(ModUtils.map.size() > 0){
-            mapFile.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_check),null, null, null);
+        if (ModUtils.map.size() > 0) {
+            mapFile.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context, R.drawable.ic_check), null, null, null);
         }
         String summaryString = String.format(getString(R.string.home_summary_context),
                 modFragment.getEnableItemCount(),
@@ -364,27 +366,27 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
 
     @Override
     public void onClick(View v) {
-        if(v.equals(clientStateCardView)){
+        if (v.equals(clientStateCardView)) {
             dialog.show();
         } else {
-            if(apkPath == null){
+            if (apkPath == null) {
                 Toast.makeText(context, R.string.install_client_download_resource, Toast.LENGTH_LONG).show();
                 return;
             }
-            if(apkModifyModel != APK_MODIFY_MODEL_NONE){
+            if (apkModifyModel != APK_MODIFY_MODEL_NONE) {
                 NativeUtils.GenerateApkMapFile(apkPath, HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/apk.map");
             }
-            if(persistentSupport){
+            if (persistentSupport) {
                 Log.d(MainApplication.LOG_TAG, "persistentSupport:" + persistentPath);
                 NativeUtils.GenerateFolderMapFile(persistentPath, HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/persistent.map");
             }
-            if(obbSupport){
+            if (obbSupport) {
                 Log.d(MainApplication.LOG_TAG, "obbSupport:" + obbPath);
                 NativeUtils.GenerateApkMapFile(obbPath, HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/obb.map");
             }
             ImportMapFile();
             clientUpdate();
-            if(persistentSupport || apkModifyModel != APK_MODIFY_MODEL_NONE || obbSupport){
+            if (persistentSupport || apkModifyModel != APK_MODIFY_MODEL_NONE || obbSupport) {
                 Toast.makeText(context, R.string.map_file_generate_success, Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(context, R.string.confirm_modify_source, Toast.LENGTH_SHORT).show();
@@ -403,48 +405,68 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         super.onDestroyView();
     }
 
-    private void clientInstall(final String apkPath, final String packageName){
+    private void clientInstall(final String apkPath, final String packageName) {
         progressDialog.show();
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 Log.d(MainApplication.LOG_TAG, apkPath);
                 final String resultString;
-                    if(apkModifyModel == APK_MODIFY_MODEL_ROOT || apkModifyModel == APK_MODIFY_MODEL_NONE){
-                        String result = getString(R.string.install_failed);
+                String result = getString(R.string.install_failed);
+                int versionCode = 0;
+                if (apkModifyModel == APK_MODIFY_MODEL_ROOT || apkModifyModel == APK_MODIFY_MODEL_NONE) {
+                    try {
+                        String basePath = HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/base.apk";
+                        if (apkModifyModel == APK_MODIFY_MODEL_ROOT) {
+                            FileUtils.copyFile(new File(apkPath), new File(basePath));
+                            HomeFragment.this.baseApkPath = basePath;
+                        }
+                        HomeFragment.this.packageName = packageName;
+                        HomeFragment.this.apkPath = apkPath;
+                        versionCode = context.getPackageManager().getPackageInfo(packageName, 0).versionCode;
+                        result = getString(R.string.install_success);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    final InstallResult installResult = VirtualCore.get().installPackage(apkPath, InstallStrategy.UPDATE_IF_EXIST);
+                    if (installResult.isSuccess) {
                         try {
                             String basePath = HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/base.apk";
-                            if(apkModifyModel == APK_MODIFY_MODEL_ROOT){
-                                FileUtils.copyFile(new File(apkPath), new File(basePath));
-                                HomeFragment.this.baseApkPath = basePath;
+                            FileUtils.copyFile(new File(apkPath), new File(basePath));
+                            if (modFragment.getEnableItemCount() > 0) {
+                                modFragment.setNeedPatch(true);
                             }
-                            HomeFragment.this.packageName = packageName;
-                            HomeFragment.this.apkPath = apkPath;
-                            result = getString(R.string.install_success);
+                            HomeFragment.this.packageName = installResult.packageName;
+                            HomeFragment.this.baseApkPath = basePath;
+                            InstalledAppInfo info = VirtualCore.get().getInstalledAppInfo(HomeFragment.this.packageName, 0);
+                            HomeFragment.this.apkPath = info.apkPath;
+                            result = getString(R.string.install_success_create_shortcut);
+                            versionCode = info.getPackageInfo(0).versionCode;
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        resultString = result;
                     } else {
-                        final InstallResult result = VirtualCore.get().installPackage(apkPath, InstallStrategy.UPDATE_IF_EXIST);
-                        if(result.isSuccess){
-                            if(modFragment.getEnableItemCount() > 0){
-                                modFragment.setNeedPatch(true);
-                            }
-                            HomeFragment.this.packageName = result.packageName;
-                            HomeFragment.this.baseApkPath = apkPath;
-                            InstalledAppInfo info = VirtualCore.get().getInstalledAppInfo(HomeFragment.this.packageName, 0);
-                            HomeFragment.this.apkPath = info.apkPath;
-                            resultString = getString(R.string.install_success_create_shortcut);
-                        } else {
-                            resultString = result.error;
-                        }
+                        result = installResult.error;
                     }
-                    settings.edit()
-                            .putString(PACKAGE_PREFERENCE_KEY, HomeFragment.this.packageName)
-                            .putString(BASE_APK_PATH_PREFERENCE_KEY, HomeFragment.this.baseApkPath)
-                            .apply();
+                }
+                if(obbSupport && versionCode != 0){
+                    try {
+                        String basePath = HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/base.obb";
+                        obbPath = context.getObbDir().getParentFile().getAbsolutePath() + "/" + packageName + "/main." + versionCode + '.' + packageName + ".obb";
+                        FileUtils.copyFile(new File(obbPath), new File(basePath));
+                        baseObbPath = basePath;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                settings.edit()
+                        .putString(PACKAGE_PREFERENCE_KEY, HomeFragment.this.packageName)
+                        .apply();
                 progressDialog.dismiss();
+                resultString = result;
                 HomeFragment.this.view.post(new Runnable() {
                     @Override
                     public void run() {
@@ -456,11 +478,11 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         }.start();
     }
 
-    public void crateShortcut(InstalledAppInfo info){
+    public void crateShortcut(InstalledAppInfo info) {
         if (ShortcutManagerCompat.isRequestPinShortcutSupported(context)) {
             PackageManager manager = va.getPackageManager();
             String name = manager.getApplicationLabel(info.getApplicationInfo(0)) + getString(R.string.shortcut_postfix);
-            BitmapDrawable icon = (BitmapDrawable)manager.getApplicationIcon(info.getApplicationInfo(0));
+            BitmapDrawable icon = (BitmapDrawable) manager.getApplicationIcon(info.getApplicationInfo(0));
             Intent shortcutInfoIntent = new Intent(Intent.ACTION_VIEW);
             shortcutInfoIntent.setClass(context, ShortcutActivity.class);
             shortcutInfoIntent.putExtra("io.github.xausky.unitymodmanager.launchPackage", info.packageName);

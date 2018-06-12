@@ -89,6 +89,7 @@
     <string name="no_virtual_model_shortcut">非虚拟环境模式无法创建快捷方式，直接使用原图标启动即可。</string>
     <string name="obb_support_title">安卓OBB资源文件补丁支持</string>
     <string name="obb_support_summary">安卓OBB资源文件补丁支持，比如《崩坏3》的日服，东南亚服，全球服。</string>
+    <string name="apk_none_obb_support">在不修改APK模式下使用Obb支持可能导致游戏无法启动。</string>
     <string-array name="apk_modify_model">
         <item>不修改</item>
         <item>虚拟环境模式</item>

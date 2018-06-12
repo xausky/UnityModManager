@@ -7,7 +7,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -75,5 +80,24 @@ public class ModUtils {
             }
         }
         return result;
+    }
+
+    public static String checkSum(String path) {
+        try {
+            MessageDigest localMessageDigest = MessageDigest.getInstance("MD5");
+            FileInputStream localFileInputStream = new FileInputStream(path);
+            long lenght = new File(path).length();
+            localFileInputStream.skip(lenght - Math.min(lenght, 65558L));
+            byte[] arrayOfByte = new byte[1024];
+            for (int i2 = 0; i2 != -1; i2 = localFileInputStream
+                    .read(arrayOfByte)) {
+                localMessageDigest.update(arrayOfByte, 0, i2);
+            }
+            BigInteger bi = new BigInteger(1, localMessageDigest.digest());
+            return bi.toString(16);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
