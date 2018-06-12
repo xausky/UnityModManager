@@ -10,6 +10,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.JsonWriter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,11 +34,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import io.github.xausky.unitymodmanager.MainApplication;
@@ -49,6 +52,7 @@ import io.github.xausky.unitymodmanager.domain.Mod;
 import io.github.xausky.unitymodmanager.utils.ModUtils;
 import io.github.xausky.unitymodmanager.utils.NativeUtils;
 
+import static io.github.xausky.unitymodmanager.utils.NativeUtils.PatchApk;
 import static io.github.xausky.unitymodmanager.utils.NativeUtils.RESULT_STATE_INTERNAL_ERROR;
 
 /**
@@ -71,6 +75,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
     private FileAlterationMonitor monitor = new FileAlterationMonitor();
     private Map<String, FileAlterationObserver> observers = new HashMap<>();
     private long lastExternalChangeTime = -1;
+    private boolean showConflict = false;
 
     public ModsAdapter(File storage, File externalCache, Context context) {
         this.storage = storage;
@@ -90,7 +95,8 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
                     preferences.getBoolean(name + ":enable", false),
                     preferences.getInt(name + ":order", Integer.MAX_VALUE),
                     preferences.getInt(name + ":fileCount", -1),
-                    path);
+                    path,
+                    preferences.getStringSet(name + ":conflict", null));
             if (mod.enable) {
                 ++enableItemCount;
                 if(file.isFile()){
@@ -116,6 +122,10 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void setShowConflict(boolean showConflict) {
+        this.showConflict = showConflict;
     }
 
     public int getEnableItemCount() {
@@ -153,6 +163,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
             editor.putBoolean(mod.name + ":enable", mod.enable);
             editor.putInt(mod.name + ":order", mod.order);
             editor.putInt(mod.name + ":fileCount", mod.fileCount);
+            editor.putStringSet(mod.name + ":conflict", mod.conflict);
         }
         editor.apply();
     }
@@ -194,7 +205,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
             result = ModUtils.Standardization(sourceFile, targetFile);
         }
         if(result >= 0){
-            mods.add(new Mod(name, false, Integer.MAX_VALUE, result, targetFile.getAbsolutePath()));
+            mods.add(new Mod(name, false, Integer.MAX_VALUE, result, targetFile.getAbsolutePath(), null));
             notifyDataSetChanged();
             if (iterator.hasNext()) {
                 process(path, iterator.next(), iterator, null, true);
@@ -270,7 +281,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
         try {
             FileUtils.write(targetFile, sourceFile.getAbsolutePath());
             int result = ModUtils.Standardization(sourceFile, cacheFile);
-            mods.add(new Mod(name, false, Integer.MAX_VALUE, result, targetFile.getAbsolutePath()));
+            mods.add(new Mod(name, false, Integer.MAX_VALUE, result, targetFile.getAbsolutePath(), null));
             notifyDataSetChanged();
         } catch (IOException e) {
             e.printStackTrace();
@@ -292,7 +303,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
         final Mod mod = mods.get(position);
         final File file = new File(mod.path);
         holder.name.setText(mod.name);
-        holder.content.setText(String.format(context.getString(R.string.mod_list_item_content), mod.fileCount));
+        holder.file.setText(String.format(context.getString(R.string.mod_list_item_content), mod.fileCount));
         holder.aSwitch.setChecked(mod.enable);
         holder.aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -336,42 +347,64 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
             } else {
                 holder.icon.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_mod_icon_default));
             }
-            holder.icon.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    FileInputStream inputStream = null;
-                    JSONObject info = null;
+            FileInputStream inputStream = null;
+            JSONObject info = null;
+            try {
+                inputStream = new FileInputStream(mod.path + "/info.json");
+                byte[] bytes = new byte[inputStream.available()];
+                if(inputStream.read(bytes) == -1){
+                    throw new IOException("map.json read failed.");
+                }
+                String json = new String(bytes);
+                info = new JSONObject(json);
+            } catch (Exception e) {
+                Log.d(MainApplication.LOG_TAG, e.getMessage());
+            }finally {
+                if(inputStream != null){
                     try {
-                        inputStream = new FileInputStream(mod.path + "/info.json");
-                        byte[] bytes = new byte[inputStream.available()];
-                        if(inputStream.read(bytes) == -1){
-                            throw new IOException("map.json read failed.");
-                        }
-                        String json = new String(bytes);
-                        info = new JSONObject(json);
+                        inputStream.close();
                     } catch (IOException e) {
                         e.printStackTrace();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    } finally {
-                        if(inputStream != null){
-                            try {
-                                inputStream.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
                     }
-                    if((images == null || images.length == 0) &&  info == null){
+                }
+            }
+            final JSONObject finalInfo = info;
+            String author = null;
+            if(info != null){
+                try {
+                    author = info.getString("author");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(author != null){
+                holder.conflict.setVisibility(View.VISIBLE);
+                holder.author.setText(author);
+            } else {
+                holder.author.setVisibility(View.INVISIBLE);
+            }
+            if(mod.conflict == null || !showConflict){
+                holder.conflict.setVisibility(View.INVISIBLE);
+            } else {
+                holder.conflict.setVisibility(View.VISIBLE);
+                holder.conflict.setText(String.format(Locale.getDefault(), "%d", mod.conflict.size()));
+            }
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if((images == null || images.length == 0) &&  finalInfo == null && (mod.conflict == null || !showConflict)){
                         Toast.makeText(context, R.string.no_preview_info_in_mod, Toast.LENGTH_LONG).show();
                     } else {
-                        new ModInfoDialog(context, images, info).show();
+                        new ModInfoDialog(context, images, finalInfo, showConflict?mod.conflict:null).show();
                     }
                 }
             });
         } else {
             holder.icon.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_folder_special));
-            holder.icon.setOnClickListener(null);
+            holder.itemView.setOnClickListener(null);
+            holder.itemView.setOnClickListener(null);
+            holder.author.setVisibility(View.INVISIBLE);
+            holder.conflict.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -461,14 +494,18 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
         private Switch aSwitch;
         private ImageView icon;
         private TextView name;
-        private TextView content;
+        private TextView file;
+        private TextView author;
+        private TextView conflict;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            aSwitch = (Switch) itemView.findViewById(R.id.mod_list_item_switch);
-            icon = (ImageView) itemView.findViewById(R.id.mod_list_item_icon);
-            name = (TextView) itemView.findViewById(R.id.mod_list_item_name);
-            content = (TextView) itemView.findViewById(R.id.mod_list_item_content);
+            aSwitch = itemView.findViewById(R.id.mod_list_item_switch);
+            icon = itemView.findViewById(R.id.mod_list_item_icon);
+            name = itemView.findViewById(R.id.mod_list_item_name);
+            file = itemView.findViewById(R.id.mod_list_item_file);
+            author = itemView.findViewById(R.id.mod_list_item_author);
+            conflict = itemView.findViewById(R.id.mod_list_item_conflict);
         }
     }
 

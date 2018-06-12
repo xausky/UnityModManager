@@ -41,18 +41,45 @@
         android:layout_below="@+id/mod_list_item_name"/>
 
     <TextView
-        android:id="@+id/mod_list_item_content"
-        android:layout_width="wrap_content"
-        android:layout_height="32dp"
-        android:layout_below="@+id/mod_list_item_name"
+        android:id="@+id/mod_list_item_file"
+        android:layout_width="64sp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/mod_list_item_icon"
         android:layout_toEndOf="@+id/mod_list_item_icon"
-        android:layout_toLeftOf="@+id/mod_list_item_switch"
         android:layout_toRightOf="@+id/mod_list_item_icon"
-        android:layout_toStartOf="@+id/mod_list_item_switch"
-        android:drawableStart="@drawable/ic_file"
         android:drawableLeft="@drawable/ic_file"
+        android:drawableStart="@drawable/ic_file"
         android:gravity="center_vertical"
-        android:text="@android:string/unknownName"
-        android:textSize="12sp" />
+        android:text="@string/mod_list_item_content_default"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/mod_list_item_conflict"
+        android:layout_width="64sp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/mod_list_item_icon"
+        android:layout_toStartOf="@+id/mod_list_item_switch"
+        android:layout_toLeftOf="@+id/mod_list_item_switch"
+        android:drawableLeft="@drawable/ic_flash"
+        android:drawableStart="@drawable/ic_flash"
+        android:gravity="center_vertical"
+        android:text="@string/mod_list_item_conflict_default"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/mod_list_item_author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/mod_list_item_icon"
+        android:layout_toEndOf="@+id/mod_list_item_file"
+        android:layout_toRightOf="@+id/mod_list_item_file"
+        android:layout_toStartOf="@+id/mod_list_item_conflict"
+        android:layout_toLeftOf="@+id/mod_list_item_conflict"
+        android:drawableLeft="@drawable/ic_account"
+        android:drawableStart="@drawable/ic_account"
+        android:textSize="16sp"
+        android:gravity="center_vertical"
+        android:text="@string/mod_list_item_author_default" />
+
 
 </RelativeLayout>

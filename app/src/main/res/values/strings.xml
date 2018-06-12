@@ -90,6 +90,12 @@
     <string name="obb_support_title">安卓OBB资源文件补丁支持</string>
     <string name="obb_support_summary">安卓OBB资源文件补丁支持，比如《崩坏3》的日服，东南亚服，全球服。</string>
     <string name="apk_none_obb_support">在不修改APK模式下使用Obb支持可能导致游戏无法启动。</string>
+    <string name="mod_list_item_content_default">0</string>
+    <string name="mod_list_item_conflict_default">0</string>
+    <string name="mod_list_item_author_default">xausky</string>
+    <string name="mod_info_conflict">冲突文件： %s</string>
+    <string name="show_conflict_info_title">显示模组文件冲突信息</string>
+    <string name="show_conflict_info_summary">显示模组文件冲突信息，便于模组作者进行调试。</string>
     <string-array name="apk_modify_model">
         <item>不修改</item>
         <item>虚拟环境模式</item>

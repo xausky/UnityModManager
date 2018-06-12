@@ -17,6 +17,11 @@
         android:defaultValue="false"
         android:title="@string/obb_support_title"
         android:summary="@string/obb_support_summary" />
+    <SwitchPreference
+        android:key="show_conflict_info"
+        android:defaultValue="false"
+        android:title="@string/show_conflict_info_title"
+        android:summary="@string/show_conflict_info_summary"/>
     <Preference
         android:key="setting_export_apk"
         android:title="@string/setting_export_apk_title"

@@ -14,6 +14,8 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -35,6 +37,30 @@ public class ModUtils {
         supportImageType.add(".jpg");
         supportImageType.add(".png");
         supportImageType.add(".bmp");
+    }
+
+    public static List<String> copyDirectory(File srcDir, File destDir){
+        List<String> result = new LinkedList<>();
+        if (!destDir.exists()){
+            destDir.mkdir();
+        }
+        File[] files = srcDir.listFiles();
+        for(File file : files){
+            File target = new File(destDir.getAbsolutePath() + '/' + file.getName());
+            if(file.isDirectory()){
+                result.addAll(copyDirectory(file, target));
+            } else {
+                if(target.exists()){
+                    result.add(srcDir.getName() + '/' + file.getName());
+                }
+                try {
+                    FileUtils.copyFile(file, target);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return result;
     }
 
     public static int Standardization(File input, File output){

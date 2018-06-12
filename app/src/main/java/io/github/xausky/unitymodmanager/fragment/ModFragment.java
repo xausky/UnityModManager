@@ -31,6 +31,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
+import java.util.TreeSet;
 
 import io.github.xausky.unitymodmanager.MainActivity;
 import io.github.xausky.unitymodmanager.MainApplication;
@@ -59,6 +60,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
     private File storage;
     private File externalCache;
     private SharedPreferences settingsPreferences;
+    private boolean showConflict;
     private Handler handler;
 
     @Override
@@ -104,8 +106,10 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         this.context = inflater.getContext();
+        showConflict = settingsPreferences.getBoolean("show_conflict_info", false);
+        adapter.setShowConflict(showConflict);
         view = inflater.inflate(R.layout.mod_fragment, container, false);
-        recyclerView = (RecyclerView) view.findViewById(R.id.mod_list);
+        recyclerView = view.findViewById(R.id.mod_list);
         adapter.setRecyclerView(recyclerView);
         if(url != null){
             AllenVersionChecker
@@ -229,7 +233,8 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
                             int result = ModUtils.Standardization(externalFile, fusionFile);
                             mod.fileCount = result;
                         } else {
-                            FileUtils.copyDirectory(modFile, fusionFile);
+                            mod.conflict = new TreeSet<>();
+                            mod.conflict.addAll(ModUtils.copyDirectory(modFile, fusionFile));
                         }
                     } catch (IOException e) {
                         Log.d(MainApplication.LOG_TAG, "Copy Mod Directory File Failed: " + e.getMessage());

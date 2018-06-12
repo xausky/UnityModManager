@@ -98,6 +98,12 @@
         <item>2</item>
     </string-array>
     <string name="obb_support_title">Android OBB resource file patch support</string>
-    <string name="obb_support_summary">Android OBB resource file patch support, such as \"Honkai Impact 3\" day service, Southeast Asia service, global service.</string>
+    <string name="obb_support_summary">Android OBB resource file patch support, such as \"Honkai Impact 3\" JP service, SEA service, global service.</string>
     <string name="apk_none_obb_support">Using Obb support without modifying the APK mode may cause the game to fail to start.</string>
+    <string name="mod_list_item_content_default">0</string>
+    <string name="mod_list_item_conflict_default">0</string>
+    <string name="mod_list_item_author_default">xausky</string>
+    <string name="mod_info_conflict">Conflict files: %s</string>
+    <string name="show_conflict_info_title">Display mod file conflict information</string>
+    <string name="show_conflict_info_summary">Display mod file conflict information for module authors to debug.</string>
 </resources>

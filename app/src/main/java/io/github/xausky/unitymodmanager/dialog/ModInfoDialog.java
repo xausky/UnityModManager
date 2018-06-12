@@ -16,17 +16,21 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 import io.github.xausky.unitymodmanager.R;
 
 public class ModInfoDialog extends AlertDialog {
-    public ModInfoDialog(Context context, File[] files, JSONObject info) {
+    public ModInfoDialog(Context context, File[] files, JSONObject info, Set<String> conflict) {
         super(context);
         View dialogView = LayoutInflater.from(context).inflate(R.layout.mod_info, null, false);
         SliderLayout slider = dialogView.findViewById(R.id.mod_info_slider);
         TextView nameView = dialogView.findViewById(R.id.mod_info_name);
         TextView authorView = dialogView.findViewById(R.id.mod_info_author);
         TextView descriptionView = dialogView.findViewById(R.id.mod_info_description);
+        TextView conflictView = dialogView.findViewById(R.id.mod_info_conflict);
         if(files!=null && files.length != 0){
             for(File file:files){
                 DefaultSliderView view = new DefaultSliderView(context);
@@ -73,7 +77,13 @@ public class ModInfoDialog extends AlertDialog {
             descriptionView.setVisibility(View.GONE);
         } else {
             descriptionView.setVisibility(View.VISIBLE);
-            descriptionView.setText(String.format(context.getString(R.string.mod_info_description), description));
+            descriptionView.setText(context.getString(R.string.mod_info_description, description));
+        }
+        if(conflict == null || conflict.size() == 0){
+            conflictView.setVisibility(View.GONE);
+        } else {
+            conflictView.setVisibility(View.VISIBLE);
+            conflictView.setText(context.getString(R.string.mod_info_conflict, conflict.toString()));
         }
         setView(dialogView);
     }
