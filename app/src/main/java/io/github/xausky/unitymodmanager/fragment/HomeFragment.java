@@ -69,7 +69,6 @@ import ru.bartwell.exfilepicker.utils.Utils;
 
 public class HomeFragment extends BaseFragment implements View.OnClickListener, ApplicationChooseDialog.OnApplicationChooseDialogResultListener {
     public static final String PACKAGE_PREFERENCE_KEY = "PACKAGE_PREFERENCE_KEY";
-    public static final String BASE_APK_PATH_PREFERENCE_KEY = "BASE_APK_PATH_PREFERENCE_KEY";
     public static final String ALL_APPLICATION_PACKAGE_REGEX = "^.*$";
     public static final int APK_MODIFY_MODEL_NONE = 0;
     public static final int APK_MODIFY_MODEL_VIRTUAL = 1;
@@ -202,6 +201,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
 
                     }
                 })
+                .setDownloadAPKPath(context.getCacheDir().getAbsolutePath())
                 .excuteMission(context);
     }
 
@@ -481,7 +481,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     public void crateShortcut(InstalledAppInfo info) {
         if (ShortcutManagerCompat.isRequestPinShortcutSupported(context)) {
             PackageManager manager = va.getPackageManager();
-            String name = manager.getApplicationLabel(info.getApplicationInfo(0)) + getString(R.string.shortcut_postfix);
+            String name = manager.getApplicationLabel(info.getApplicationInfo(0)) + context.getString(R.string.shortcut_postfix);
             BitmapDrawable icon = (BitmapDrawable) manager.getApplicationIcon(info.getApplicationInfo(0));
             Intent shortcutInfoIntent = new Intent(Intent.ACTION_VIEW);
             shortcutInfoIntent.setClass(context, ShortcutActivity.class);

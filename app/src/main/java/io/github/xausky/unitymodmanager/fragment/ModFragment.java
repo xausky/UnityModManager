@@ -133,7 +133,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
                 public void onDownloadFail() {
                     Log.d(MainApplication.LOG_TAG, "onDownloadFail:");
                 }
-            }).excuteMission(context);
+            }).setDownloadAPKPath(context.getCacheDir().getAbsolutePath()).excuteMission(context);
             url = null;
         }
         return view;
