@@ -21,8 +21,8 @@ android {
         applicationId "io.github.xausky.unitymodmanager"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 240
-        versionName "2.4.0"
+        versionCode 241
+        versionName "2.4.1"
         ndk{
             abiFilters "armeabi-v7a","x86"
         }

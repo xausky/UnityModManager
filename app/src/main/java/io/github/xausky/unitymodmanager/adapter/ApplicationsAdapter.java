@@ -15,6 +15,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import io.github.xausky.unitymodmanager.R;
 
@@ -25,6 +27,7 @@ import io.github.xausky.unitymodmanager.R;
 
 public class ApplicationsAdapter extends BaseAdapter {
     private List<ApplicationInfo> applicationInfos = new ArrayList<>();
+    private Set<String> packages = new TreeSet<>();
     private LayoutInflater inflater;
     private PackageManager manager;
 
@@ -37,7 +40,7 @@ public class ApplicationsAdapter extends BaseAdapter {
         }
         List<ResolveInfo> infos = manager.queryIntentActivities(intent, 0);
         for(ResolveInfo info: infos){
-            if(info.activityInfo.packageName.matches(packageRegex)){
+            if(info.activityInfo.packageName.matches(packageRegex) && packages.add(info.activityInfo.packageName)){
                 applicationInfos.add(info.activityInfo.applicationInfo);
             }
         }

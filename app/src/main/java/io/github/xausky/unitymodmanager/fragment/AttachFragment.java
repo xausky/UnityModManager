@@ -61,7 +61,7 @@ public class AttachFragment extends BaseFragment implements ApplicationChooseDia
         progressDialog.setTitle(R.string.progress_dialog_title);
         progressDialog.setMessage(getString(R.string.progress_dialog_message));
         progressDialog.setCancelable(false);
-        dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, true, true);
+        dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, true, false);
         dialog.setListener(this);
         attaches = view.findViewById(R.id.attach_list);
         adapter.setRecyclerView(attaches);
