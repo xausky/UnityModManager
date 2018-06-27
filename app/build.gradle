@@ -59,7 +59,7 @@ dependencies {
     implementation 'com.github.xausky:VirtualApp:99d8e8050f'
     implementation 'com.github.medyo:android-about-page:1.2.2'
     implementation 'com.github.bartwell:ExFilePicker:0c5a7c83ae'
-    implementation 'com.github.xausky:CheckVersionLib:abf99da29f'
+    implementation 'com.github.xausky:CheckVersionLib:17a5d19c40'
 
     implementation 'com.crashlytics.sdk.android:answers:1.4.2'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.9.4'

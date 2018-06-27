@@ -200,9 +200,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                     public void onRequestVersionFailure(String message) {
 
                     }
-                })
-                .setDownloadAPKPath(context.getCacheDir().getAbsolutePath())
-                .excuteMission(context);
+                }).excuteMission(context);
     }
 
     public void ImportMapFile() {
