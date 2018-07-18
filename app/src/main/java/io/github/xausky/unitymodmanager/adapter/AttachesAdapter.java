@@ -21,8 +21,6 @@ import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.ipc.VActivityManager;
 import com.lody.virtual.remote.InstalledAppInfo;
 
-import junit.framework.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 

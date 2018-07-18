@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.25.2'
+        classpath 'io.fabric.tools:gradle:1.25.4'
     }
 }
 apply plugin: 'com.android.application'
@@ -19,8 +19,8 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "io.github.xausky.unitymodmanager"
-        minSdkVersion 15
-        targetSdkVersion 22
+        minSdkVersion 19
+        targetSdkVersion 23
         versionCode 241
         versionName "2.4.1"
         ndk{
@@ -56,7 +56,7 @@ dependencies {
     implementation 'com.hzy:libp7zip:1.5.0' //https://github.com/hzy3774/AndroidP7zip
     implementation 'com.github.topjohnwu:libsu:1.1.1' //https://github.com/topjohnwu/libsu
     implementation 'com.daimajia.slider:library:1.1.5' //https://github.com/daimajia/AndroidImageSlider
-    implementation 'com.github.xausky:VirtualApp:155685926d' //https://github.com/xausky/VirtualApp
+    implementation 'com.github.xausky:VirtualXposed:dde76419bf' //https://github.com/xausky/VirtualXposed
     implementation 'com.github.medyo:android-about-page:1.2.4' //https://github.com/medyo/android-about-page
     implementation 'com.github.bartwell:ExFilePicker:0c5a7c83ae' //https://github.com/bartwell/ExFilePicker
     implementation 'com.github.xausky:CheckVersionLib:17a5d19c40' //https://github.com/xausky/CheckVersionLib
