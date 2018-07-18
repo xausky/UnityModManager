@@ -23,6 +23,7 @@ public class InfoFragment extends BaseFragment {
                 .addEmail("xausky@163.com", getString(R.string.my_email))
                 .addWebsite("https://space.bilibili.com/8419077/", getString(R.string.my_bilibili))
                 .addGitHub("xausky", getString(R.string.my_github))
+                .addWebsite("https://crowdin.com/project/unitymodmanager", getString(R.string.improved_translation))
                 .create();
     }
 }
