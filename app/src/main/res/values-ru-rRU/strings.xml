@@ -12,7 +12,7 @@
   <string name="info_context_text">
 Это программа с открытым исходным кодом в соответствии с соглашением GPL на Github и не может быть использована в  коммерческих целях.\n
    Создание этой программы невозможно без следующих проектов с открытым исходным кодом:\n
-   UnityStudio, miniz, VirtualApp, AndroidP7zip, ExFilePicker, android-about-page, CheckVersionLib, AndroidImageSlider. \n
+   UnityStudio, miniz, VirtualXposed, AndroidP7zip, ExFilePicker, android-about-page, CheckVersionLib, AndroidImageSlider. \n
    Благодарю переводчиков:\n
         Традиционный китайский язык - 栗子\n
         Русский язык - onemeshnig
