@@ -3,9 +3,12 @@
 #include "Utils.hh"
 #include "BundleFile.hh"
 #include <sys/stat.h>
+#include "libumm/binary_stream.h"
+#include "libumm/wwise_akpk.h"
 
 namespace xausky {
     char FolderPathBuffer[PATH_BUFFER_SIZE];
+    char indentifier[5];
 
     void RestoreTarget(string targetPath, string backupPath){
         __LIBUABE_LOG("RestoreTarget: targetPath=%s,backupPath=%s\n", targetPath.c_str(), backupPath.c_str());
@@ -30,16 +33,49 @@ namespace xausky {
         sprintf(FolderPathBuffer, "%s/%s", modsPath.c_str(), matchName.c_str());
         if(stat(FolderPathBuffer,&modStat)==0){
             if(S_ISDIR(modStat.st_mode)){
-                __LIBUABE_LOG("bundle patch: %s\n", matchName.c_str());
+                memset(indentifier, 0, 5);
+                binary_stream_t input;
+                if(binary_stream_create_file(&input, (targetPath + '/' + filename).c_str(), BINARY_STREAM_ORDER_LITTLE_ENDIAN) != 0){
+                    __LIBUABE_LOG("binary_stream_create_file failed.");
+                    return;
+                }
+                if(binary_stream_read(&input, indentifier, 4) != 4) {
+                    __LIBUABE_LOG("binary_stream_read failed.");
+                    return;
+                }
                 BackupFile(filename, targetPath, backupPath);
-                BinaryStream bundle(targetPath + '/' + filename, true);
-                BinaryStream patchedBundle(targetPath + '/' + filename, true);
-                BundleFile bundleFile;
-                bundleFile.open(bundle);
-                map<string, map<int64_t, BinaryStream*>*>* patch = Utils::MakeBundlePatch(FolderPathBuffer);
-                bundleFile.patch(*patch);
-                bundleFile.save(patchedBundle);
-                Utils::FreeBundlePatch(patch);
+                if(strcmp(indentifier, "AKPK")){
+                    __LIBUABE_LOG("AKPK patch: %s\n", matchName.c_str());
+                    wwise_akpk_t akpk;
+                    wwise_akpk_patch_t patch;
+                    binary_stream_seek(&input, 0, SEEK_SET);
+                    if(wwise_akpk_parser(&akpk, &input, 0) != 0){
+                        __LIBUABE_LOG("wwise_akpk_parser failed.");
+                        return;
+                    }
+                    if(wwise_akpk_make_patch(&patch, FolderPathBuffer) != 0){
+                        __LIBUABE_LOG("wwise_akpk_make_patch failed.");
+                        return;
+                    }
+                    binary_stream_seek(&input, 0, SEEK_SET);
+                    if(wwise_akpk_save(&akpk, &input) != 0) {
+                        __LIBUABE_LOG("wwise_akpk_save failed.");
+                        return;
+                    }
+                    wwise_akpk_destory_patch(&patch);
+                } else {
+
+                    __LIBUABE_LOG("bundle patch: %s\n", matchName.c_str());
+                    BinaryStream bundle(targetPath + '/' + filename, true);
+                    BinaryStream patchedBundle(targetPath + '/' + filename, true);
+                    BundleFile bundleFile;
+                    bundleFile.open(bundle);
+                    map<string, map<int64_t, BinaryStream*>*>* patch = Utils::MakeBundlePatch(FolderPathBuffer);
+                    bundleFile.patch(*patch);
+                    bundleFile.save(patchedBundle);
+                    Utils::FreeBundlePatch(patch);
+                }
+                binary_stream_destory(&input);
             }else if(S_ISREG(modStat.st_mode)){
                 __LIBUABE_LOG("copy patch: %s\n", filename.c_str());
                 BackupFile(filename, targetPath, backupPath);

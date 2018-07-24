@@ -4,6 +4,7 @@
 #include "BundleFile.hh"
 #include "Utils.hh"
 #include "LogUtils.hh"
+#include "libumm/wwise_akpk.h"
 
 #include <sys/stat.h>
 
@@ -21,18 +22,70 @@ namespace xausky {
         if(stat(pathBuffer,&modStat)==0){
             if(S_ISDIR(modStat.st_mode)){
                 if(mz_zip_reader_extract_to_mem(zip, i, dataBuffer, DATA_BUFFER_SIZE, 0)){
-                    BinaryStream bundle(dataBuffer, entrityStat->m_uncomp_size, true);
-                    BinaryStream patchedBundle(true);
-                    BundleFile bundleFile;
-                    bundleFile.open(bundle);
-                    map<string, map<int64_t, BinaryStream*>*>* patch = Utils::MakeBundlePatch(pathBuffer);
-                    bundleFile.patch(*patch);
-                    bundleFile.save(patchedBundle);
-                    Utils::FreeBundlePatch(patch);
-                    int len = patchedBundle.size();
-                    patchedBundle.ReadData(dataBuffer, len);
-                    mz_zip_writer_add_mem(out, entrityStat->m_filename, dataBuffer, len, MZ_NO_COMPRESSION);
-                    __LIBUABE_LOG("bundle patch: %s\n", entrityStat->m_filename);
+                    if(memcmp(dataBuffer, "AKPK", 4) == 0){
+                        __LIBUABE_LOG("AKPK patch: %s\n", entrityStat->m_filename);
+                        binary_stream_t target;
+                        if(binary_stream_create_memory(&target, entrityStat->m_uncomp_size, BINARY_STREAM_ORDER_LITTLE_ENDIAN) != 0){
+                            __LIBUABE_LOG("binary_stream_create_memory failed.");
+                            return;
+                        }
+                        if(binary_stream_write(&target, dataBuffer, entrityStat->m_uncomp_size) != entrityStat->m_uncomp_size){
+                            __LIBUABE_LOG("binary_stream_write failed.");
+                            return;
+                        }
+                        wwise_akpk_t akpk;
+                        wwise_akpk_patch_t patch;
+                        binary_stream_seek(&target, 0, SEEK_SET);
+                        if(wwise_akpk_parser(&akpk, &target, 0) != 0){
+                            __LIBUABE_LOG("wwise_akpk_parser failed.");
+                            return;
+                        }
+                        if(wwise_akpk_make_patch(&patch, pathBuffer) != 0){
+                            __LIBUABE_LOG("wwise_akpk_make_patch failed.");
+                            return;
+                        }
+                        if(wwise_akpk_patch(&akpk, &patch)){
+                            __LIBUABE_LOG("wwise_akpk_patch failed.");
+                            return;
+                        }
+                        if(binary_stream_seek(&target, 0, SEEK_SET) != 0){
+                            __LIBUABE_LOG("binary_stream_seek failed.");
+                            return;
+                        }
+                        if(wwise_akpk_save(&akpk, &target) != 0) {
+                            __LIBUABE_LOG("wwise_akpk_save failed.");
+                            return;
+                        }
+                        int64_t size;
+                        if((size = binary_stream_seek(&target, 0, SEEK_END)) < 0){
+                            __LIBUABE_LOG("binary_stream_seek failed.");
+                            return;
+                        }
+                        if((binary_stream_seek(&target, 0, SEEK_SET)) < 0){
+                            __LIBUABE_LOG("binary_stream_seek failed.");
+                            return;
+                        }
+                        if(binary_stream_read(&target, dataBuffer, size) != size){
+                            __LIBUABE_LOG("binary_stream_read failed.");
+                            return;
+                        }
+                        binary_stream_destory(&target);
+                        wwise_akpk_destory_patch(&patch);
+                        mz_zip_writer_add_mem(out, entrityStat->m_filename, dataBuffer, size, MZ_NO_COMPRESSION);
+                    } else {
+                        __LIBUABE_LOG("bundle patch: %s\n", entrityStat->m_filename);
+                        BinaryStream bundle(dataBuffer, entrityStat->m_uncomp_size, true);
+                        BinaryStream patchedBundle(true);
+                        BundleFile bundleFile;
+                        bundleFile.open(bundle);
+                        map<string, map<int64_t, BinaryStream *> *> *patch = Utils::MakeBundlePatch(pathBuffer);
+                        bundleFile.patch(*patch);
+                        bundleFile.save(patchedBundle);
+                        Utils::FreeBundlePatch(patch);
+                        int len = patchedBundle.size();
+                        patchedBundle.ReadData(dataBuffer, len);
+                        mz_zip_writer_add_mem(out, entrityStat->m_filename, dataBuffer, len, MZ_NO_COMPRESSION);
+                    }
                     return;
                 } else {
                     __LIBUABE_LOG("mz_zip_reader_extract_to_mem() failed!\n");
