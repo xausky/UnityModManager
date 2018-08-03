@@ -14,7 +14,6 @@ repositories {
     maven { url 'https://maven.fabric.io/public' }
 }
 
-
 android {
     compileSdkVersion 27
     defaultConfig {
@@ -22,7 +21,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 23
         versionCode 250
-        versionName "2.5.0-dev"
+        versionName "2.5.0"
         ndk{
             abiFilters "armeabi-v7a","x86"
         }

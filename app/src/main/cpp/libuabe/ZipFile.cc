@@ -7,6 +7,7 @@
 #include "libumm/wwise_akpk.h"
 
 #include <sys/stat.h>
+#include <libumm/binary_stream.h>
 
 namespace xausky {
     char pathBuffer[PATH_BUFFER_SIZE];
@@ -21,18 +22,15 @@ namespace xausky {
         sprintf(pathBuffer, "%s/%s", mods, filename.c_str());
         if(stat(pathBuffer,&modStat)==0){
             if(S_ISDIR(modStat.st_mode)){
-                if(mz_zip_reader_extract_to_mem(zip, i, dataBuffer, DATA_BUFFER_SIZE, 0)){
-                    if(memcmp(dataBuffer, "AKPK", 4) == 0){
+                binary_stream_t target;
+                if(binary_stream_create_memory(&target, entrityStat->m_uncomp_size, BINARY_STREAM_ORDER_LITTLE_ENDIAN) != 0){
+                    __LIBUABE_LOG("binary_stream_create_memory failed.");
+                    return;
+                }
+                if(mz_zip_reader_extract_to_mem(zip, i, target.data, target.capacity, 0)){
+                    target.size = entrityStat->m_uncomp_size;
+                    if(memcmp(target.data, "AKPK", 4) == 0){
                         __LIBUABE_LOG("AKPK patch: %s\n", entrityStat->m_filename);
-                        binary_stream_t target;
-                        if(binary_stream_create_memory(&target, entrityStat->m_uncomp_size, BINARY_STREAM_ORDER_LITTLE_ENDIAN) != 0){
-                            __LIBUABE_LOG("binary_stream_create_memory failed.");
-                            return;
-                        }
-                        if(binary_stream_write(&target, dataBuffer, entrityStat->m_uncomp_size) != entrityStat->m_uncomp_size){
-                            __LIBUABE_LOG("binary_stream_write failed.");
-                            return;
-                        }
                         wwise_akpk_t akpk;
                         wwise_akpk_patch_t patch;
                         binary_stream_seek(&target, 0, SEEK_SET);
@@ -56,25 +54,11 @@ namespace xausky {
                             __LIBUABE_LOG("wwise_akpk_save failed.");
                             return;
                         }
-                        int64_t size;
-                        if((size = binary_stream_seek(&target, 0, SEEK_END)) < 0){
-                            __LIBUABE_LOG("binary_stream_seek failed.");
-                            return;
-                        }
-                        if((binary_stream_seek(&target, 0, SEEK_SET)) < 0){
-                            __LIBUABE_LOG("binary_stream_seek failed.");
-                            return;
-                        }
-                        if(binary_stream_read(&target, dataBuffer, size) != size){
-                            __LIBUABE_LOG("binary_stream_read failed.");
-                            return;
-                        }
-                        binary_stream_destory(&target);
                         wwise_akpk_destory_patch(&patch);
-                        mz_zip_writer_add_mem(out, entrityStat->m_filename, dataBuffer, size, MZ_NO_COMPRESSION);
+                        mz_zip_writer_add_mem(out, entrityStat->m_filename, target.data, target.size, MZ_NO_COMPRESSION);
                     } else {
                         __LIBUABE_LOG("bundle patch: %s\n", entrityStat->m_filename);
-                        BinaryStream bundle(dataBuffer, entrityStat->m_uncomp_size, true);
+                        BinaryStream bundle((char *)target.data, entrityStat->m_uncomp_size, true);
                         BinaryStream patchedBundle(true);
                         BundleFile bundleFile;
                         bundleFile.open(bundle);
@@ -90,6 +74,7 @@ namespace xausky {
                 } else {
                     __LIBUABE_LOG("mz_zip_reader_extract_to_mem() failed!\n");
                 }
+                binary_stream_destory(&target);
             }
             if(S_ISREG(modStat.st_mode)){
                 mz_zip_writer_add_file(out, entrityStat->m_filename, pathBuffer, NULL, 0, MZ_NO_COMPRESSION);

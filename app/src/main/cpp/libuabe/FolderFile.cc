@@ -50,32 +50,42 @@ namespace xausky {
                     wwise_akpk_patch_t patch;
                     binary_stream_seek(&input, 0, SEEK_SET);
                     if(wwise_akpk_parser(&akpk, &input, 0) != 0){
+                        binary_stream_destory(&input);
                         __LIBUABE_LOG("wwise_akpk_parser failed.");
                         return;
                     }
                     if(wwise_akpk_make_patch(&patch, FolderPathBuffer) != 0){
+                        binary_stream_destory(&input);
                         __LIBUABE_LOG("wwise_akpk_make_patch failed.");
                         return;
                     }
-                    binary_stream_seek(&input, 0, SEEK_SET);
+                    if(binary_stream_seek(&input, 0, SEEK_SET) != 0){
+                        wwise_akpk_destory_patch(&patch);
+                        binary_stream_destory(&input);
+                        __LIBUABE_LOG("binary_stream_seek failed.");
+                        return;
+                    }
                     if(wwise_akpk_save(&akpk, &input) != 0) {
+                        wwise_akpk_destory_patch(&patch);
+                        binary_stream_destory(&input);
                         __LIBUABE_LOG("wwise_akpk_save failed.");
                         return;
                     }
                     wwise_akpk_destory_patch(&patch);
+                    binary_stream_destory(&input);
                 } else {
-
+                    binary_stream_destory(&input);
                     __LIBUABE_LOG("bundle patch: %s\n", matchName.c_str());
                     BinaryStream bundle(targetPath + '/' + filename, true);
                     BinaryStream patchedBundle(targetPath + '/' + filename, true);
                     BundleFile bundleFile;
                     bundleFile.open(bundle);
-                    map<string, map<int64_t, BinaryStream*>*>* patch = Utils::MakeBundlePatch(FolderPathBuffer);
+                    map<string, map<int64_t, BinaryStream *> *> *patch = Utils::MakeBundlePatch(
+                            FolderPathBuffer);
                     bundleFile.patch(*patch);
                     bundleFile.save(patchedBundle);
                     Utils::FreeBundlePatch(patch);
                 }
-                binary_stream_destory(&input);
             }else if(S_ISREG(modStat.st_mode)){
                 __LIBUABE_LOG("copy patch: %s\n", filename.c_str());
                 BackupFile(filename, targetPath, backupPath);

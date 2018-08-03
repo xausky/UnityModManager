@@ -69,6 +69,7 @@ import ru.bartwell.exfilepicker.utils.Utils;
 
 public class HomeFragment extends BaseFragment implements View.OnClickListener, ApplicationChooseDialog.OnApplicationChooseDialogResultListener {
     public static final String PACKAGE_PREFERENCE_KEY = "PACKAGE_PREFERENCE_KEY";
+    public static final String BASE_APK_PATH_KEY = "BASE_APK_PATH_KEY";
     public static final String ALL_APPLICATION_PACKAGE_REGEX = "^.*$";
     public static final int APK_MODIFY_MODEL_NONE = 0;
     public static final int APK_MODIFY_MODEL_VIRTUAL = 1;
@@ -334,6 +335,9 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         obbPath = context.getObbDir().getParentFile().getAbsolutePath() + "/" + packageName + "/main." + versionCode + '.' + packageName + ".obb";
         persistentPath = context.getExternalFilesDir(null).getParentFile().getParentFile().getAbsolutePath() + "/" + packageName + "/files";
         baseApkPath = context.getFilesDir().getAbsolutePath() + "/base.apk";
+        if(apkModifyModel == APK_MODIFY_MODEL_VIRTUAL){
+            baseApkPath = settings.getString(BASE_APK_PATH_KEY, null);
+        }
         baseObbPath = context.getFilesDir().getAbsolutePath() + "/base.obb";
         backupPath = context.getFilesDir().getAbsolutePath() + "/backup";
         File backup = new File(backupPath);
@@ -431,21 +435,17 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 } else {
                     final InstallResult installResult = VirtualCore.get().installPackage(apkPath, InstallStrategy.UPDATE_IF_EXIST);
                     if (installResult.isSuccess) {
-                        try {
-                            String basePath = HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/base.apk";
-                            FileUtils.copyFile(new File(apkPath), new File(basePath));
-                            if (modFragment.getEnableItemCount() > 0) {
-                                modFragment.setNeedPatch(true);
-                            }
-                            HomeFragment.this.packageName = installResult.packageName;
-                            HomeFragment.this.baseApkPath = basePath;
-                            InstalledAppInfo info = VirtualCore.get().getInstalledAppInfo(HomeFragment.this.packageName, 0);
-                            HomeFragment.this.apkPath = info.apkPath;
-                            result = getString(R.string.install_success_create_shortcut);
-                            versionCode = info.getPackageInfo(0).versionCode;
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        String basePath = HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/base.apk";
+                        if (modFragment.getEnableItemCount() > 0) {
+                            modFragment.setNeedPatch(true);
                         }
+                        HomeFragment.this.packageName = installResult.packageName;
+                        HomeFragment.this.baseApkPath = apkPath;
+                        settings.edit().putString(BASE_APK_PATH_KEY, apkPath).apply();
+                        InstalledAppInfo info = VirtualCore.get().getInstalledAppInfo(HomeFragment.this.packageName, 0);
+                        HomeFragment.this.apkPath = info.apkPath;
+                        result = getString(R.string.install_success_create_shortcut);
+                        versionCode = info.getPackageInfo(0).versionCode;
                     } else {
                         result = installResult.error;
                     }

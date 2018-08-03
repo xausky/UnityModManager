@@ -2,6 +2,7 @@
 
 > ⼀个便捷的程序可以给Unity游戏添加模组，修改游戏内模型。
 
+[![Crowdin](https://d322cqt584bo4o.cloudfront.net/unitymodmanager/localized.svg)](https://crowdin.com/project/unitymodmanager)
 [![Build Status](https://travis-ci.org/xausky/UnityModManager.svg?branch=master)](https://travis-ci.org/xausky/UnityModManager)
 [![GPL Licence](https://badges.frapsoft.com/os/gpl/gpl.svg?v=103)](https://opensource.org/licenses/GPL-3.0/)
 

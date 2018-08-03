@@ -30,7 +30,7 @@
   <string name="confirm">Выбор</string>
   <string name="cancel">Отмена</string>
   <string name="prompt">Prompt</string>
-  <string name="attach_delete_confirm_message">ВЫ точно хотите удалить [%s] вложений?</string>
+  <string name="attach_delete_confirm_message">Вы точно хотите удалить [%s] вложений?</string>
   <string name="visibility_delete_confirm_message">Вы точно хотите убрать [%s] видимых?</string>
   <string name="attach_delete_fail">Ошибка при удалении вложения.</string>
   <string name="attach_delete_success">Вложение удалено.</string>
@@ -50,7 +50,7 @@
   <string name="mod_info_description">Описание:\n%s</string>
   <string name="mod_info_name">%s</string>
   <string name="mod_info_author">Автор:%s</string>
-  <string name="install_source_not_found">Пожалуйста сначала вернитесь на стартовую страницу установки клиента и убедитесь источник не не установлен или не удалён.</string>
+  <string name="install_source_not_found">Пожалуйста сначала вернитесь на главную для выбора клиента и убедитесь источник не не установлен или не удалён.</string>
   <string name="unsupport_operation">Неподдерживаемая операция.</string>
   <string name="install_mods_failed">Не удалось установить мод.</string>
   <string name="no_storage_permissions">Приложение не имеет разрешения для чтения и записи в памяти телефона, пожалуйста, перейдите к настройкам доступа и дайте права, иначе оно не сможет работать.</string>
@@ -71,29 +71,29 @@
   <string name="install_client_download_resource">Сначала установите клиент и загрузите обновления ресурсов.</string>
   <string name="map_file_generate_success">Файл сопоставления успешно создан.</string>
   <string name="confirm_modify_source">Please make sure there is at least one change source.</string>
-  <string name="my_email">my email</string>
-  <string name="my_bilibili">my bilibili</string>
-  <string name="my_github">my github</string>
-  <string name="improved_translation">Improved translation</string>
+  <string name="my_email">Моя электронная почта</string>
+  <string name="my_bilibili">Мой канал bilibili</string>
+  <string name="my_github">Мой GitHub</string>
+  <string name="improved_translation">Улучшить перевод</string>
   <string name="install_client_and_generate_map_file_first">Пожалуйста, сначала установите клиент для создания индекса.</string>
   <string name="external_mod_import_model">External module directory import mode is not recommended for no mod developers.</string>
   <string name="checked_external_mod_changed">An external module change was detected and the game was restarted.</string>
   <string name="import_mod">Добавить мод</string>
   <string name="package_export_success">Export integration package success: [%s]</string>
   <string name="package_export_failed">Failed to export the integration package. Please make sure that the program can read and write external storage.</string>
-  <string name="apk_modify_model_title">APK resource modification model</string>
-  <string name="apk_modify_model_summary">Choose how to modify the resources in the APK. If you do not modify the mode, you do not modify the APK resource. You can continue to use persistent resource patches.</string>
-  <string name="persistent_support_title">Persistent resource patch support</string>
-  <string name="persistent_support_summary">Unity\'s PersistentDataPath path provides resource patch support, such as \"Honkai Impact 3\" UC version.</string>
-  <string name="setting_export_apk_title">Export Integration APK file</string>
-  <string name="setting_export_apk_summary">Click to export the patched APK file to out.apk in the internal storage root directory.</string>
+  <string name="apk_modify_model_title">Тип изменения ресурсов APK</string>
+  <string name="apk_modify_model_summary">Выберите, как будут изменятся ресурсы APK. Если вы не меняете режим, можно не изменять ресурсы APK. Вы можете использовать патчи persistent resource.</string>
+  <string name="persistent_support_title">Поддержка патчей persistent resource</string>
+  <string name="persistent_support_summary">Патч пути PersistentDataPath в Unity поддерживает изменение ресурсов в \"Honkai Impact 3\" UC версии.</string>
+  <string name="setting_export_apk_title">Создать патченный APK файл</string>
+  <string name="setting_export_apk_summary">Нажмите для создания пропатченого APK файла out.apk в памяти устройства.</string>
   <string name="create_shortcut_title">Создать ярлык игры</string>
-  <string name="create_shortcut_summary">Create a game shortcut to go directly from the desktop to the game in the virtual environment without first opening the manager.</string>
+  <string name="create_shortcut_summary">Создать ярлык для запуска игры в виртуальной среде без использования менеджера.</string>
   <string name="none_modify_export">Unable to export integrated package No Modify APK mode</string>
   <string name="no_virtual_model_shortcut">No VirtualApp Model cannot create shortcuts. Start using the original icon.</string>
   <string-array name="apk_modify_model">
-    <item>No Modify</item>
-    <item>VirtualApp Model</item>
+    <item>Без модификации</item>
+    <item>VirtualApp</item>
     <item>Root права (осторожно)</item>
   </string-array>
   <string-array name="apk_modify_model_values">
