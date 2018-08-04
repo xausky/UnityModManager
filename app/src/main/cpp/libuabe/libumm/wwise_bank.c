@@ -1,4 +1,5 @@
 #include "wwise_bank.h"
+#include "utils.h"
 
 int8_t wwise_bank_parser_event_voice(kbtree_t(wwise_bank_key_value_map) *map, binary_stream_t *stream){
     uint32_t id, wem;
@@ -21,6 +22,7 @@ int8_t wwise_bank_parser_event_voice(kbtree_t(wwise_bank_key_value_map) *map, bi
     if(type == 0){
         kb_put(wwise_bank_key_value_map, map, entity);
     }
+    __LIBUABE_DEBUG("voice:%u,%u,%u\n", id, type, wem);
     return 0;
 }
 
@@ -43,6 +45,7 @@ int8_t wwise_bank_parser_event_action(kbtree_t(wwise_bank_key_value_map) *map, b
     entity.key = id;
     entity.value = voice;
     kb_put(wwise_bank_key_value_map, map, entity);
+    __LIBUABE_DEBUG("action:%u,%u,%u,%u\n", id, scope, type, voice);
     return 0;
 }
 
@@ -57,43 +60,97 @@ int8_t wwise_bank_parser_event_event(kbtree_t(wwise_bank_key_values_map) *map, b
     }
     entity.key = id;
     entity.size = number;
+    __LIBUABE_DEBUG("event:%u\n", id);
     for(int i = 0; i < number; ++i){
         if(i >= EVENT_MAX_ACTION_BUMBER){
-            puts("EVENT_MAX_ACTION_BUMBER error.\n");
+            __LIBUABE_DEBUG("EVENT_MAX_ACTION_BUMBER error.\n");
             break;
         }
         if(binary_stream_read_uint32(stream, &action) != 0){
             return -3;
         }
+        __LIBUABE_DEBUG("--action:%u\n", action);
         entity.values[i] = action;
     }
     kb_put(wwise_bank_key_values_map, map, entity);
     return 0;
 }
 
-int8_t wwise_bank_parser_event_container(kbtree_t(wwise_bank_key_values_map) *map, binary_stream_t *stream){
-    uint32_t id, number, voice;
+int8_t wwise_bank_parser_event_sequence(kbtree_t(wwise_bank_key_values_map) *map, binary_stream_t *stream){
+    uint16_t check = 0;
+    uint32_t id, number, object;
     wwise_bank_key_values_t entity;
     uint64_t start = binary_stream_seek(stream, 0, SEEK_CUR);
     if(binary_stream_read_uint32(stream, &id) != 0){
         return -1;
     }
-    if(binary_stream_seek(stream, 0x34, SEEK_CUR) == -1){
+    do {
+        if(binary_stream_read_uint16(stream, &check) != 0){
+            return -2;
+        }
+        if(binary_stream_seek(stream, -1, SEEK_CUR) == -1){
+            return -2;
+        }
+    } while(check != 0x447A);
+    if(binary_stream_seek(stream, 15, SEEK_CUR) == -1){
         return -2;
     }
     if(binary_stream_read_uint32(stream, &number) != 0){
         return -2;
     }
     if(number > EVENT_MAX_ACTION_BUMBER){
+        __LIBUABE_DEBUG("sequence number too more.\n");
         return 0;
     }
     entity.key = id;
     entity.size = number;
+    __LIBUABE_DEBUG("sequence:%u\n", id);
     for(int i = 0; i < number; ++i){
-        if(binary_stream_read_uint32(stream, &voice) != 0){
+        if(binary_stream_read_uint32(stream, &object) != 0){
             return -3;
         }
-        entity.values[i] = voice;
+        __LIBUABE_DEBUG("--object:%u\n", object);
+        entity.values[i] = object;
+    }
+    if(number > 0){
+        kb_put(wwise_bank_key_values_map, map, entity);
+    }
+    return 0;
+}
+
+int8_t wwise_bank_parser_event_switch(kbtree_t(wwise_bank_key_values_map) *map, binary_stream_t *stream){
+    uint8_t skip;
+    uint32_t id, number, object;
+    wwise_bank_key_values_t entity;
+    uint64_t start = binary_stream_seek(stream, 0, SEEK_CUR);
+    if(binary_stream_read_uint32(stream, &id) != 0){
+        return -1;
+    }
+    if(binary_stream_seek(stream, 0x0C, SEEK_CUR) == -1){
+        return -2;
+    }
+    if(binary_stream_read_uint8(stream, &skip) != 0){
+        return -2;
+    }
+    if(binary_stream_seek(stream, 0x19 + 5 * skip, SEEK_CUR) == -1){
+        return -2;
+    }
+    if(binary_stream_read_uint32(stream, &number) != 0){
+        return -2;
+    }
+    if(number > EVENT_MAX_ACTION_BUMBER){
+        __LIBUABE_DEBUG("switch number too more.\n");
+        return 0;
+    }
+    entity.key = id;
+    entity.size = number;
+    __LIBUABE_DEBUG("switch:%u\n", id);
+    for(int i = 0; i < number; ++i){
+        if(binary_stream_read_uint32(stream, &object) != 0){
+            return -3;
+        }
+        __LIBUABE_DEBUG("--object:%u\n", object);
+        entity.values[i] = object;
     }
     if(number > 0){
         kb_put(wwise_bank_key_values_map, map, entity);
@@ -102,11 +159,11 @@ int8_t wwise_bank_parser_event_container(kbtree_t(wwise_bank_key_values_map) *ma
 }
 
 int8_t wwise_bank_parser_event(wwise_bank_t *bank, binary_stream_t *stream){
-    bank->voice_wem_map = kb_init(wwise_bank_key_value_map, KB_DEFAULT_SIZE);
-    bank->event_wems_map = kb_init(wwise_bank_key_values_map, KB_DEFAULT_SIZE);
-    bank->action_object_map = kb_init(wwise_bank_key_value_map, KB_DEFAULT_SIZE);
-    bank->event_actions_map = kb_init(wwise_bank_key_values_map, KB_DEFAULT_SIZE);
-    bank->object_voices_map = kb_init(wwise_bank_key_values_map, KB_DEFAULT_SIZE);
+    bank->voice_wem_map = kb_init(wwise_bank_key_value_map, KB_DEFAULT_SIZE * sizeof(wwise_bank_key_value_t));
+    bank->event_wems_map = kb_init(wwise_bank_key_values_map, KB_DEFAULT_SIZE* sizeof(wwise_bank_key_values_t));
+    bank->action_object_map = kb_init(wwise_bank_key_value_map, KB_DEFAULT_SIZE* sizeof(wwise_bank_key_value_t));
+    bank->event_actions_map = kb_init(wwise_bank_key_values_map, KB_DEFAULT_SIZE* sizeof(wwise_bank_key_values_t));
+    bank->object_voices_map = kb_init(wwise_bank_key_values_map, KB_DEFAULT_SIZE* sizeof(wwise_bank_key_values_t));
     uint8_t type;
     uint32_t number, length, id;
     int64_t end;
@@ -125,6 +182,15 @@ int8_t wwise_bank_parser_event(wwise_bank_t *bank, binary_stream_t *stream){
         if(end < 0){
             return -3;
         }
+        /*
+        if(binary_stream_read_uint32(stream, &id) != 0){
+            return -2;
+        }
+        binary_stream_seek(stream, -4, SEEK_CUR);
+        __LIBUABE_DEBUG("object:%u,%u,%u\n", id, type, length);
+        if(id == 151993151 || id == 606474963 || id == 698201592 || id == 462587676){
+            utils_file_stream_dump(stream, length, id);
+        }*/
         switch(type){
             case 4: //Event
                 if(wwise_bank_parser_event_event(bank->event_actions_map, stream)!=0){
@@ -142,7 +208,12 @@ int8_t wwise_bank_parser_event(wwise_bank_t *bank, binary_stream_t *stream){
                 }
                 break;
             case 5: //Random Container or Sequence Container
-                if(wwise_bank_parser_event_container(bank->object_voices_map, stream)!=0){
+                if(wwise_bank_parser_event_sequence(bank->object_voices_map, stream)!=0){
+                    return -7;
+                }
+                break;
+            case 6: //Switch
+                if(wwise_bank_parser_event_switch(bank->object_voices_map, stream)!=0){
                     return -7;
                 }
                 break;
@@ -212,6 +283,7 @@ int8_t wwise_bank_parser_didx(wwise_bank_t *bank, binary_stream_t *stream, uint3
         if(current < 0){
             return -6;
         }
+        __LIBUABE_DEBUG("wem:%u,%u\n", put.key, put.length);
     }
     return 0;
 }
@@ -221,7 +293,7 @@ int8_t wwise_bank_parser_data(wwise_bank_t *bank, binary_stream_t *stream){
     int32_t start;
     wwise_bank_key_stream_t put;
     if(bank->wem_stream_map == 0){
-        printf("wwise_bank_parser_data not didx.");
+        __LIBUABE_DEBUG("wwise_bank_parser_data not didx.");
         return 0;
     }
     start = binary_stream_seek(stream, 0, SEEK_CUR);

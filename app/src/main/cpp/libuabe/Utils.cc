@@ -1,5 +1,4 @@
 #include "Utils.hh"
-#include "LogUtils.hh"
 #include <iostream>
 #include <dirent.h>
 #include <sys/stat.h>
@@ -49,6 +48,9 @@ namespace xausky {
         while (!folders.empty()){
             string current = folders.back();folders.pop_back();
             DIR *folder = opendir((path + "/" + current).c_str());
+            if(folder == NULL){
+                continue;
+            }
             struct dirent *rent = NULL;
             while((rent = readdir(folder)) != NULL){
                 if(strcmp(rent->d_name,".")==0 || strcmp(rent->d_name,"..")==0){

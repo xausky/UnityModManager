@@ -30,7 +30,7 @@ namespace xausky {
                 if(mz_zip_reader_extract_to_mem(zip, i, target.data, target.capacity, 0)){
                     target.size = entrityStat->m_uncomp_size;
                     if(memcmp(target.data, "AKPK", 4) == 0){
-                        __LIBUABE_LOG("AKPK patch: %s\n", entrityStat->m_filename);
+                        __LIBUABE_LOG("Wwise patch: %s\n", entrityStat->m_filename);
                         wwise_akpk_t akpk;
                         wwise_akpk_patch_t patch;
                         binary_stream_seek(&target, 0, SEEK_SET);
@@ -56,8 +56,8 @@ namespace xausky {
                         }
                         wwise_akpk_destory_patch(&patch);
                         mz_zip_writer_add_mem(out, entrityStat->m_filename, target.data, target.size, MZ_NO_COMPRESSION);
-                    } else {
-                        __LIBUABE_LOG("bundle patch: %s\n", entrityStat->m_filename);
+                    } else if(memcmp(target.data, "UnityFS", 7) == 0) {
+                        __LIBUABE_LOG("Bundle patch: %s\n", entrityStat->m_filename);
                         BinaryStream bundle((char *)target.data, entrityStat->m_uncomp_size, true);
                         BinaryStream patchedBundle(true);
                         BundleFile bundleFile;
@@ -69,12 +69,14 @@ namespace xausky {
                         int len = patchedBundle.size();
                         patchedBundle.ReadData(dataBuffer, len);
                         mz_zip_writer_add_mem(out, entrityStat->m_filename, dataBuffer, len, MZ_NO_COMPRESSION);
+                    } else {
+                        __LIBUABE_LOG("Unknown patch: %s\n", entrityStat->m_filename);
                     }
+                    binary_stream_destory(&target);
                     return;
                 } else {
                     __LIBUABE_LOG("mz_zip_reader_extract_to_mem() failed!\n");
                 }
-                binary_stream_destory(&target);
             }
             if(S_ISREG(modStat.st_mode)){
                 mz_zip_writer_add_file(out, entrityStat->m_filename, pathBuffer, NULL, 0, MZ_NO_COMPRESSION);
