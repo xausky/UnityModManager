@@ -97,8 +97,10 @@ int8_t wwise_akpk_parser(wwise_akpk_t *akpk, binary_stream_t *stream, uint8_t pa
             }
             bank->sound.sections = NULL;
             if(parser_event){
-                if(wwise_bank_parser(&bank->sound, &bank->data, 1) != 0){
-                    return -21;
+                if(memcmp(bank->data.data, "RIFF", 4) != 0){
+                    if(wwise_bank_parser(&bank->sound, &bank->data, 1) != 0){
+                        return -21;
+                    }
                 }
                 kbitr_t wwise_bank_itr;
                 if(bank->sound.event_wems_map != NULL){
@@ -158,8 +160,10 @@ int8_t wwise_akpk_make_patch(wwise_akpk_patch_t *patch, const char *path){
     uint32_t bank_id, index, wem_id;
     wwise_akpk_patch_element_t find, *result;
     wwise_bank_key_stream_t put;
+    wwise_akpk_key_stream_t akpk_put;
     memset(patch, 0, sizeof(wwise_akpk_patch_t));
     patch->patch = kb_init(wwise_akpk_patch_map, KB_DEFAULT_SIZE);
+    patch->bank_patch = kb_init(wwise_akpk_key_stream_map, KB_DEFAULT_SIZE);
     if(patch->patch == NULL){
         return -1;
     }
@@ -168,21 +172,33 @@ int8_t wwise_akpk_make_patch(wwise_akpk_patch_t *patch, const char *path){
         return -1;
     }
     for (p = kl_begin(files); p != kl_end(files); p = kl_next(p)){
-        if(sscanf(kl_val(p).name, "%u-%u-%u.wem", &bank_id, &index, &wem_id) != 3){
-            continue;
+        if(memcmp(kl_val(p).name, "bank", 4) == 0){
+            if(sscanf(kl_val(p).name, "bank-%u-%u.wem", &bank_id, &index) != 2){
+                continue;
+            }
+            sprintf(path_buffer, "%s/%s", path, kl_val(p).name);
+            if(binary_stream_create_file(&akpk_put.stream, path_buffer, BINARY_STREAM_ORDER_LITTLE_ENDIAN) != 0){
+                return -4;
+            }
+            akpk_put.key = ((uint64_t)index) << 32 | ((uint64_t)bank_id);
+            kb_put(wwise_akpk_key_stream_map, patch->bank_patch, akpk_put);
+        }else{
+            if(sscanf(kl_val(p).name, "%u-%u-%u.wem", &bank_id, &index, &wem_id) != 3){
+                continue;
+            }
+            find.key = ((uint64_t)index) << 32 | ((uint64_t)bank_id);
+            result = kb_getp(wwise_akpk_patch_map, patch->patch, &find);
+            if(result == NULL){
+                result = kb_putp(wwise_akpk_patch_map, patch->patch, &find);
+                result->patch = kb_init(wwise_bank_key_stream_map, KB_DEFAULT_SIZE);
+            }
+            put.key = wem_id;
+            sprintf(path_buffer, "%s/%s", path, kl_val(p).name);
+            if(binary_stream_create_file(&put.stream, path_buffer, BINARY_STREAM_ORDER_LITTLE_ENDIAN) != 0){
+                return -4;
+            }
+            kb_put(wwise_bank_key_stream_map, result->patch, put);
         }
-        find.key = ((uint64_t)index) << 32 | ((uint64_t)bank_id);
-        result = kb_getp(wwise_akpk_patch_map, patch->patch, &find);
-        if(result == NULL){
-            result = kb_putp(wwise_akpk_patch_map, patch->patch, &find);
-            result->patch = kb_init(wwise_bank_key_stream_map, KB_DEFAULT_SIZE);
-        }
-        put.key = wem_id;
-        sprintf(path_buffer, "%s/%s", path, kl_val(p).name);
-        if(binary_stream_create_file(&put.stream, path_buffer, BINARY_STREAM_ORDER_LITTLE_ENDIAN) != 0){
-            return -4;
-        }
-        kb_put(wwise_bank_key_stream_map, result->patch, put);
     }
     utils_file_list_destory(files);
     return 0;
@@ -199,14 +215,19 @@ void wwise_akpk_destory_patch(wwise_akpk_patch_t *patch){
         kb_destroy(wwise_bank_key_stream_map, entity->patch);
     }
     kb_destroy(wwise_akpk_patch_map, patch->patch);
+    for(kb_itr_first(wwise_akpk_key_stream_map, patch->bank_patch, &bank); kb_itr_valid(&bank); kb_itr_next(wwise_akpk_key_stream_map, patch->bank_patch, &bank)){
+        wwise_akpk_key_stream_t *entity = &kb_itr_key(wwise_akpk_key_stream_t, &bank);
+        binary_stream_destory(&entity->stream);
+    }
+    kb_destroy(wwise_akpk_key_stream_map, patch->bank_patch);
 }
 
 int8_t wwise_akpk_patch(wwise_akpk_t *akpk, wwise_akpk_patch_t *patch){
     kbitr_t itr;
+    int64_t size;
     wwise_akpk_key_bank_map_t find, *result;
     for(kb_itr_first(wwise_akpk_patch_map, patch->patch, &itr); kb_itr_valid(&itr); kb_itr_next(wwise_akpk_patch_map, patch->patch, &itr)){
         wwise_akpk_patch_element_t *entity = &kb_itr_key(wwise_akpk_patch_element_t, &itr);
-        wwise_akpk_key_bank_map_t *result;
         find.key = entity->key;
         for(int i = 0; i < 3; ++i){
             result = kb_getp(wwise_akpk_key_bank_map, akpk->banks[i], &find);
@@ -229,6 +250,31 @@ int8_t wwise_akpk_patch(wwise_akpk_t *akpk, wwise_akpk_patch_t *patch){
                 return -3;
             }
             wwise_bank_destory(&result->sound);
+        }
+    }
+    for(kb_itr_first(wwise_akpk_key_stream_map, patch->bank_patch, &itr); kb_itr_valid(&itr); kb_itr_next(wwise_akpk_key_stream_map, patch->bank_patch, &itr)){
+        wwise_akpk_key_stream_t *entity = &kb_itr_key(wwise_akpk_key_stream_t, &itr);
+        find.key = entity->key;
+        for(int i = 0; i < 3; ++i){
+            result = kb_getp(wwise_akpk_key_bank_map, akpk->banks[i], &find);
+            if(result != NULL){
+                break;
+            }
+        }
+        if(result != NULL){
+            binary_stream_destory(&result->data);
+            if(binary_stream_create_memory(&result->data, 1024, BINARY_STREAM_ORDER_LITTLE_ENDIAN) != 0){
+                return -2;
+            }
+            if((size = binary_stream_seek(&entity->stream, 0, SEEK_END)) < 0){
+                return -1;
+            }
+            if(binary_stream_seek(&entity->stream, 0, SEEK_SET) != 0){
+                return -1;
+            }
+            if(binary_stream_copy(&result->data, &entity->stream, size) < 0){
+                return -3;
+            }
         }
     }
     return 0;

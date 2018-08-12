@@ -61,7 +61,15 @@ typedef struct {
 KBTREE_INIT(wwise_akpk_patch_map, wwise_akpk_patch_element_t, wwise_akpk_key_map_cmp) ;
 
 typedef struct {
+    uint64_t key;
+    binary_stream_t stream;
+} wwise_akpk_key_stream_t;
+
+KBTREE_INIT(wwise_akpk_key_stream_map, wwise_akpk_key_stream_t, wwise_bank_key_value_cmp)
+
+typedef struct {
     kbtree_t(wwise_akpk_patch_map) *patch;
+    kbtree_t(wwise_akpk_key_stream_map) *bank_patch;
 } wwise_akpk_patch_t;
 
 int8_t wwise_akpk_parser(wwise_akpk_t *akpk, binary_stream_t *stream, uint8_t parser_event);
