@@ -3,11 +3,11 @@
 <resources>
   <string name="app_name">Менеджер модов Unity</string>
   <string name="menu_launch_game">Запустить игру</string>
-  <string name="nav_home">Домой</string>
+  <string name="nav_home">Главная</string>
   <string name="nav_mod">Моды</string>
   <string name="nav_attach">Вложения</string>
   <string name="nav_setting">Настройки</string>
-  <string name="nav_system">Система</string>
+  <string name="nav_system">Параметры</string>
   <string name="nav_info">О программе</string>
   <string name="info_context_text">
 Это программа с открытым исходным кодом в соответствии с соглашением GPL на Github и не может быть использована в  коммерческих целях.\n
@@ -15,8 +15,8 @@
    UnityStudio, miniz, VirtualXposed, AndroidP7zip, ExFilePicker, android-about-page, CheckVersionLib, AndroidImageSlider. \n
    Благодарю переводчиков:\n
         Традиционный китайский язык - 栗子\n
-        Русский язык - onemeshnig
-    </string>
+        Русский язык - onemeshnig\n
+        корейский - Bebridge    </string>
   <string name="home_summary_context">
 Включено модов: %d\nУстановлено модов: %d\nУстановлено вложений: %d\nВидимые приложения: %d\nПриложений в VirtualApp: %d
     </string>
@@ -29,7 +29,7 @@
   <string name="progress_dialog_processing">Обработка</string>
   <string name="confirm">Выбор</string>
   <string name="cancel">Отмена</string>
-  <string name="prompt">Prompt</string>
+  <string name="prompt">Напоминание</string>
   <string name="attach_delete_confirm_message">Вы точно хотите удалить [%s] вложений?</string>
   <string name="visibility_delete_confirm_message">Вы точно хотите убрать [%s] видимых?</string>
   <string name="attach_delete_fail">Ошибка при удалении вложения.</string>
@@ -70,17 +70,17 @@
   <string name="create_backup_folder_failed">Не удается создать резервную копию папки</string>
   <string name="install_client_download_resource">Сначала установите клиент и загрузите обновления ресурсов.</string>
   <string name="map_file_generate_success">Файл сопоставления успешно создан.</string>
-  <string name="confirm_modify_source">Please make sure there is at least one change source.</string>
+  <string name="confirm_modify_source">Пожалуйста, убедитесь, что есть по крайней мере одно изменение источника.</string>
   <string name="my_email">Моя электронная почта</string>
   <string name="my_bilibili">Мой канал bilibili</string>
   <string name="my_github">Мой GitHub</string>
   <string name="improved_translation">Улучшить перевод</string>
   <string name="install_client_and_generate_map_file_first">Пожалуйста, сначала установите клиент для создания индекса.</string>
-  <string name="external_mod_import_model">External module directory import mode is not recommended for no mod developers.</string>
-  <string name="checked_external_mod_changed">An external module change was detected and the game was restarted.</string>
+  <string name="external_mod_import_model">Режим \"Импорт моды из внешниих директориев\" рекомендуется только для разработчиков моды.</string>
+  <string name="checked_external_mod_changed">Изменение внешнего модуля обнаружено. Перезапуск игры.</string>
   <string name="import_mod">Добавить мод</string>
-  <string name="package_export_success">Export integration package success: [%s]</string>
-  <string name="package_export_failed">Failed to export the integration package. Please make sure that the program can read and write external storage.</string>
+  <string name="package_export_success">Успешно создался комплексный пакет: [%s]</string>
+  <string name="package_export_failed">Не удалось экспортировать комплексный пакет. Пожалуйста, проверьте права приложения на чтение и запись в память устройства.</string>
   <string name="apk_modify_model_title">Тип изменения ресурсов APK</string>
   <string name="apk_modify_model_summary">Выберите, как будут изменятся ресурсы APK. Если вы не меняете режим, можно не изменять ресурсы APK. Вы можете использовать патчи persistent resource.</string>
   <string name="persistent_support_title">Поддержка патчей persistent resource</string>
@@ -89,8 +89,8 @@
   <string name="setting_export_apk_summary">Нажмите для создания пропатченого APK файла out.apk в памяти устройства.</string>
   <string name="create_shortcut_title">Создать ярлык игры</string>
   <string name="create_shortcut_summary">Создать ярлык для запуска игры в виртуальной среде без использования менеджера.</string>
-  <string name="none_modify_export">Unable to export integrated package No Modify APK mode</string>
-  <string name="no_virtual_model_shortcut">No VirtualApp Model cannot create shortcuts. Start using the original icon.</string>
+  <string name="none_modify_export">Экспорт комплексного пакета не разрешен при режиме \"Не изменения файла APK\"</string>
+  <string name="no_virtual_model_shortcut">Создание ярлыка не разрешен при режиме \"Не виртуальной среды\". Пожапуйста, запустите игру, используя первоначальную иконку.</string>
   <string-array name="apk_modify_model">
     <item>Без модификации</item>
     <item>VirtualApp</item>
@@ -110,4 +110,6 @@
   <string name="mod_info_conflict">Конфликт файлов: %s</string>
   <string name="show_conflict_info_title">Показывать информацию о конфликтах модов</string>
   <string name="show_conflict_info_summary">Показывать информацию о конфликтах модов авторам для исправления.</string>
+  <string name="valid_files_zero">В моде \"[%s]\" не нашлись действенные файлы. Пожалуйста, проверьтесь, что правильно создали отображение файла.</string>
+  <string name="mod_decompression_error">Ошибка при распаковке моды \"[%s]\". Пожалуйста, утвердите, что самый файл моды не повреждён.</string>
 </resources>

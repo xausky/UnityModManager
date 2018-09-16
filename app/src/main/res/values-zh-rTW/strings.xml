@@ -15,8 +15,8 @@
         UnityStudio，miniz，VirtualXposed，AndroidP7zip，ExFilePicker，android-about-page，CheckVersionLib，AndroidImageSlider。\n
         感謝以下翻譯者：\n
         繁體中文 - 栗子\n
-        俄語 - onemeshnig
-    </string>
+        俄語 - onemeshnig\n
+        韓語 - Bebridge    </string>
   <string name="home_summary_context">
         已啟用模組數量：%d\n已安裝模組數量：%d\n已安裝附加組件數量：%d\n可見的外部程序數量：%d\n虛擬環境已安裝應用數量：%d
     </string>
@@ -110,4 +110,6 @@
   <string name="mod_info_conflict">衝突文件： %s</string>
   <string name="show_conflict_info_title">顯示模組文件衝突信息</string>
   <string name="show_conflict_info_summary">顯示模組文件衝突信息，便於模組作者進行調試。</string>
+  <string name="valid_files_zero">模組 [%s] 有效文件數為零，請確保映射生成正確。</string>
+  <string name="mod_decompression_error">模組 [%s] 解壓錯誤，請確認模組文件沒有損壞。</string>
 </resources>

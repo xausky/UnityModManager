@@ -205,6 +205,9 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
             result = ModUtils.Standardization(sourceFile, targetFile);
         }
         if(result >= 0){
+            if(result == 0){
+                Toast.makeText(context, String.format(context.getString(R.string.valid_files_zero), name), Toast.LENGTH_LONG).show();
+            }
             mods.add(new Mod(name, false, Integer.MAX_VALUE, result, targetFile.getAbsolutePath(), null));
             notifyDataSetChanged();
             if (iterator.hasNext()) {
@@ -215,7 +218,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
         }
         switch (result) {
             case RESULT_STATE_INTERNAL_ERROR:
-                Toast.makeText(context, String.format("模组[%s]解压错误，请确认模组文件未损坏。", name), Toast.LENGTH_LONG).show();
+                Toast.makeText(context, String.format(context.getString(R.string.mod_decompression_error), name), Toast.LENGTH_LONG).show();
                 try {
                     FileUtils.deleteDirectory(targetFile);
                 } catch (Exception e) {
