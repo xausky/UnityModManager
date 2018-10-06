@@ -28,11 +28,11 @@
         android:id="@+id/action_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
+        android:layout_gravity="end|top"
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/ic_add"
         app:layout_behavior="io.github.xausky.unitymodmanager.utils.FabBehavior"
         app:layout_anchor="@+id/fragment_container"
-        app:layout_anchorGravity="right|bottom" />
+        app:layout_anchorGravity="bottom" />
 
 </android.support.design.widget.CoordinatorLayout>

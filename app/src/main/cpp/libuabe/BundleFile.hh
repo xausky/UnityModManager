@@ -8,6 +8,7 @@
 using namespace std;
 namespace xausky{
     enum CompressMethod{
+        NONE = 0,
         LZ4HC = 3,
     };
     struct UnsupprtBundleFileType : std::exception {

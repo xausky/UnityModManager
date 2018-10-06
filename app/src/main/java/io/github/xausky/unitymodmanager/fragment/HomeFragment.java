@@ -100,7 +100,6 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     private SharedPreferences settings;
     private ApplicationChooseDialog dialog;
     private ProgressDialog progressDialog;
-    private VirtualCore va;
 
     @Override
     public BaseFragment setBase(Context base) {
@@ -131,7 +130,6 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             visibilityFragment = (VisibilityFragment) BaseFragment.fragment(R.id.nav_visibility);
             modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
             summary = (TextView) view.findViewById(R.id.home_summary);
-            va = VirtualCore.get();
             currentVersion = (TextView) view.findViewById(R.id.home_current_version);
             latestVersion = (TextView) view.findViewById(R.id.home_latest_version);
             clientState = (TextView) view.findViewById(R.id.home_client_state);
@@ -201,7 +199,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                     public void onRequestVersionFailure(String message) {
 
                     }
-                }).excuteMission(context);
+                }).excuteMission(getActivity().getBaseContext());
     }
 
     public void ImportMapFile() {
@@ -325,7 +323,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 e.printStackTrace();
             }
         } else {
-            InstalledAppInfo installedAppInfo = va.getInstalledAppInfo(packageName, 0);
+            InstalledAppInfo installedAppInfo = VirtualCore.get().getInstalledAppInfo(packageName, 0);
             if (installedAppInfo != null) {
                 versionName = installedAppInfo.getPackageInfo(0).versionName;
                 versionCode = installedAppInfo.getPackageInfo(0).versionCode;
@@ -362,7 +360,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 modFragment.getItemCount(),
                 attachFragment.getItemCount(),
                 visibilityFragment.getItemCount(),
-                va.getInstalledAppCount());
+                VirtualCore.get().isStartup() ? VirtualCore.get().getInstalledAppCount(): -1);
         summary.setText(summaryString);
     }
 
@@ -478,7 +476,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
 
     public void crateShortcut(InstalledAppInfo info) {
         if (ShortcutManagerCompat.isRequestPinShortcutSupported(context)) {
-            PackageManager manager = va.getPackageManager();
+            PackageManager manager = VirtualCore.get().getPackageManager();
             String name = manager.getApplicationLabel(info.getApplicationInfo(0)) + context.getString(R.string.shortcut_postfix);
             BitmapDrawable icon = (BitmapDrawable) manager.getApplicationIcon(info.getApplicationInfo(0));
             Intent shortcutInfoIntent = new Intent(Intent.ACTION_VIEW);

@@ -112,4 +112,5 @@
   <string name="show_conflict_info_summary">Показывать информацию о конфликтах модов авторам для исправления.</string>
   <string name="valid_files_zero">В моде \"[%s]\" не нашлись действенные файлы. Пожалуйста, проверьтесь, что правильно создали отображение файла.</string>
   <string name="mod_decompression_error">Ошибка при распаковке моды \"[%s]\". Пожалуйста, утвердите, что самый файл моды не повреждён.</string>
+  <string name="not_available_non_virtual">Feature not available in non-virtual mode</string>
 </resources>

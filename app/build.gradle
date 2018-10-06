@@ -18,7 +18,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "io.github.xausky.unitymodmanager"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 23
         versionCode 260
         versionName "2.6.0"

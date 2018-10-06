@@ -22,6 +22,7 @@ import com.lody.virtual.client.ipc.VActivityManager;
 import com.lody.virtual.remote.InstalledAppInfo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.github.xausky.unitymodmanager.R;
@@ -35,15 +36,13 @@ public class AttachesAdapter extends RecyclerView.Adapter<AttachesAdapter.ViewHo
 
     private List<ApplicationInfo> applications = new ArrayList<>();
     private Context context;
-    private VirtualCore va;
     private PackageManager manager;
     private ConfirmDialog dialog;
     private String uninstallPackageName;
     private String excludePackageName;
 
-    public AttachesAdapter(VirtualCore va, String excludePackageName) {
-        this.va = va;
-        this.manager = va.getPackageManager();
+    public AttachesAdapter(String excludePackageName) {
+        this.manager = VirtualCore.get().isStartup() ? VirtualCore.get().getPackageManager(): null;
         update(excludePackageName);
     }
 
@@ -59,7 +58,7 @@ public class AttachesAdapter extends RecyclerView.Adapter<AttachesAdapter.ViewHo
     public void update(String excludePackageName){
         this.excludePackageName = excludePackageName;
         applications.clear();
-        List<InstalledAppInfo> installedApplications = va.getInstalledApps(0);
+        List<InstalledAppInfo> installedApplications = VirtualCore.get().isStartup() ? VirtualCore.get().getInstalledApps(0): Collections.<InstalledAppInfo>emptyList();
         for(InstalledAppInfo info: installedApplications){
             if(!info.packageName.equals(excludePackageName)) {
                 applications.add(info.getApplicationInfo(0));
@@ -97,7 +96,7 @@ public class AttachesAdapter extends RecyclerView.Adapter<AttachesAdapter.ViewHo
     @Override
     public void onClick(DialogInterface dialog, int which) {
         if(which == AlertDialog.BUTTON_POSITIVE){
-            if (va.uninstallPackage(uninstallPackageName)){
+            if (VirtualCore.get().uninstallPackage(uninstallPackageName)){
                 update(excludePackageName);
                 Toast.makeText(context, R.string.attach_delete_success, Toast.LENGTH_LONG).show();
             } else {
@@ -141,7 +140,7 @@ public class AttachesAdapter extends RecyclerView.Adapter<AttachesAdapter.ViewHo
             ViewHolder holder = (ViewHolder)target;
             String name = holder.name.getText().toString();
             uninstallPackageName = holder.packageName.getText().toString();
-            String message = String.format(context.getString(R.string.attach_delete_confirm_message), name);
+            String message = context.getString(R.string.attach_delete_confirm_message, name);
             dialog.setMessage(message);
             dialog.show();
         }

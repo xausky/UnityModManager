@@ -23,7 +23,7 @@ public class ShortcutActivity extends Activity{
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.shortcut_launch_activity);
-        VisibilityAdapter visibilityAdapter = new VisibilityAdapter(VirtualCore.get(), this);
+        VisibilityAdapter visibilityAdapter = new VisibilityAdapter(this);
     }
 
     @Override

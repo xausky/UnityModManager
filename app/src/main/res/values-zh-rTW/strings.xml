@@ -112,4 +112,5 @@
   <string name="show_conflict_info_summary">顯示模組文件衝突信息，便於模組作者進行調試。</string>
   <string name="valid_files_zero">模組 [%s] 有效文件數為零，請確保映射生成正確。</string>
   <string name="mod_decompression_error">模組 [%s] 解壓錯誤，請確認模組文件沒有損壞。</string>
+    <string name="not_available_non_virtual">Feature not available in non-virtual mode</string>
 </resources>

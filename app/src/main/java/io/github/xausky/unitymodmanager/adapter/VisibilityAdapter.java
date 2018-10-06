@@ -35,18 +35,18 @@ public class VisibilityAdapter  extends RecyclerView.Adapter<VisibilityAdapter.V
 
     private List<ApplicationInfo> applications = new ArrayList<>();
     private Context context;
-    private VirtualCore va;
     private PackageManager manager;
     private ConfirmDialog dialog;
     private String removePackageName;
     private SharedPreferences preferences;
 
-    public VisibilityAdapter(VirtualCore va, Context context) {
-        this.va = va;
+    public VisibilityAdapter(Context context) {
         this.context = context;
         this.manager = context.getPackageManager();
         this.preferences = context.getSharedPreferences(VISIBILITY_SHARED_PREFERENCES_KEY,Context.MODE_PRIVATE);
-        update();
+        if(VirtualCore.get().isStartup()){
+            update();
+        }
     }
 
     public void setRecyclerView(RecyclerView view){
@@ -63,9 +63,9 @@ public class VisibilityAdapter  extends RecyclerView.Adapter<VisibilityAdapter.V
         List<ApplicationInfo> installedApplications = manager.getInstalledApplications(0);
         for(ApplicationInfo info: installedApplications){
             if(preferences.getBoolean(info.packageName, false)){
-                va.addVisibleOutsidePackage(info.packageName);
+                VirtualCore.get().addVisibleOutsidePackage(info.packageName);
             }
-            if(va.isOutsidePackageVisible(info.packageName)) {
+            if(VirtualCore.get().isOutsidePackageVisible(info.packageName)) {
                 applications.add(info);
             }
         }
@@ -101,7 +101,7 @@ public class VisibilityAdapter  extends RecyclerView.Adapter<VisibilityAdapter.V
     @Override
     public void onClick(DialogInterface dialog, int which) {
         if(which == AlertDialog.BUTTON_POSITIVE){
-            va.removeVisibleOutsidePackage(removePackageName);
+            VirtualCore.get().removeVisibleOutsidePackage(removePackageName);
             preferences.edit().remove(removePackageName).apply();
             Toast.makeText(context, R.string.visibility_delete_success, Toast.LENGTH_LONG).show();
         }
@@ -109,7 +109,7 @@ public class VisibilityAdapter  extends RecyclerView.Adapter<VisibilityAdapter.V
     }
 
     public void addVisibleOutsidePackage(String packageName){
-        va.addVisibleOutsidePackage(packageName);
+        VirtualCore.get().addVisibleOutsidePackage(packageName);
         update();
         preferences.edit().putBoolean(packageName, true).apply();
     }

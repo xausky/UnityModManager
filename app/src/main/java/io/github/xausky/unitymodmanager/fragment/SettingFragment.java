@@ -1,19 +1,24 @@
 package io.github.xausky.unitymodmanager.fragment;
 
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.lody.virtual.client.NativeEngine;
 import com.lody.virtual.client.core.VirtualCore;
+import com.lody.virtual.client.stub.VASettings;
 
 import org.apache.commons.io.FileUtils;
 
@@ -29,7 +34,7 @@ import static io.github.xausky.unitymodmanager.utils.ModUtils.RESULT_STATE_INTER
  * Created by xausky on 18-3-3.
  */
 
-public class SettingFragment extends PreferenceFragment {
+public class SettingFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     public static final String SETTINGS_PREFERENCE_NAME = "settings";
     private ProgressDialog dialog;
 
@@ -76,6 +81,38 @@ public class SettingFragment extends PreferenceFragment {
         }
         return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        if(s.equals("apk_modify_model")){
+            if(Integer.valueOf(sharedPreferences.getString("apk_modify_model", "1")) == HomeFragment.APK_MODIFY_MODEL_VIRTUAL && !VirtualCore.get().isStartup()){
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    NativeEngine.disableJit(Build.VERSION.SDK_INT);
+                }
+                VASettings.ENABLE_IO_REDIRECT = true;
+                VASettings.ENABLE_INNER_SHORTCUT = false;
+                try {
+                    VirtualCore.get().startup(this.getActivity().getBaseContext());
+                } catch (Throwable throwable) {
+                    throwable.printStackTrace();
+                    throw new RuntimeException("virtual app core startup failed:" + throwable.getMessage());
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onPause() {
+        getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+        super.onPause();
+    }
+
 
     static class ExportApkTask extends AsyncTask<Object, Object, Integer> {
         private ProgressDialog dialog;

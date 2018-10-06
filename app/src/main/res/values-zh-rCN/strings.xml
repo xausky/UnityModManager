@@ -112,4 +112,5 @@
   <string name="show_conflict_info_summary">显示模组文件冲突信息，便于模组作者进行调试。</string>
   <string name="valid_files_zero">模组 [%s] 中有效文件的数目为零。请确保正确生成映射。</string>
   <string name="mod_decompression_error">模组 [%s] 解压错误, 请确认模块文件未损坏。</string>
+  <string name="not_available_non_virtual">Feature not available in non-virtual mode</string>
 </resources>

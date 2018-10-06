@@ -111,4 +111,6 @@
     <string name="show_conflict_info_summary">Display mod file conflict information for module authors to debug.</string>
     <string name="valid_files_zero">The number of valid files in mod [%s] is zero. Please make sure the mapping is generated correctly.</string>
     <string name="mod_decompression_error">Mod [%s] decompression error, please confirm that the module file is not damaged.</string>
+    <string name="not_available_non_virtual">Feature not available in non-virtual mode</string>
+    <string name="nav_online_mods">OnlineMods</string>
 </resources>

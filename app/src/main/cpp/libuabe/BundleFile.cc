@@ -50,10 +50,14 @@ namespace xausky {
             char compressedData[compressedSize];
             char uncompressedData[uncompressedSize];
             bundleReader.ReadData(compressedData, compressedSize);
-            int result = 0;
-            if((result = LZ4_decompress_safe(compressedData, uncompressedData, compressedSize, uncompressedSize)) != uncompressedSize){
-                DecompressDataException e;
-                throw e;
+            if(getCompressMethod(flag) == CompressMethod::LZ4HC){
+                int result = 0;
+                if((result = LZ4_decompress_safe(compressedData, uncompressedData, compressedSize, uncompressedSize)) != uncompressedSize){
+                    DecompressDataException e;
+                    throw e;
+                }
+            } else if(getCompressMethod(flag) == CompressMethod::NONE){
+                memcpy(uncompressedData, compressedData, compressedSize);
             }
             assertDataStream.WriteData(uncompressedData, uncompressedSize);            
         }

@@ -34,17 +34,10 @@ public class VisibilityFragment extends BaseFragment  implements ApplicationChoo
     private RecyclerView attaches;
     private VisibilityAdapter adapter;
     private HomeFragment homeFragment;
-    private VirtualCore va;
-
-
-
-    public VisibilityFragment() {
-        va = VirtualCore.get();
-    }
 
     @Override
     public BaseFragment setBase(Context base) {
-        adapter = new VisibilityAdapter(va, base);
+        adapter = new VisibilityAdapter(base);
         return super.setBase(base);
     }
 
@@ -72,7 +65,11 @@ public class VisibilityFragment extends BaseFragment  implements ApplicationChoo
 
     @Override
     public void OnActionButtonClick() {
-        VisibilityFragment.this.dialog.show();
+        if(VirtualCore.get().isStartup()) {
+            VisibilityFragment.this.dialog.show();
+        } else {
+            Toast.makeText(context, R.string.not_available_non_virtual, Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override

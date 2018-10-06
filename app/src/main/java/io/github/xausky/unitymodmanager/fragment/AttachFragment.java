@@ -34,16 +34,14 @@ public class AttachFragment extends BaseFragment implements ApplicationChooseDia
     private RecyclerView attaches;
     private AttachesAdapter adapter;
     private HomeFragment homeFragment;
-    private VirtualCore va;
 
     @Override
     public BaseFragment setBase(Context base) {
-        va = VirtualCore.get();
         homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
         if(homeFragment.apkModifyModel == HomeFragment.APK_MODIFY_MODEL_VIRTUAL){
-            adapter = new AttachesAdapter(va, homeFragment.packageName);
+            adapter = new AttachesAdapter(homeFragment.packageName);
         } else {
-            adapter = new AttachesAdapter(va, null);
+            adapter = new AttachesAdapter( null);
         }
         return super.setBase(base);
     }
@@ -100,7 +98,11 @@ public class AttachFragment extends BaseFragment implements ApplicationChooseDia
 
     @Override
     public void OnActionButtonClick() {
-        AttachFragment.this.dialog.show();
+        if(VirtualCore.get().isStartup()){
+            AttachFragment.this.dialog.show();
+        } else {
+            Toast.makeText(context, R.string.not_available_non_virtual, Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
