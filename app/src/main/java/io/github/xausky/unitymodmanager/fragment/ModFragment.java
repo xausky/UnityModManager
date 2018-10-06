@@ -63,6 +63,35 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
     private boolean showConflict;
     private Handler handler;
 
+    public void importMod(String url){
+        if(context != null){
+            AllenVersionChecker
+                    .getInstance()
+                    .downloadOnly(
+                            UIData.create().setDownloadUrl(url).setTitle(getString(R.string.import_mod)).setContent(url)
+                    ).setAutoInstall(false).setShowNotification(false).setApkDownloadListener(new APKDownloadListener() {
+                @Override
+                public void onDownloading(int progress) {
+                    Log.d(MainApplication.LOG_TAG, "onDownloading:" + progress);
+                }
+
+                @Override
+                public void onDownloadSuccess(File file) {
+                    Log.d(MainApplication.LOG_TAG, "onDownloadSuccess:" + file.getAbsolutePath());
+                    adapter.addMods(file.getParentFile().getAbsolutePath() + "/", Collections.singletonList(file.getName()));
+                }
+
+                @Override
+                public void onDownloadFail() {
+                    Log.d(MainApplication.LOG_TAG, "onDownloadFail:");
+                }
+            }).excuteMission(context);
+            this.url = null;
+        } else {
+            this.url = url;
+        }
+    }
+
     @Override
     public BaseFragment setBase(Context base) {
         handler = new Handler(Looper.getMainLooper());
@@ -112,29 +141,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
         recyclerView = view.findViewById(R.id.mod_list);
         adapter.setRecyclerView(recyclerView);
         if(url != null){
-            AllenVersionChecker
-                    .getInstance()
-                    .downloadOnly(
-                            UIData.create().setDownloadUrl(url).setTitle(getString(R.string.import_mod)).setContent(url)
-                    ).setAutoInstall(false).setShowNotification(false).setApkDownloadListener(new APKDownloadListener() {
-                @Override
-                public void onDownloading(int progress) {
-                    Log.d(MainApplication.LOG_TAG, "onDownloading:" + progress);
-
-                }
-
-                @Override
-                public void onDownloadSuccess(File file) {
-                    Log.d(MainApplication.LOG_TAG, "onDownloadSuccess:" + file.getAbsolutePath());
-                    adapter.addMods(file.getParentFile().getAbsolutePath() + "/", Collections.singletonList(file.getName()));
-                }
-
-                @Override
-                public void onDownloadFail() {
-                    Log.d(MainApplication.LOG_TAG, "onDownloadFail:");
-                }
-            }).excuteMission(context);
-            url = null;
+            importMod(url);
         }
         return view;
     }

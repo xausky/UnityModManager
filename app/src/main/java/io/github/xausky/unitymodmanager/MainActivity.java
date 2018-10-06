@@ -41,6 +41,20 @@ public class MainActivity extends AppCompatActivity {
     private HomeFragment homeFragment;
     private ModFragment modFragment;
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        String scheme = intent.getScheme();
+        Uri uri = intent.getData();
+        if("umm".equals(scheme) && uri != null && "import".equals(uri.getHost())){
+            MainActivity.this.setTitle(getString(R.string.app_name) + "-" + getString(R.string.nav_mod));
+            navigation(R.id.nav_mod);
+            modFragment.importMod(uri.getQueryParameter("url"));
+        } else {
+            MainActivity.this.setTitle(getString(R.string.app_name) + "-" + getString(R.string.nav_home));
+            navigation(R.id.nav_home);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +98,13 @@ public class MainActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                if(item.getItemId() == R.id.nav_online_mods){
+                    Intent intent = new Intent();
+                    intent.setData(Uri.parse("https://umms.herokuapp.com/index"));
+                    intent.setAction(Intent.ACTION_VIEW);
+                    MainActivity.this.startActivity(intent);
+                    return false;
+                }
                 navigation(item.getItemId());
                 item.setChecked(true);
                 MainActivity.this.setTitle(getString(R.string.app_name) + "-" + item.getTitle());
@@ -94,23 +115,10 @@ public class MainActivity extends AppCompatActivity {
         dialog.setTitle(R.string.progress_dialog_title);
         dialog.setMessage(getString(R.string.progress_dialog_message));
         dialog.setCancelable(false);
-
         modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
         homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
         homeFragment.ImportMapFile();
-
-        Intent intent = getIntent();
-        String scheme = intent.getScheme();
-        Uri uri = intent.getData();
-        if("umm".equals(scheme) && uri != null && "import".equals(uri.getHost())){
-            modFragment.url = uri.getQueryParameter("url");
-            MainActivity.this.setTitle(getString(R.string.app_name) + "-" + getString(R.string.nav_mod));
-            navigation(R.id.nav_mod);
-        } else {
-            MainActivity.this.setTitle(getString(R.string.app_name) + "-" + getString(R.string.nav_home));
-            navigation(R.id.nav_home);
-        }
-        Log.d(MainApplication.LOG_TAG, "scheme:" + scheme);
+        onNewIntent(getIntent());
     }
 
     private void navigation(int item){

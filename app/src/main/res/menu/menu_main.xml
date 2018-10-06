@@ -22,7 +22,7 @@
             android:icon="@drawable/ic_visibility"
             android:title="@string/nav_visibility" />
         <item
-            android:id="@+id/online_mods"
+            android:id="@+id/nav_online_mods"
             android:icon="@drawable/ic_cloud"
             android:title="@string/nav_online_mods" />
         <item android:title="@string/nav_system">
