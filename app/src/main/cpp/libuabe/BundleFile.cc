@@ -21,10 +21,6 @@ namespace xausky {
         int32_t compressedSize = bundleReader.ReadInt32();
         int32_t uncompressedSize = bundleReader.ReadInt32();
         int32_t flag = bundleReader.ReadInt32();
-        if(getCompressMethod(flag) != CompressMethod::LZ4HC){
-            UnsupprtCompressMethod e;
-            throw e;
-        }
         char compressedData[compressedSize];
         char uncompressedData[uncompressedSize];
         if(infoBlocksIsAtOfFileEnd(flag)){
@@ -35,7 +31,14 @@ namespace xausky {
         } else {
             bundleReader.ReadData(compressedData, compressedSize);
         }
-        if((LZ4_decompress_safe(compressedData, uncompressedData, compressedSize, uncompressedSize)) != uncompressedSize){
+        if(getCompressMethod(flag) == LZ4HC || getCompressMethod(flag) == LZ4){
+            if((LZ4_decompress_safe(compressedData, uncompressedData, compressedSize, uncompressedSize)) != uncompressedSize){
+                DecompressDataException e;
+                throw e;
+            }
+        } else if(getCompressMethod(flag) == NONE){
+            memcpy(uncompressedData, compressedData, compressedSize);
+        } else {
             DecompressDataException e;
             throw e;
         }
@@ -50,7 +53,7 @@ namespace xausky {
             char compressedData[compressedSize];
             char uncompressedData[uncompressedSize];
             bundleReader.ReadData(compressedData, compressedSize);
-            if(getCompressMethod(flag) == CompressMethod::LZ4HC){
+            if(getCompressMethod(flag) == CompressMethod::LZ4HC || getCompressMethod(flag) == LZ4){
                 int result = 0;
                 if((result = LZ4_decompress_safe(compressedData, uncompressedData, compressedSize, uncompressedSize)) != uncompressedSize){
                     DecompressDataException e;
@@ -58,6 +61,9 @@ namespace xausky {
                 }
             } else if(getCompressMethod(flag) == CompressMethod::NONE){
                 memcpy(uncompressedData, compressedData, compressedSize);
+            } else {
+                DecompressDataException e;
+                throw e;
             }
             assertDataStream.WriteData(uncompressedData, uncompressedSize);            
         }
