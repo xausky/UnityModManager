@@ -130,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
             actionButton.setVisibility(View.INVISIBLE);
         }
         drawerLayout.closeDrawers();
+        navigationView.setCheckedItem(item);
         currentNavigation = item;
     }
 

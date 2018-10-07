@@ -92,10 +92,12 @@ public class ModUtils {
                 }
                 result += r;
             } else if(name.length() > 4 && supportImageType.contains(name.substring(name.length() - 4))){
-                try {
-                    FileUtils.copyFile(file, new File(output + "/images/" + System.currentTimeMillis() + "-" + name));
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if(file.length() < 1024 * 1024){
+                    try {
+                        FileUtils.copyFile(file, new File(output + "/images/" + System.currentTimeMillis() + "-" + name));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             } else if(name.equals("info.json")){
                 try {

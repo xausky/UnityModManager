@@ -114,10 +114,11 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        context = inflater.getContext();
+        settings = context.getSharedPreferences(SettingFragment.SETTINGS_PREFERENCE_NAME, Context.MODE_PRIVATE);
         apkModifyModel = Integer.valueOf(settings.getString("apk_modify_model", "1"));
         persistentSupport = settings.getBoolean("persistent_support", false);
         obbSupport = settings.getBoolean("obb_support", false);
-        context = inflater.getContext();
         dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, apkModifyModel == APK_MODIFY_MODEL_VIRTUAL, true);
         dialog.setListener(this);
         progressDialog = new ProgressDialog(context);

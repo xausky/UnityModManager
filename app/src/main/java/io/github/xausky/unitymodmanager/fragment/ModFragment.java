@@ -60,9 +60,21 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
     private Context context;
     private File storage;
     private File externalCache;
-    private SharedPreferences settingsPreferences;
+    private SharedPreferences settings;
     private boolean showConflict;
     private Handler handler;
+
+    @Override
+    public void onDetach() {
+        this.context = null;
+        super.onDetach();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        this.context = context;
+        super.onAttach(context);
+    }
 
     public void importMod(String url, final String name){
         this.name = name;
@@ -114,8 +126,8 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
                 Toast.makeText(base, R.string.store_mkdir_failed, Toast.LENGTH_LONG).show();
             }
         }
-        this.settingsPreferences = base.getSharedPreferences(SettingFragment.SETTINGS_PREFERENCE_NAME, Context.MODE_PRIVATE);
-        needPatch = settingsPreferences.getBoolean(NEED_PATCH_PREFERENCES_KEY, false);
+        settings = base.getSharedPreferences(SettingFragment.SETTINGS_PREFERENCE_NAME, Context.MODE_PRIVATE);
+        needPatch = settings.getBoolean(NEED_PATCH_PREFERENCES_KEY, false);
         adapter = new ModsAdapter(storage, externalCache, base);
         adapter.setListener(this);
         return super.setBase(base);
@@ -127,7 +139,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
 
     public void setNeedPatch(boolean needPatch) {
         this.needPatch = needPatch;
-        settingsPreferences.edit().putBoolean(NEED_PATCH_PREFERENCES_KEY, needPatch).apply();
+        settings.edit().putBoolean(NEED_PATCH_PREFERENCES_KEY, needPatch).apply();
     }
 
     public int getItemCount(){
@@ -141,8 +153,9 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        this.context = inflater.getContext();
-        showConflict = settingsPreferences.getBoolean("show_conflict_info", false);
+        context = inflater.getContext();
+        settings = context.getSharedPreferences(SettingFragment.SETTINGS_PREFERENCE_NAME, Context.MODE_PRIVATE);
+        showConflict = settings.getBoolean("show_conflict_info", false);
         adapter.setShowConflict(showConflict);
         view = inflater.inflate(R.layout.mod_fragment, container, false);
         recyclerView = view.findViewById(R.id.mod_list);
