@@ -51,7 +51,8 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
     private static final int MOD_FILE_PICKER_RESULT = 1;
     private static final int EXTERNAL_MOD_FILE_PICKER_RESULT = 2;
     private static final String NEED_PATCH_PREFERENCES_KEY = "NEED_PATCH_PREFERENCES_KEY";
-    public String url = null;
+    private String url = null;
+    private String name = null;
     private View view;
     private RecyclerView recyclerView;
     private ModsAdapter adapter;
@@ -63,27 +64,33 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
     private boolean showConflict;
     private Handler handler;
 
-    public void importMod(String url){
+    public void importMod(String url, final String name){
+        this.name = name;
         if(context != null){
             AllenVersionChecker
                     .getInstance()
                     .downloadOnly(
-                            UIData.create().setDownloadUrl(url).setTitle(getString(R.string.import_mod)).setContent(url)
+                            UIData.create().setDownloadUrl(url).setTitle(getString(R.string.import_mod)).setContent(name == null?url:name)
                     ).setAutoInstall(false).setShowNotification(false).setApkDownloadListener(new APKDownloadListener() {
                 @Override
                 public void onDownloading(int progress) {
-                    Log.d(MainApplication.LOG_TAG, "onDownloading:" + progress);
                 }
 
                 @Override
                 public void onDownloadSuccess(File file) {
-                    Log.d(MainApplication.LOG_TAG, "onDownloadSuccess:" + file.getAbsolutePath());
-                    adapter.addMods(file.getParentFile().getAbsolutePath() + "/", Collections.singletonList(file.getName()));
+                    if(name != null){
+                        try {
+                            FileUtils.moveFile(file, new File(file.getParentFile().getAbsolutePath() + "/" + name + ".zip"));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    adapter.addMods(file.getParentFile().getAbsolutePath() + "/", Collections.singletonList(name != null?name + ".zip":file.getName()));
                 }
 
                 @Override
                 public void onDownloadFail() {
-                    Log.d(MainApplication.LOG_TAG, "onDownloadFail:");
+                    Log.e(MainApplication.LOG_TAG, "onDownloadFail");
                 }
             }).excuteMission(context);
             this.url = null;
@@ -141,7 +148,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
         recyclerView = view.findViewById(R.id.mod_list);
         adapter.setRecyclerView(recyclerView);
         if(url != null){
-            importMod(url);
+            importMod(url, this.name);
         }
         return view;
     }

@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         if("umm".equals(scheme) && uri != null && "import".equals(uri.getHost())){
             MainActivity.this.setTitle(getString(R.string.app_name) + "-" + getString(R.string.nav_mod));
             navigation(R.id.nav_mod);
-            modFragment.importMod(uri.getQueryParameter("url"));
+            modFragment.importMod(uri.getQueryParameter("url"), uri.getQueryParameter("name"));
         } else {
             MainActivity.this.setTitle(getString(R.string.app_name) + "-" + getString(R.string.nav_home));
             navigation(R.id.nav_home);
