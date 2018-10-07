@@ -30,7 +30,7 @@
   <string name="confirm">확인</string>
   <string name="cancel">취소</string>
   <string name="prompt">프롬프트</string>
-  <string name="attach_delete_confirm_message">정말 이 첨부 파일을 삭제 하시겠습니까 [%s] ?</string>
+  <string name="attach_delete_confirm_message">정말 이 첨부 파일을 삭제 하시겠습니까?</string>
   <string name="visibility_delete_confirm_message">정말로 [%s] 가시성을 제거하시겠습니까?</string>
   <string name="attach_delete_fail">첨부파일 삭제에 실패하였습니다.</string>
   <string name="attach_delete_success">첨부파일이 성공적으로 삭제되었습니다.</string>
@@ -112,5 +112,6 @@
   <string name="show_conflict_info_summary">모드 제작자들의 디버깅을 돕기 위해 모드 파일 충돌정보를 표시합니다.</string>
   <string name="valid_files_zero">Mod [%s] 에 유효한 파일 개수 0입니다. 매핑을 올바르게 생성 되는지 확인 하십시오.</string>
   <string name="mod_decompression_error">Mod [%s] 감압 오류 모듈 파일 손상 되지 않은 확인 하십시오.</string>
-  <string name="not_available_non_virtual">Feature not available in non-virtual mode</string>
+  <string name="not_available_non_virtual">가상 모드에서 사용할 수 없는 기능</string>
+  <string name="nav_online_mods">OnlineMods</string>
 </resources>
