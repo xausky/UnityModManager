@@ -8,6 +8,7 @@ extern "C" {
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 typedef enum {
     BINARY_STREAM_TYPE_FILE = 1, BINARY_STREAM_TYPE_MEMORY = 2

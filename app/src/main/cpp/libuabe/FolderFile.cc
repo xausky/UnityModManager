@@ -3,8 +3,8 @@
 #include "Utils.hh"
 #include "BundleFile.hh"
 #include <sys/stat.h>
-#include "libumm/binary_stream.h"
-#include "libumm/wwise_akpk.h"
+#include "binary_stream.h"
+#include "wwise_akpk.h"
 
 namespace xausky {
     char FolderPathBuffer[PATH_BUFFER_SIZE];

@@ -4,10 +4,10 @@
 #include "BundleFile.hh"
 #include "Utils.hh"
 #include "LogUtils.hh"
-#include "libumm/wwise_akpk.h"
+#include "wwise_akpk.h"
 
 #include <sys/stat.h>
-#include <libumm/binary_stream.h>
+#include <binary_stream.h>
 
 namespace xausky {
     char pathBuffer[PATH_BUFFER_SIZE];

@@ -86,7 +86,8 @@ int8_t wwise_bank_parser_event_sequence(kbtree_t(wwise_bank_key_values_map) *map
     }
     do {
         if(binary_stream_read_uint16(stream, &check) != 0){
-            return -2;
+				__LIBUABE_DEBUG("sequence block unsuported.\n");
+            return 0;
         }
         if(binary_stream_seek(stream, -1, SEEK_CUR) == -1){
             return -2;
