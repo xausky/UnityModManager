@@ -76,6 +76,26 @@ int main(int argc, char* argv[]){
                         }
                     }
                 }
+                if(bank->sound.sections == NULL){
+                    fprintf(map, "bank-%u-%u.wem %u\n", bank->id, bank->index);
+                    sprintf(buffer, "%s/bank-%u-%u.wem", outputPath, bank->id, bank->index);
+                    binary_stream_t output;
+                    if(binary_stream_create_file(&output, buffer, BINARY_STREAM_ORDER_LITTLE_ENDIAN) < 0){
+                        printf("create file error: %s\n", buffer);
+                        continue;
+                    }
+                    if(binary_stream_seek(&bank->data, 0, SEEK_SET) < 0){
+                        binary_stream_destory(&output);
+                        printf("bank seek error: %u\n", bank->id);
+                        continue;
+                    }
+                    if(binary_stream_copy(&output, &bank->data, bank->size) < 0){
+                        binary_stream_destory(&output);
+                        printf("bank copy error: %u\n", bank->id);
+                        continue;
+                    }
+                    binary_stream_destory(&output);
+                }
             }
         }
         wwise_akpk_destory(&akpk);

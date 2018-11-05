@@ -7,5 +7,9 @@ umm:$(OBJECTS) main.c
 	gcc -c $(CFLAGS) -o $@ $^
 
 clean:
-	rm src/*.o
-	rm umm
+	-rm src/*.o
+	-rm umm
+	-rm umm.exe
+	-rm -rf out
+	-rm out.map.txt
+	-rm test.pck
