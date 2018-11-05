@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 if(item.getItemId() == R.id.nav_online_mods){
                     Intent intent = new Intent();
-                    intent.setData(Uri.parse("https://umms.herokuapp.com/index"));
+                    intent.setData(Uri.parse("https://umms.xausky.cn/"));
                     intent.setAction(Intent.ACTION_VIEW);
                     MainActivity.this.startActivity(intent);
                     return false;

@@ -83,7 +83,7 @@ namespace xausky {
         }
     }
     void BundleFile::save(BinaryStream& bundleStream, int32_t maxBlockSize, int32_t bundleFlag, int16_t blocksFlag, int32_t fileFlag){
-        char uncompressedData[maxBlockSize], compressedData[maxBlockSize];
+        char uncompressedData[maxBlockSize], compressedData[maxBlockSize + 1024];
         bundleStream.WriteStringToNull(fileType);
         bundleStream.WriteInt32(fileVersion);
         bundleStream.WriteStringToNull(versionPlayer);
@@ -108,7 +108,7 @@ namespace xausky {
                 uncompressedSize = file->stream->count();
                 if(uncompressedSize > 0){
                     blocksStream.WriteInt32(uncompressedSize);
-                    compressedSize =  LZ4_compress_HC(uncompressedData, compressedData, uncompressedSize, maxBlockSize, LZ4HC_CLEVEL_DEFAULT);
+                    compressedSize =  LZ4_compress_HC(uncompressedData, compressedData, uncompressedSize, maxBlockSize + 1024, LZ4HC_CLEVEL_DEFAULT);
                     if(compressedSize <= 0){
                         DecompressDataException e;
                         throw e;

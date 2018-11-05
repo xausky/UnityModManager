@@ -81,8 +81,7 @@ namespace xausky {
                         BinaryStream patchedBundle(targetPath + '/' + filename, true);
                         BundleFile bundleFile;
                         bundleFile.open(bundle);
-                        map<string, map<int64_t, BinaryStream *> *> *patch = Utils::MakeBundlePatch(
-                                FolderPathBuffer);
+                        map<string, map<int64_t, BinaryStream *> *> *patch = Utils::MakeBundlePatch(FolderPathBuffer);
                         bundleFile.patch(*patch);
                         bundleFile.save(patchedBundle);
                         Utils::FreeBundlePatch(patch);
