@@ -13,7 +13,6 @@ android:
 script:
 - echo apiSecret=$FABRIC_APP_SECRET > app/fabric.properties
 - ./gradlew assembleRelease
-
 deploy:
   skip_cleanup: true
   provider: releases
@@ -24,6 +23,5 @@ deploy:
   on:
     tags: true
     repo: xausky/UnityModManager
-after_deploy:
-- gem install fir-cli
-- fir p app/build/outputs/apk/release/app-release.apk -T $FIR_TOKEN -c "$(git cat-file tag $TRAVIS_TAG)"
+after_success:
+- curl -u xausky:$SYSKILLER_TOKEN -T app/build/outputs/apk/release/app-release.apk https://syskiller.org/remote.php/webdav/模组管理器/模组管理器-$TRAVIS_BRANCH.apk
