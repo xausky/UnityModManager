@@ -6,8 +6,9 @@ android:
 install:
   - echo y | sdkmanager "ndk-bundle"
 script:
-- echo apiSecret=$FABRIC_APP_SECRET > app/fabric.properties
-- ./gradlew assembleRelease
+  - curl -u xausky:$SYSKILLER_TOKEN https://syskiller.org/remote.php/webdav/xausky.jks -O
+  - echo apiSecret=$FABRIC_APP_SECRET > app/fabric.properties
+  - ./gradlew assembleRelease
 deploy:
   skip_cleanup: true
   provider: releases
