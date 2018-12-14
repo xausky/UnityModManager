@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         actionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                BaseFragment fragment = (BaseFragment)BaseFragment.fragment(currentNavigation);
+                BaseFragment fragment = (BaseFragment)BaseFragment.fragment(currentNavigation, MainActivity.this.getApplication());
                 try {
                     fragment.OnActionButtonClick();
                 }catch (UnsupportedOperationException e){
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         actionButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                BaseFragment fragment = (BaseFragment)BaseFragment.fragment(currentNavigation);
+                BaseFragment fragment = (BaseFragment)BaseFragment.fragment(currentNavigation, MainActivity.this.getApplication());
                 try {
                     fragment.OnActionButtonLongClick();
                 }catch (UnsupportedOperationException e){
@@ -115,14 +115,14 @@ public class MainActivity extends AppCompatActivity {
         dialog.setTitle(R.string.progress_dialog_title);
         dialog.setMessage(getString(R.string.progress_dialog_message));
         dialog.setCancelable(false);
-        modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
-        homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
+        modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod, MainActivity.this.getApplication());
+        homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home, MainActivity.this.getApplication());
         homeFragment.ImportMapFile();
         onNewIntent(getIntent());
     }
 
     private void navigation(int item){
-        Fragment fragment = BaseFragment.fragment(item);
+        Fragment fragment = BaseFragment.fragment(item, MainActivity.this.getApplication());
         getFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
         if(fragment instanceof BaseFragment){
             actionButton.setVisibility(((BaseFragment)fragment).actionButtonVisibility());
@@ -181,8 +181,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Integer doInBackground(Object... params) {
             int result = ModUtils.RESULT_STATE_OK;
-            ModFragment modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
-            HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
+            ModFragment modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod, dialog.getContext());
+            HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home, dialog.getContext());
             if (modFragment.isNeedPatch()) {
                 result = modFragment.patch(homeFragment.apkPath, homeFragment.baseApkPath, homeFragment.persistentPath, homeFragment.obbPath, homeFragment.baseObbPath, homeFragment.backupPath, homeFragment.apkModifyModel, homeFragment.persistentSupport, homeFragment.obbSupport);
             }
@@ -201,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer result) {
             dialog.hide();
-            ModFragment modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
+            ModFragment modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod, dialog.getContext());
             if (result == ModUtils.RESULT_STATE_OK) {
                 modFragment.setNeedPatch(false);
             } else if (result == ModUtils.RESULT_STATE_INTERNAL_ERROR) {

@@ -37,7 +37,7 @@ public class AttachFragment extends BaseFragment implements ApplicationChooseDia
 
     @Override
     public BaseFragment setBase(Context base) {
-        homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
+        homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home, base);
         if(homeFragment.apkModifyModel == HomeFragment.APK_MODIFY_MODEL_VIRTUAL){
             adapter = new AttachesAdapter(homeFragment.packageName);
         } else {

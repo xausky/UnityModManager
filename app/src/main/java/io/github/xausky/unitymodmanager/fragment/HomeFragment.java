@@ -127,9 +127,9 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         progressDialog.setCancelable(false);
         if (view == null) {
             view = inflater.inflate(R.layout.home_fragment, container, false);
-            attachFragment = (AttachFragment) BaseFragment.fragment(R.id.nav_attach);
-            visibilityFragment = (VisibilityFragment) BaseFragment.fragment(R.id.nav_visibility);
-            modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
+            attachFragment = (AttachFragment) BaseFragment.fragment(R.id.nav_attach, this.getActivity().getApplication());
+            visibilityFragment = (VisibilityFragment) BaseFragment.fragment(R.id.nav_visibility, this.getActivity().getApplication());
+            modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod, this.getActivity().getApplication());
             summary = (TextView) view.findViewById(R.id.home_summary);
             currentVersion = (TextView) view.findViewById(R.id.home_current_version);
             latestVersion = (TextView) view.findViewById(R.id.home_latest_version);

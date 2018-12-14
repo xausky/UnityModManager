@@ -34,21 +34,22 @@ public abstract class BaseFragment extends Fragment {
         return this;
     }
 
-    public static Map<Integer, Fragment> map;
+    public static Map<Integer, Fragment> fragments;
 
-    public static void initialize(Context base){
-        if (map == null) {
-            map = new TreeMap<>();
-            map.put(R.id.nav_mod, new ModFragment().setBase(base));
-            map.put(R.id.nav_home, new HomeFragment().setBase(base));
-            map.put(R.id.nav_info, new InfoFragment().setBase(base));
-            map.put(R.id.nav_attach, new AttachFragment().setBase(base));
-            map.put(R.id.nav_visibility, new VisibilityFragment().setBase(base));
-            map.put(R.id.nav_setting, new SettingFragment());
+    public static synchronized Map<Integer, Fragment> initialize(Context base){
+        if (fragments == null) {
+            fragments = new TreeMap<>();
+            fragments.put(R.id.nav_mod, new ModFragment().setBase(base));
+            fragments.put(R.id.nav_home, new HomeFragment().setBase(base));
+            fragments.put(R.id.nav_info, new InfoFragment().setBase(base));
+            fragments.put(R.id.nav_attach, new AttachFragment().setBase(base));
+            fragments.put(R.id.nav_visibility, new VisibilityFragment().setBase(base));
+            fragments.put(R.id.nav_setting, new SettingFragment());
         }
+        return fragments;
     }
 
-    public static Fragment fragment(int item){
-        return map.get(item);
+    public static Fragment fragment(int item, Context base){
+        return initialize(base).get(item);
     }
 }

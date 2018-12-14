@@ -57,7 +57,7 @@ public class SettingFragment extends PreferenceFragment implements SharedPrefere
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
         if(preference.getKey().equals("setting_export_apk")){
-            HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
+            HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home, this.getActivity().getApplication());
             if(homeFragment.apkModifyModel == HomeFragment.APK_MODIFY_MODEL_NONE){
                 Toast.makeText(this.getActivity(), R.string.none_modify_export, Toast.LENGTH_LONG).show();
                 return super.onPreferenceTreeClick(preferenceScreen, preference);
@@ -68,7 +68,7 @@ public class SettingFragment extends PreferenceFragment implements SharedPrefere
                 new ExportApkTask(dialog).execute();
             }
         } else if(preference.getKey().equals("create_shortcut")){
-            HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
+            HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home, this.getActivity().getApplication());
             if(homeFragment.apkModifyModel != HomeFragment.APK_MODIFY_MODEL_VIRTUAL){
                 Toast.makeText(this.getActivity(), R.string.no_virtual_model_shortcut, Toast.LENGTH_LONG).show();
                 return super.onPreferenceTreeClick(preferenceScreen, preference);
@@ -130,8 +130,8 @@ public class SettingFragment extends PreferenceFragment implements SharedPrefere
         @Override
         protected Integer doInBackground(Object... params) {
             int result = ModUtils.RESULT_STATE_OK;
-            ModFragment modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
-            HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home);
+            ModFragment modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod, dialog.getContext());
+            HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home, dialog.getContext());
             if (modFragment.isNeedPatch()) {
                 result = modFragment.patch(homeFragment.apkPath, homeFragment.baseApkPath, homeFragment.persistentPath, homeFragment.obbPath, homeFragment.baseObbPath, homeFragment.backupPath, homeFragment.apkModifyModel, homeFragment.persistentSupport, homeFragment.obbSupport);
             }
@@ -150,7 +150,7 @@ public class SettingFragment extends PreferenceFragment implements SharedPrefere
         @Override
         protected void onPostExecute(Integer result) {
             dialog.hide();
-            ModFragment modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod);
+            ModFragment modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod, dialog.getContext());
             if (result == ModUtils.RESULT_STATE_OK) {
                 modFragment.setNeedPatch(false);
                 String exportPath = Environment.getExternalStorageDirectory() + "/out.apk";

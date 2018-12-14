@@ -222,7 +222,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
             @Override
             public void run() {
                 Toast.makeText(context, R.string.checked_external_mod_changed, Toast.LENGTH_LONG).show();
-                HomeFragment fragment = (HomeFragment)BaseFragment.fragment(R.id.nav_home);
+                HomeFragment fragment = (HomeFragment)BaseFragment.fragment(R.id.nav_home, ModFragment.this.getActivity().getApplication());
                 VirtualCore.get().killApp(fragment.packageName, 0);
                 MainActivity activity = (MainActivity)context;
                 needPatch = true;
