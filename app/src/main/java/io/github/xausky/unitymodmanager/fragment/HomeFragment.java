@@ -3,6 +3,7 @@ package io.github.xausky.unitymodmanager.fragment;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -35,6 +36,7 @@ import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.remote.InstallResult;
 import com.lody.virtual.remote.InstalledAppInfo;
 
+import io.github.xausky.unitymodmanager.dialog.ConfirmDialog;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -67,7 +69,7 @@ import ru.bartwell.exfilepicker.utils.Utils;
  * Created by xausky on 18-3-3.
  */
 
-public class HomeFragment extends BaseFragment implements View.OnClickListener, ApplicationChooseDialog.OnApplicationChooseDialogResultListener {
+public class HomeFragment extends BaseFragment implements View.OnClickListener, ApplicationChooseDialog.OnApplicationChooseDialogResultListener, DialogInterface.OnClickListener {
     public static final String PACKAGE_PREFERENCE_KEY = "PACKAGE_PREFERENCE_KEY";
     public static final String BASE_APK_PATH_KEY = "BASE_APK_PATH_KEY";
     public static final String ALL_APPLICATION_PACKAGE_REGEX = "^.*$";
@@ -84,6 +86,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     public int apkModifyModel;
     public boolean persistentSupport;
     public boolean obbSupport;
+    private ConfirmDialog confirmDialog;
     private View view;
     private TextView summary;
     private TextView clientState;
@@ -126,6 +129,8 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         progressDialog.setMessage(getString(R.string.progress_dialog_message));
         progressDialog.setCancelable(false);
         if (view == null) {
+            confirmDialog = new ConfirmDialog(context, this);
+            confirmDialog.setMessage(context.getString(R.string.install_client_remove_all_mod_confirm));
             view = inflater.inflate(R.layout.home_fragment, container, false);
             attachFragment = (AttachFragment) BaseFragment.fragment(R.id.nav_attach, this.getActivity().getApplication());
             visibilityFragment = (VisibilityFragment) BaseFragment.fragment(R.id.nav_visibility, this.getActivity().getApplication());
@@ -334,7 +339,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         obbPath = context.getObbDir().getParentFile().getAbsolutePath() + "/" + packageName + "/main." + versionCode + '.' + packageName + ".obb";
         persistentPath = context.getExternalFilesDir(null).getParentFile().getParentFile().getAbsolutePath() + "/" + packageName + "/files";
         baseApkPath = context.getFilesDir().getAbsolutePath() + "/base.apk";
-        if(apkModifyModel == APK_MODIFY_MODEL_VIRTUAL){
+        if (apkModifyModel == APK_MODIFY_MODEL_VIRTUAL) {
             baseApkPath = settings.getString(BASE_APK_PATH_KEY, null);
         }
         baseObbPath = context.getFilesDir().getAbsolutePath() + "/base.obb";
@@ -361,7 +366,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 modFragment.getItemCount(),
                 attachFragment.getItemCount(),
                 visibilityFragment.getItemCount(),
-                VirtualCore.get().isStartup() ? VirtualCore.get().getInstalledAppCount(): -1);
+                VirtualCore.get().isStartup() ? VirtualCore.get().getInstalledAppCount() : -1);
         summary.setText(summaryString);
     }
 
@@ -435,9 +440,6 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                     final InstallResult installResult = VirtualCore.get().installPackage(apkPath, InstallStrategy.UPDATE_IF_EXIST);
                     if (installResult.isSuccess) {
                         String basePath = HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/base.apk";
-                        if (modFragment.getEnableItemCount() > 0) {
-                            modFragment.setNeedPatch(true);
-                        }
                         HomeFragment.this.packageName = installResult.packageName;
                         HomeFragment.this.baseApkPath = apkPath;
                         settings.edit().putString(BASE_APK_PATH_KEY, apkPath).apply();
@@ -449,7 +451,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                         result = installResult.error;
                     }
                 }
-                if(obbSupport && versionCode != 0){
+                if (obbSupport && versionCode != 0) {
                     try {
                         String basePath = HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/base.obb";
                         obbPath = context.getObbDir().getParentFile().getAbsolutePath() + "/" + packageName + "/main." + versionCode + '.' + packageName + ".obb";
@@ -469,6 +471,12 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                     public void run() {
                         clientUpdate();
                         Toast.makeText(context, resultString, Toast.LENGTH_LONG).show();
+                        if (modFragment.getEnableItemCount() > 0) {
+                            modFragment.setNeedPatch(true);
+                        }
+                        if (modFragment.getItemCount() > 0) {
+                            confirmDialog.show();
+                        }
                     }
                 });
             }
@@ -496,5 +504,12 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     public void OnApplicationChooseDialogResult(String packageName, String apkPath) {
         clientInstall(apkPath, packageName);
         dialog.hide();
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        if (which == DialogInterface.BUTTON_POSITIVE) {
+            modFragment.removeAllMods();
+        }
     }
 }

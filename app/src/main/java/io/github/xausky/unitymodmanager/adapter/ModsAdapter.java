@@ -416,6 +416,31 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
         return mods.size();
     }
 
+    public void removeAllMods(){
+        for(Mod mod: mods){
+            File targetFile = new File(storage.getAbsolutePath() + "/" + mod.name);
+            try {
+                if(targetFile.isDirectory()){
+                    FileUtils.deleteDirectory(targetFile);
+                } else {
+                    FileUtils.forceDelete(targetFile);
+                    if(mod.enable){
+                        FileAlterationObserver observer = observers.get(mod.name);
+                        if(observer != null){
+                            monitor.removeObserver(observer);
+                            observers.remove(mod.name);
+                        }
+                        Toast.makeText(context, context.getString(R.string.external_mods_observer_stop, mod.name), Toast.LENGTH_LONG).show();
+                    }
+                }
+                mods.remove(mod);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(context, context.getString(R.string.mod_file_delete_failed, mod.name), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     @Override
     public void onClick(DialogInterface dialog, int which) {
         if (which == DialogInterface.BUTTON_POSITIVE) {

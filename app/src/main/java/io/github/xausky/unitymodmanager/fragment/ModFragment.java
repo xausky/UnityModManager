@@ -150,6 +150,10 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
         return adapter.getEnableItemCount();
     }
 
+    public void removeAllMods(){
+        adapter.removeAllMods();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
