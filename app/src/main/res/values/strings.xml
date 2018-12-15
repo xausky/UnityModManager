@@ -105,7 +105,7 @@
     <string name="apk_none_obb_support">Using Obb support without modifying the APK mode may cause the game to fail to start.</string>
     <string name="mod_list_item_content_default">0</string>
     <string name="mod_list_item_conflict_default">0</string>
-    <string name="mod_list_item_author_default">xausky</string>
+    <string name="mod_list_item_author_default">unknown</string>
     <string name="mod_info_conflict">Conflict files: %s</string>
     <string name="show_conflict_info_title">Display mod file conflict information</string>
     <string name="show_conflict_info_summary">Display mod file conflict information for module authors to debug.</string>
