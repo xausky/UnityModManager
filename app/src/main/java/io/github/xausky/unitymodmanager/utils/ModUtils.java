@@ -30,6 +30,8 @@ public class ModUtils {
     public static final int RESULT_STATE_OK = 0;
     public static final int RESULT_STATE_INTERNAL_ERROR = -1;
     public static final int RESULT_STATE_PASSWORD_ERROR = -2;
+    public static final int RESULT_STATE_ROOT_ERROR = -3;
+    public static final int RESULT_STATE_OBB_ERROR = -4;
     public static Map<String, String> map;
     public static Set<String> supportImageType = new TreeSet<>();
 

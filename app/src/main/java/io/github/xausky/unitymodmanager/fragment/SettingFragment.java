@@ -151,12 +151,21 @@ public class SettingFragment extends PreferenceFragment implements SharedPrefere
         protected void onPostExecute(Integer result) {
             dialog.hide();
             ModFragment modFragment = (ModFragment) BaseFragment.fragment(R.id.nav_mod, dialog.getContext());
-            if (result == ModUtils.RESULT_STATE_OK) {
-                modFragment.setNeedPatch(false);
-                String exportPath = Environment.getExternalStorageDirectory() + "/out.apk";
-                Toast.makeText(modFragment.getBase(), modFragment.getBase().getString(R.string.package_export_success,exportPath), Toast.LENGTH_LONG).show();
-            } else if (result == RESULT_STATE_INTERNAL_ERROR) {
-                Toast.makeText(modFragment.getBase(), R.string.package_export_failed, Toast.LENGTH_LONG).show();
+            switch (result) {
+                case  ModUtils.RESULT_STATE_OK:
+                    modFragment.setNeedPatch(false);
+                    String exportPath = Environment.getExternalStorageDirectory() + "/out.apk";
+                    Toast.makeText(modFragment.getBase(), modFragment.getBase().getString(R.string.package_export_success,exportPath), Toast.LENGTH_LONG).show();
+                    break;
+                case ModUtils.RESULT_STATE_OBB_ERROR:
+                    Toast.makeText(modFragment.getBase(), R.string.install_mods_obb_error, Toast.LENGTH_LONG).show();
+                    break;
+                case ModUtils.RESULT_STATE_ROOT_ERROR:
+                    Toast.makeText(modFragment.getBase(), R.string.install_mods_root_error, Toast.LENGTH_LONG).show();
+                    break;
+                default:
+                    Toast.makeText(modFragment.getBase(), R.string.install_mods_failed, Toast.LENGTH_LONG).show();
+                    break;
             }
         }
     }

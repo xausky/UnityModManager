@@ -51,7 +51,9 @@
     <string name="mod_info_author">Author:%s</string>
     <string name="install_source_not_found">Please go to the home page to install the client first, and make sure the installation source is not uninstalled or deleted.</string>
     <string name="unsupport_operation">Unsupported operation.</string>
-    <string name="install_mods_failed">Failed to install the mod.</string>
+    <string name="install_mods_failed">The installation module failed. Please clear the data again, or go to BiliBili for help.</string>
+    <string name="install_mods_obb_error">The modification of the OBB file failed. Please confirm that the setting client has the corresponding obb file. It is recommended to close the obb support and try again.</string>
+    <string name="install_mods_root_error">Get the root permission fails, please contact the root device or switch to other apk modification modes.</string>
     <string name="no_storage_permissions">The application does not have permission to read and write phone storage, please go to the phone rights management interface to give, otherwise it can not run.</string>
     <string name="external_mods_observer_start">External mod monitoring start: %s</string>
     <string name="external_mods_observer_stop">External mod monitoring stop: %s</string>

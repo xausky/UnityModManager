@@ -237,6 +237,9 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
 
     public int patch(String apkPath, String baseApkPath, String persistentPath, String obbPath, String baseObbPath, String backupPath,  int apkModifyModel, boolean persistentSupport, boolean obbSupport){
         if(apkModifyModel == HomeFragment.APK_MODIFY_MODEL_ROOT){
+            if(!Shell.rootAccess()){
+                return ModUtils.RESULT_STATE_ROOT_ERROR;
+            }
             //暂时禁用SELinux，并且修改目标APK权限为666。
             Shell.Sync.su("setenforce 0", "chmod 666 " + apkPath);
         }
@@ -277,7 +280,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
                 int result = NativeUtils.PatchApk(baseObbPath, obbPath, fusionFile.getAbsolutePath());
                 if(result != NativeUtils.RESULT_STATE_OK){
                     Log.d(MainApplication.LOG_TAG, "Patch Obb File Failed: " + result + ",obbPath:" + apkPath + ",baseObbPath:" + baseApkPath);
-                    return result;
+                    return ModUtils.RESULT_STATE_OBB_ERROR;
                 }
                 try {
                     InputStream inputStream = context.getAssets().open("settings.xml");
