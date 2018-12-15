@@ -104,7 +104,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
                 public void onDownloadFail() {
                     Log.e(MainApplication.LOG_TAG, "onDownloadFail");
                 }
-            }).excuteMission(context);
+            }).executeMission(context);
             this.url = null;
         } else {
             this.url = url;

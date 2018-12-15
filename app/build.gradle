@@ -33,7 +33,7 @@ android {
     }
     signingConfigs {
         releaseConfig {
-            storeFile file("../xausky.jks")
+            storeFile file("../../xausky.jks")
             storePassword project.hasProperty("KEYSTORE_PASS") ? KEYSTORE_PASS : System.getenv("KEYSTORE_PASS")
             keyAlias project.hasProperty("ALIAS_NAME") ? ALIAS_NAME : System.getenv("ALIAS_NAME")
             keyPassword project.hasProperty("ALIAS_PASS") ? ALIAS_PASS : System.getenv("ALIAS_PASS")
@@ -44,21 +44,31 @@ android {
             signingConfig signingConfigs.releaseConfig
         }
     }
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
 }
 
 dependencies {
     implementation 'commons-io:commons-io:2.4' //最新版2.6使用新的JavaFileAPI，无法在目前Android版本上使用。
     implementation 'com.android.support:design:28.0.0'
-    implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support:cardview-v7:28.0.0'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
 
     implementation 'com.hzy:libp7zip:1.5.0' //https://github.com/hzy3774/AndroidP7zip
     implementation 'com.github.topjohnwu:libsu:2.0.2' //https://github.com/topjohnwu/libsu
-    implementation 'com.daimajia.slider:library:1.1.5' //https://github.com/daimajia/AndroidImageSlider
-    implementation 'com.github.xausky:VirtualXposed:8c04e459bc' //https://github.com/xausky/VirtualXposed
+    
+    implementation ('com.daimajia.slider:library:1.1.5'){ //https://github.com/daimajia/AndroidImageSlider
+        exclude group: 'com.android.support', module: 'support-v4'
+    }
+
     implementation 'com.github.medyo:android-about-page:1.2.4' //https://github.com/medyo/android-about-page
+    implementation 'com.github.xausky:VirtualXposed:8c04e459bc' //https://github.com/xausky/VirtualXposed
     implementation 'com.github.bartwell:ExFilePicker:0c5a7c83ae' //https://github.com/bartwell/ExFilePicker
-    implementation 'com.github.xausky:CheckVersionLib:17a5d19c40' //https://github.com/xausky/CheckVersionLib
+    implementation 'com.github.xausky:CheckVersionLib:ac25f0874e' //https://github.com/xausky/CheckVersionLib
 
     implementation 'com.crashlytics.sdk.android:answers:1.4.5'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.9.7'
