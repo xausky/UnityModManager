@@ -36,6 +36,7 @@ import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.remote.InstallResult;
 import com.lody.virtual.remote.InstalledAppInfo;
 
+import io.github.xausky.unitymodmanager.MainActivity;
 import io.github.xausky.unitymodmanager.dialog.ConfirmDialog;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -129,7 +130,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         progressDialog.setMessage(getString(R.string.progress_dialog_message));
         progressDialog.setCancelable(false);
         if (view == null) {
-            confirmDialog = new ConfirmDialog(context, this);
+            confirmDialog = new ConfirmDialog(this.getActivity(), this);
             confirmDialog.setMessage(context.getString(R.string.install_client_remove_all_mod_confirm));
             view = inflater.inflate(R.layout.home_fragment, container, false);
             attachFragment = (AttachFragment) BaseFragment.fragment(R.id.nav_attach, this.getActivity().getApplication());

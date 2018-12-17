@@ -417,7 +417,9 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
     }
 
     public void removeAllMods(){
-        for(Mod mod: mods){
+        Iterator<Mod> modIterator = mods.iterator();
+        while (modIterator.hasNext()){
+            Mod mod = modIterator.next();
             File targetFile = new File(storage.getAbsolutePath() + "/" + mod.name);
             try {
                 if(targetFile.isDirectory()){
@@ -433,12 +435,13 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
                         Toast.makeText(context, context.getString(R.string.external_mods_observer_stop, mod.name), Toast.LENGTH_LONG).show();
                     }
                 }
-                mods.remove(mod);
+                modIterator.remove();
             } catch (Exception e) {
                 e.printStackTrace();
                 Toast.makeText(context, context.getString(R.string.mod_file_delete_failed, mod.name), Toast.LENGTH_SHORT).show();
             }
         }
+        ModsAdapter.this.notifyDataSetChanged();
     }
 
     @Override

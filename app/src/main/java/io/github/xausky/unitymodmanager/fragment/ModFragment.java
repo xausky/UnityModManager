@@ -160,6 +160,9 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
         context = inflater.getContext();
         settings = context.getSharedPreferences(SettingFragment.SETTINGS_PREFERENCE_NAME, Context.MODE_PRIVATE);
         showConflict = settings.getBoolean("show_conflict_info", false);
+        if(adapter == null){
+            setBase(context);
+        }
         adapter.setShowConflict(showConflict);
         view = inflater.inflate(R.layout.mod_fragment, container, false);
         recyclerView = view.findViewById(R.id.mod_list);
