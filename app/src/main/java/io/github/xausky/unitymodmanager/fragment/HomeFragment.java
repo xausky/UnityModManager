@@ -1,5 +1,6 @@
 package io.github.xausky.unitymodmanager.fragment;
 
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -10,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageParser;
 import android.content.pm.ShortcutManager;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.sip.SipRegistrationListener;
@@ -475,7 +477,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                         if (modFragment.getEnableItemCount() > 0) {
                             modFragment.setNeedPatch(true);
                         }
-                        if (modFragment.getItemCount() > 0) {
+                        if (modFragment.getItemCount() > 0 && !HomeFragment.this.getActivity().isFinishing()) {
                             confirmDialog.show();
                         }
                     }
@@ -484,16 +486,38 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         }.start();
     }
 
+    public static Bitmap drawableToBitmap(Drawable drawable) {
+        Bitmap bitmap = null;
+
+        if (drawable instanceof BitmapDrawable) {
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
+            if(bitmapDrawable.getBitmap() != null) {
+                return bitmapDrawable.getBitmap();
+            }
+        }
+
+        if(drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
+            bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888); // Single color bitmap will be created of 1x1 pixel
+        } else {
+            bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        }
+
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+        return bitmap;
+    }
+
     public void crateShortcut(InstalledAppInfo info) {
         if (ShortcutManagerCompat.isRequestPinShortcutSupported(context)) {
             PackageManager manager = VirtualCore.get().getPackageManager();
             String name = manager.getApplicationLabel(info.getApplicationInfo(0)) + context.getString(R.string.shortcut_postfix);
-            BitmapDrawable icon = (BitmapDrawable) manager.getApplicationIcon(info.getApplicationInfo(0));
+            Drawable icon = manager.getApplicationIcon(info.getApplicationInfo(0));
             Intent shortcutInfoIntent = new Intent(Intent.ACTION_VIEW);
             shortcutInfoIntent.setClass(context, ShortcutActivity.class);
             shortcutInfoIntent.putExtra("io.github.xausky.unitymodmanager.launchPackage", info.packageName);
             ShortcutInfoCompat shortcutInfo = new ShortcutInfoCompat.Builder(context, name)
-                    .setIcon(IconCompat.createWithBitmap(icon.getBitmap()))
+                    .setIcon(IconCompat.createWithBitmap(drawableToBitmap(icon)))
                     .setShortLabel(name)
                     .setIntent(shortcutInfoIntent)
                     .build();

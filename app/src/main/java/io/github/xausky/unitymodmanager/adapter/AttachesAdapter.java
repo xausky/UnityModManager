@@ -58,7 +58,12 @@ public class AttachesAdapter extends RecyclerView.Adapter<AttachesAdapter.ViewHo
     public void update(String excludePackageName){
         this.excludePackageName = excludePackageName;
         applications.clear();
-        List<InstalledAppInfo> installedApplications = VirtualCore.get().isStartup() ? VirtualCore.get().getInstalledApps(0): Collections.<InstalledAppInfo>emptyList();
+        List<InstalledAppInfo> installedApplications = Collections.emptyList();
+        try {
+            installedApplications = VirtualCore.get().getInstalledApps(0);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
         for(InstalledAppInfo info: installedApplications){
             if(!info.packageName.equals(excludePackageName)) {
                 applications.add(info.getApplicationInfo(0));

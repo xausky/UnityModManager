@@ -286,7 +286,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
                     return ModUtils.RESULT_STATE_OBB_ERROR;
                 }
                 try {
-                    InputStream inputStream = context.getAssets().open("settings.xml");
+                    InputStream inputStream = getBase().getAssets().open("settings.xml");
                     String settings = IOUtils.toString(inputStream);
                     inputStream.close();
                     settings = settings.replace("$CHECKSUM", ModUtils.checkSum(obbPath));
