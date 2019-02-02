@@ -112,7 +112,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         settings = base.getSharedPreferences(SettingFragment.SETTINGS_PREFERENCE_NAME, Context.MODE_PRIVATE);
         packageName = settings.getString(PACKAGE_PREFERENCE_KEY, null);
         apkModifyModel = Integer.valueOf(settings.getString("apk_modify_model", "1"));
-        persistentSupport = settings.getBoolean("persistent_support", false);
+        persistentSupport = settings.getBoolean("persistent_support", true);
         obbSupport = settings.getBoolean("obb_support", false);
         return super.setBase(base);
     }
@@ -123,7 +123,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         context = inflater.getContext();
         settings = context.getSharedPreferences(SettingFragment.SETTINGS_PREFERENCE_NAME, Context.MODE_PRIVATE);
         apkModifyModel = Integer.valueOf(settings.getString("apk_modify_model", "1"));
-        persistentSupport = settings.getBoolean("persistent_support", false);
+        persistentSupport = settings.getBoolean("persistent_support", true);
         obbSupport = settings.getBoolean("obb_support", false);
         dialog = new ApplicationChooseDialog(context, this, ALL_APPLICATION_PACKAGE_REGEX, apkModifyModel == APK_MODIFY_MODEL_VIRTUAL, true);
         dialog.setListener(this);

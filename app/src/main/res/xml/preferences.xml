@@ -9,7 +9,7 @@
         android:entryValues="@array/apk_modify_model_values"/>
     <SwitchPreference
         android:key="persistent_support"
-        android:defaultValue="false"
+        android:defaultValue="true"
         android:title="@string/persistent_support_title"
         android:summary="@string/persistent_support_summary" />
     <SwitchPreference

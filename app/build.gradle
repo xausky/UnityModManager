@@ -20,8 +20,8 @@ android {
         applicationId "io.github.xausky.unitymodmanager"
         minSdkVersion 21
         targetSdkVersion 23
-        versionCode 282
-        versionName "2.8.2"
+        versionCode 290
+        versionName "2.9.0"
         ndk{
             abiFilters "armeabi-v7a","x86"
         }
@@ -66,10 +66,10 @@ dependencies {
     }
 
     implementation 'com.github.medyo:android-about-page:1.2.4' //https://github.com/medyo/android-about-page
-    implementation 'com.github.xausky:VirtualXposed:8c04e459bc' //https://github.com/xausky/VirtualXposed
+    implementation 'com.github.xausky:VirtualXposed:8d2abfc77a' //https://github.com/xausky/VirtualXposed
     implementation 'com.github.bartwell:ExFilePicker:0c5a7c83ae' //https://github.com/bartwell/ExFilePicker
     implementation 'com.github.xausky:CheckVersionLib:ac25f0874e' //https://github.com/xausky/CheckVersionLib
 
-    implementation 'com.crashlytics.sdk.android:answers:1.4.5'
-    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.7'
+    implementation 'com.crashlytics.sdk.android:answers:1.4.6'
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.8'
 }
