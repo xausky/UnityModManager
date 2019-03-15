@@ -193,7 +193,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
                 FileUtils.forceMkdir(temp);
                 int p7zip = P7ZipApi.executeCommand(String.format("7z x '%s' '-o%s' '-p%s' -aoa", sourceFile.getAbsolutePath(), temp.getAbsolutePath(), password));
                 if(p7zip == 0){
-                    result = ModUtils.Standardization(temp, targetFile);
+                    result = ModUtils.Standardization(temp.getAbsolutePath(), "", targetFile);
                 }
                 FileUtils.deleteDirectory(temp);
                 if(p7zip == 2){
@@ -204,7 +204,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
                 result = ModUtils.RESULT_STATE_INTERNAL_ERROR;
             }
         }else if(sourceFile.isDirectory()){
-            result = ModUtils.Standardization(sourceFile, targetFile);
+            result = ModUtils.Standardization(sourceFile.getAbsolutePath(), "", targetFile);
         }
         if(result >= 0){
             if(result == 0){
@@ -285,7 +285,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ViewHolder> im
         }
         try {
             FileUtils.write(targetFile, sourceFile.getAbsolutePath());
-            int result = ModUtils.Standardization(sourceFile, cacheFile);
+            int result = ModUtils.Standardization(sourceFile.getAbsolutePath(), "", cacheFile);
             mods.add(new Mod(name, false, Integer.MAX_VALUE, result, targetFile.getAbsolutePath(), null));
             notifyDataSetChanged();
         } catch (IOException e) {

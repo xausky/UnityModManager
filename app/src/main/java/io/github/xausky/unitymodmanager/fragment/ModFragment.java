@@ -180,7 +180,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
 
     @Override
     public void OnActionButtonClick() {
-        if(ModUtils.map == null){
+        if(ModUtils.effectiveFiles == null){
             Toast.makeText(context, R.string.install_client_and_generate_map_file_first, Toast.LENGTH_LONG).show();
             return;
         }
@@ -192,7 +192,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
 
     @Override
     public void OnActionButtonLongClick() {
-        if(ModUtils.map == null){
+        if(ModUtils.effectiveFiles == null){
             Toast.makeText(context, R.string.install_client_and_generate_map_file_first, Toast.LENGTH_LONG).show();
             return;
         }
@@ -267,7 +267,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
                     try {
                         if(modFile.isFile()){
                             File externalFile = new File(FileUtils.readFileToString(modFile));
-                            int result = ModUtils.Standardization(externalFile, fusionFile);
+                            int result = ModUtils.Standardization(externalFile.getAbsolutePath(), "", fusionFile);
                             mod.fileCount = result;
                         } else {
                             mod.conflict = new TreeSet<>();

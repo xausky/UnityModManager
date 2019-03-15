@@ -57,6 +57,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -212,7 +213,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     }
 
     public void ImportMapFile() {
-        ModUtils.map = new HashMap<>();
+        ModUtils.effectiveFiles = new HashSet<>();
         File persistentMap = new File(getBase().getFilesDir() + "/persistent.map");
         if (persistentMap.exists() && persistentSupport) {
             FileReader reader = null;
@@ -224,7 +225,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 while ((line = bufferedReader.readLine()) != null) {
                     String[] column = line.split(":");
                     if (column.length == 2) {
-                        ModUtils.map.put(column[0], column[1]);
+                        ModUtils.effectiveFiles.add(column[1]);
                     }
                 }
             } catch (FileNotFoundException e1) {
@@ -259,7 +260,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 while ((line = bufferedReader.readLine()) != null) {
                     String[] column = line.split(":");
                     if (column.length == 2) {
-                        ModUtils.map.put(column[0], column[1]);
+                        ModUtils.effectiveFiles.add(column[1]);
                     }
                 }
             } catch (FileNotFoundException e1) {
@@ -294,7 +295,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 while ((line = bufferedReader.readLine()) != null) {
                     String[] column = line.split(":");
                     if (column.length == 2) {
-                        ModUtils.map.put(column[0], column[1]);
+                        ModUtils.effectiveFiles.add(column[1]);
                     }
                 }
             } catch (FileNotFoundException e1) {
@@ -360,8 +361,8 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
             clientState.setText(getText(R.string.home_client_uninstalled));
             clientState.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context, R.drawable.ic_clear), null, null, null);
         }
-        mapFile.setText(String.format(context.getString(R.string.map_file_size), ModUtils.map.size()));
-        if (ModUtils.map.size() > 0) {
+        mapFile.setText(String.format(context.getString(R.string.map_file_size), ModUtils.effectiveFiles.size()));
+        if (ModUtils.effectiveFiles.size() > 0) {
             mapFile.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context, R.drawable.ic_check), null, null, null);
         }
         String summaryString = String.format(getString(R.string.home_summary_context),
