@@ -32,7 +32,7 @@ public class ModUtils {
     public static final int RESULT_STATE_PASSWORD_ERROR = -2;
     public static final int RESULT_STATE_ROOT_ERROR = -3;
     public static final int RESULT_STATE_OBB_ERROR = -4;
-    public static Map<String, String> map;
+    public static Set<String> effectiveFiles;
     public static Set<String> supportImageType = new TreeSet<>();
 
     static {
@@ -65,8 +65,9 @@ public class ModUtils {
         return result;
     }
 
-    public static int Standardization(File input, File output){
+    public static int Standardization(String root, String current, File output){
         int result = 0;
+        File input = new File(root + File.separator + current);
         if(!input.isDirectory()){
             return RESULT_STATE_INTERNAL_ERROR;
         }
@@ -74,13 +75,13 @@ public class ModUtils {
         for(File file : files){
             String path = null;
             String name = file.getName();
-            path = map.get(input.getName() + "/" + name);
-            if(path != null){
+            path = current + name;
+            if(effectiveFiles.contains(path)){
                 try {
                     if(file.isDirectory()){
-                        FileUtils.copyDirectory(file, new File(output + "/" + path));
+                        FileUtils.copyDirectory(file, new File(output + File.separator + path));
                     } else {
-                        FileUtils.copyFile(file, new File(output + "/" + path));
+                        FileUtils.copyFile(file, new File(output +File.separator + path));
                     }
                     result++;
                 } catch (IOException e) {
@@ -88,7 +89,7 @@ public class ModUtils {
                     return RESULT_STATE_INTERNAL_ERROR;
                 }
             } else if(file.isDirectory()){
-                int r = Standardization(new File(input + "/" + name), output);
+                int r = Standardization(root,  path + File.separator, output);
                 if(r == RESULT_STATE_INTERNAL_ERROR){
                     return RESULT_STATE_INTERNAL_ERROR;
                 }
@@ -96,14 +97,14 @@ public class ModUtils {
             } else if(name.length() > 4 && supportImageType.contains(name.substring(name.length() - 4))){
                 if(file.length() < 1024 * 1024){
                     try {
-                        FileUtils.copyFile(file, new File(output + "/images/" + System.currentTimeMillis() + "-" + name));
+                        FileUtils.copyFile(file, new File(output + File.separator  + "images" + File.separator  + System.currentTimeMillis() + "-" + name));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
             } else if(name.equals("info.json")){
                 try {
-                    FileUtils.copyFile(file, new File(output + "/info.json"));
+                    FileUtils.copyFile(file, new File(output + File.separator  + "info.json"));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
