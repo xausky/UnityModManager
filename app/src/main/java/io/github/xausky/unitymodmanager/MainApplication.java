@@ -25,7 +25,7 @@ public class MainApplication extends Application {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         SharedPreferences settings = base.getSharedPreferences(SettingFragment.SETTINGS_PREFERENCE_NAME, Context.MODE_PRIVATE);
-        if(Integer.valueOf(settings.getString("apk_modify_model", "1")) == HomeFragment.APK_MODIFY_MODEL_VIRTUAL){
+        if(Integer.valueOf(settings.getString("apk_modify_model", "0")) == HomeFragment.APK_MODIFY_MODEL_VIRTUAL){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 NativeEngine.disableJit(Build.VERSION.SDK_INT);
             }

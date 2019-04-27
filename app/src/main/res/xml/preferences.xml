@@ -4,7 +4,7 @@
         android:key="apk_modify_model"
         android:title="@string/apk_modify_model_title"
         android:summary="@string/apk_modify_model_summary"
-        android:defaultValue="1"
+        android:defaultValue="0"
         android:entries="@array/apk_modify_model"
         android:entryValues="@array/apk_modify_model_values"/>
     <SwitchPreference

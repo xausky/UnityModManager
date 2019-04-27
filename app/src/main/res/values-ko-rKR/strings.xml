@@ -51,8 +51,8 @@
     <string name="install_source_not_found">먼저 홈 화면에서 클라이언트를 설치해주시고, 설치된 게임 파일이 제거되지 않은지 확인해주십시오.</string>
     <string name="unsupport_operation">지원되지 않는 기능입니다.</string>
     <string name="install_mods_failed">모드 설치에 실패하였습니다</string>
-    <string name="install_mods_obb_error">The modification of the OBB file failed. Please confirm that the setting client has the corresponding obb file. It is recommended to close the obb support and try again.</string>
-    <string name="install_mods_root_error">Get the root permission fails, please contact the root device or switch to other apk modification modes.</string>
+    <string name="install_mods_obb_error">OBB 파일의 수정 하지 못했습니다. 설정 클라이언트 해당 obb 파일에 있는지 확인 하십시오. Obb 지원을 닫고 다시 시도 하는 것이 좋습니다.</string>
+    <string name="install_mods_root_error">루트 권한 실패 얻을, 하시기 바랍니다 연락 루트 장치 또는 다른 apk 수정 모드 전환.</string>
     <string name="no_storage_permissions">애플리케이션이 내부 저장소 읽기 및 쓰기 권한을 가지고 있지 않습니다. 모바일 기기의 설정에서 권한 설정을 해주십시오. 이 권한 없이는 애플리케이션이 제대로 작동하지 않습니다.</string>
     <string name="external_mods_observer_start">외부 모드 모니터링 시작: %s</string>
     <string name="external_mods_observer_stop">외부 모드 모니터링 정지: %s</string>
@@ -114,5 +114,5 @@
     <string name="mod_decompression_error">Mod [%s] 감압 오류 모듈 파일 손상 되지 않은 확인 하십시오.</string>
     <string name="not_available_non_virtual">가상 모드에서 사용할 수 없는 기능</string>
     <string name="nav_online_mods">OnlineMods</string>
-    <string name="install_client_remove_all_mod_confirm">Is the legacy mod of the original client detected deleted?</string>
+    <string name="install_client_remove_all_mod_confirm">원래 클라이언트 감지의 레거시 모드 삭제?</string>
 </resources>

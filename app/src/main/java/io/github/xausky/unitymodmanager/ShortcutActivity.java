@@ -33,7 +33,7 @@ public class ShortcutActivity extends Activity{
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         SharedPreferences preferences = getSharedPreferences(SettingFragment.SETTINGS_PREFERENCE_NAME, Context.MODE_PRIVATE);
-        int apkModifyModel = Integer.valueOf(preferences.getString("apk_modify_model", "1"));
+        int apkModifyModel = Integer.valueOf(preferences.getString("apk_modify_model", "0"));
         if(apkModifyModel != APK_MODIFY_MODEL_VIRTUAL){
             Toast.makeText(this, R.string.no_virtual_model_shortcut, Toast.LENGTH_LONG).show();
             finish();

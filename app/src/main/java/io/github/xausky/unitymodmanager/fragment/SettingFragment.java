@@ -85,7 +85,7 @@ public class SettingFragment extends PreferenceFragment implements SharedPrefere
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         if(s.equals("apk_modify_model")){
-            if(Integer.valueOf(sharedPreferences.getString("apk_modify_model", "1")) == HomeFragment.APK_MODIFY_MODEL_VIRTUAL && !VirtualCore.get().isStartup()){
+            if(Integer.valueOf(sharedPreferences.getString("apk_modify_model", "0")) == HomeFragment.APK_MODIFY_MODEL_VIRTUAL && !VirtualCore.get().isStartup()){
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     NativeEngine.disableJit(Build.VERSION.SDK_INT);
                 }
