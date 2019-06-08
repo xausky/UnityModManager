@@ -90,37 +90,33 @@ namespace xausky {
         bundleStream.WriteStringToNull(versionEngine);
         BinaryStream blocksStream(true);
         BinaryStream assertStream(true);
+        BinaryStream tempAssertStream(true);
         blocksStream.WriteConst(0, 0x10);
-        int sizeCount = 0;
         for(std::list<MemoryFile*>::iterator it = files.begin(); it != files.end(); it++){
-            sizeCount+=(*it)->stream->size();
+            MemoryFile* file = (*it);
+            file->offset = tempAssertStream.positionOutput();
+            (*it)->stream->WriteTo(tempAssertStream);
+            file->size = file->offset - tempAssertStream.positionOutput();
         }
-        int blockCount = (sizeCount - 1)/maxBlockSize + 1;
+        int blockCount = (tempAssertStream.positionOutput() - 1)/maxBlockSize + 1;
         blocksStream.WriteInt32(blockCount);
         int uncompressedSize = 0;
         int compressedSize = 0;
-        int position = 0;
-        for(std::list<MemoryFile*>::iterator it = files.begin(); it != files.end(); it++){
-            MemoryFile* file = (*it);
-            file->offset = position;
-            do{
-                file->stream->ReadData(uncompressedData, maxBlockSize);
-                uncompressedSize = file->stream->count();
-                if(uncompressedSize > 0){
-                    blocksStream.WriteInt32(uncompressedSize);
-                    compressedSize =  LZ4_compress_HC(uncompressedData, compressedData, uncompressedSize, maxBlockSize + 1024, LZ4HC_CLEVEL_DEFAULT);
-                    if(compressedSize <= 0){
-                        DecompressDataException e;
-                        throw e;
-                    }
-                    blocksStream.WriteInt32(compressedSize);
-                    blocksStream.WriteInt16(blocksFlag);
-                    assertStream.WriteData(compressedData, compressedSize);
-                    position += uncompressedSize;
+        do{
+            tempAssertStream.ReadData(uncompressedData, maxBlockSize);
+            uncompressedSize = tempAssertStream.count();
+            if(uncompressedSize > 0){
+                blocksStream.WriteInt32(uncompressedSize);
+                compressedSize =  LZ4_compress_HC(uncompressedData, compressedData, uncompressedSize, maxBlockSize + 1024, LZ4HC_CLEVEL_DEFAULT);
+                if(compressedSize <= 0){
+                    DecompressDataException e;
+                    throw e;
                 }
-            }while(uncompressedSize > 0 && !file->stream->eof());
-            file->size = position - file->offset;
-        }
+                blocksStream.WriteInt32(compressedSize);
+                blocksStream.WriteInt16(blocksFlag);
+                assertStream.WriteData(compressedData, compressedSize);
+            }
+        }while(uncompressedSize > 0 && !tempAssertStream.eof());
         blocksStream.WriteInt32(files.size());
         for(std::list<MemoryFile*>::iterator it = files.begin(); it != files.end(); it++){
             MemoryFile* file = (*it);

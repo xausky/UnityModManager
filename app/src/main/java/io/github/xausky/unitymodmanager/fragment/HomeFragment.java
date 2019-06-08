@@ -165,7 +165,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         AllenVersionChecker
                 .getInstance()
                 .requestVersion()
-                .setRequestUrl("https://api.github.com/repos/xausky/UnityModManager/releases")
+                .setRequestUrl("http://umms.xausky.cn/releases/api")
                 .request(new RequestVersionListener() {
                     @Nullable
                     @Override
@@ -191,7 +191,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                                     UIData data = UIData.create();
                                     data.setTitle(getString(R.string.new_version_release, latestVersion));
                                     data.setContent(getString(R.string.update_logs, latestRelease.getString("body")));
-                                    data.setDownloadUrl(latestRelease.getJSONArray("assets").getJSONObject(0).getString("browser_download_url"));
+                                    data.setDownloadUrl(String.format("http://umms.xausky.cn/releases/download/%s/app-release.apk", latestVersion));
                                     return data;
                                 } else {
                                     Drawable check = context.getResources().getDrawable(R.drawable.ic_check_circle);
