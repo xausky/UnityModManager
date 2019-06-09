@@ -24,11 +24,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
@@ -230,7 +227,13 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
             public void run() {
                 Toast.makeText(context, R.string.checked_external_mod_changed, Toast.LENGTH_LONG).show();
                 HomeFragment fragment = (HomeFragment)BaseFragment.fragment(R.id.nav_home, ModFragment.this.getActivity().getApplication());
-                VirtualCore.get().killApp(fragment.packageName, 0);
+                if (fragment.apkModifyModel == HomeFragment.APK_MODIFY_MODEL_VIRTUAL){
+                    VirtualCore.get().killApp(fragment.packageName, 0);
+                } else {
+                    if(Shell.rootAccess()){
+                        Shell.su("am force-stop " + fragment.packageName).exec();
+                    }
+                }
                 MainActivity activity = (MainActivity)context;
                 needPatch = true;
                 activity.launch();
@@ -244,7 +247,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
                 return ModUtils.RESULT_STATE_ROOT_ERROR;
             }
             //暂时禁用SELinux，并且修改目标APK权限为666。
-            Shell.Sync.su("setenforce 0", "chmod 666 " + apkPath);
+            Shell.su("setenforce 0", "chmod 666 " + apkPath).exec();
         }
         try {
             Log.d(MainApplication.LOG_TAG, "patch: apkPath=" + apkPath + ", baseApkPath=" + baseApkPath + ", apkModifyModel=" + apkModifyModel);
@@ -322,7 +325,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
         }finally {
             if(apkModifyModel == HomeFragment.APK_MODIFY_MODEL_ROOT){
                 //修改目标APK权限回644，并且重新启用SELinux。
-                Shell.Sync.su("chmod 644 " + apkPath, "setenforce 0");
+                Shell.su("chmod 644 " + apkPath, "setenforce 0").exec();
             }
         }
     }
