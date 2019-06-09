@@ -22,7 +22,7 @@ namespace xausky {
     };
 
     struct DecompressDataException : std::exception {
-        const char *what() const noexcept { return "decompress data excption"; }
+        const char *what() const noexcept { return "Decompress data exception"; }
     };
 
     class BundleFile {
@@ -31,8 +31,7 @@ namespace xausky {
 
         void open(BinaryStream &stream);
 
-        void save(BinaryStream &stream, int32_t maxBlockSize = 131072, int32_t bundleFlag = 67,
-                  int16_t blocksFlag = 3, int32_t fileFlag = 4);
+        void save(BinaryStream &stream, int32_t maxBlockSize = 131072, int32_t bundleFlag = 67, int16_t blocksFlag = 3);
 
         void patch(map<string, map<int64_t, BinaryStream *> *> &mods);
 

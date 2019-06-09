@@ -79,10 +79,11 @@ namespace xausky {
             BinaryStream* fileStream = new BinaryStream(data, size, true);
             delete[] data;
             MemoryFile* file = new MemoryFile(name, fileStream);
+            file->flag = flag;
             files.push_back(file);
         }
     }
-    void BundleFile::save(BinaryStream& bundleStream, int32_t maxBlockSize, int32_t bundleFlag, int16_t blocksFlag, int32_t fileFlag){
+    void BundleFile::save(BinaryStream& bundleStream, int32_t maxBlockSize, int32_t bundleFlag, int16_t blocksFlag){
         char uncompressedData[maxBlockSize], compressedData[maxBlockSize + 1024];
         bundleStream.WriteStringToNull(fileType);
         bundleStream.WriteInt32(fileVersion);
@@ -96,7 +97,7 @@ namespace xausky {
             MemoryFile* file = (*it);
             file->offset = tempAssertStream.positionOutput();
             (*it)->stream->WriteTo(tempAssertStream);
-            file->size = file->offset - tempAssertStream.positionOutput();
+            file->size = tempAssertStream.positionOutput() - file->offset;
         }
         int blockCount = (tempAssertStream.positionOutput() - 1)/maxBlockSize + 1;
         blocksStream.WriteInt32(blockCount);
@@ -122,7 +123,7 @@ namespace xausky {
             MemoryFile* file = (*it);
             blocksStream.WriteInt64(file->offset);
             blocksStream.WriteInt64(file->size);
-            blocksStream.WriteInt32(fileFlag);
+            blocksStream.WriteInt32(file->flag);
             blocksStream.WriteStringToNull(file->name);
         }
         uncompressedSize = blocksStream.size();

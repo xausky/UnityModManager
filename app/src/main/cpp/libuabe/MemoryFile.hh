@@ -9,6 +9,7 @@ namespace xausky {
         ~MemoryFile();
         string name;
         BinaryStream* stream;
+        int32_t flag;
         int64_t offset;
         int64_t size;
     };
