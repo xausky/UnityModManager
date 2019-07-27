@@ -7,7 +7,6 @@ android:
 install:
   - echo y | sdkmanager "ndk-bundle"
 script:
-  - curl -u xausky:$SYSKILLER_TOKEN https://syskiller.org/remote.php/webdav/xausky.jks -o ../xausky.jks
   - ./gradlew assembleRelease
 deploy:
   skip_cleanup: true

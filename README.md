@@ -1,6 +1,6 @@
 # Unity模组管理器
 
-> ⼀个便捷的程序可以修改游戏内资源包括：Unity游戏资源，Wwise音频资源
+> 一个便捷的程序可以修改游戏内资源包括：Unity游戏资源，Wwise音频资源
 
 [![Crowdin](https://d322cqt584bo4o.cloudfront.net/unitymodmanager/localized.svg)](https://crowdin.com/project/unitymodmanager)
 [![Build Status](https://travis-ci.org/xausky/UnityModManager.svg?branch=master)](https://travis-ci.org/xausky/UnityModManager)
