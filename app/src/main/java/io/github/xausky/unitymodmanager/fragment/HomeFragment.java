@@ -28,6 +28,8 @@ import android.widget.Toast;
 import com.allenliu.versionchecklib.v2.AllenVersionChecker;
 import com.allenliu.versionchecklib.v2.builder.UIData;
 import com.allenliu.versionchecklib.v2.callback.RequestVersionListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.lody.virtual.client.core.InstallStrategy;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.remote.InstallResult;
@@ -76,6 +78,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     public boolean obbSupport;
     private ConfirmDialog confirmDialog;
     private View view;
+    private AdView mAdView;
     private TextView summary;
     private TextView clientState;
     private TextView currentVersion;
@@ -139,6 +142,9 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 e.printStackTrace();
             }
             currentVersion.setText(String.format(getText(R.string.home_current_version).toString(), currentVersionString));
+            mAdView = view.findViewById(R.id.adView);
+            AdRequest adRequest = new AdRequest.Builder().build();
+            mAdView.loadAd(adRequest);
             checkVersion();
         }
         clientUpdate();

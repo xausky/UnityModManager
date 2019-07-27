@@ -37,6 +37,9 @@
             </intent-filter>
         </activity>
         <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-5364789594685674~8707472956"/>
+        <meta-data
             android:name="android.max_aspect"
             android:value="2.1" />
     </application>

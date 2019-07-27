@@ -91,6 +91,19 @@
             android:layout_margin="10dp"
             android:text="@android:string/unknownName" />
     </androidx.cardview.widget.CardView>
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp">
+            <com.google.android.gms.ads.AdView
+                xmlns:ads="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/adView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                ads:adSize="LARGE_BANNER"
+                ads:adUnitId="ca-app-pub-5364789594685674/1018461293">
+            </com.google.android.gms.ads.AdView>
+        </androidx.cardview.widget.CardView>
     </LinearLayout>
 </ScrollView>
 </LinearLayout>

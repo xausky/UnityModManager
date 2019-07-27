@@ -57,11 +57,8 @@ dependencies {
     //https://github.com/hzy3774/AndroidP7zip
     implementation 'com.github.topjohnwu:libsu:2.0.2'
     //https://github.com/topjohnwu/libsu
-    implementation('com.daimajia.slider:library:1.1.5') {
-        //https://github.com/daimajia/AndroidImageSlider
-        exclude group: 'com.android.support', module: 'support-v4'
-        exclude group: 'com.android.support', module: 'appcompat-v7'
-    }
+    implementation('com.daimajia.slider:library:1.1.5')
+    //https://github.com/daimajia/AndroidImageSlider
     implementation 'com.github.medyo:android-about-page:1.2.5'
     //https://github.com/medyo/android-about-page
     implementation 'com.github.xausky:VirtualXposed:12332ab93b'
@@ -73,6 +70,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:17.0.1'
     implementation 'com.google.firebase:firebase-perf:18.0.1'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
+    implementation 'com.google.android.gms:play-services-ads:18.1.1'
 }
 
 apply plugin: 'com.google.gms.google-services'

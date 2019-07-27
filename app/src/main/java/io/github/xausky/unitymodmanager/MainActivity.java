@@ -11,6 +11,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.core.app.ActivityCompat;
@@ -85,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         if (!checkDangerousPermissions(this, REQUIRED_PERMISSIONS) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             this.requestPermissions(REQUIRED_PERMISSIONS, 0);
         }
+        MobileAds.initialize(this, "ca-app-pub-5364789594685674~8707472956");
         setContentView(R.layout.activity_main);
         SharedPreferences preferences = this.getSharedPreferences("default", MODE_PRIVATE);
         BaseFragment.initialize(this);
