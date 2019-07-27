@@ -57,8 +57,11 @@ dependencies {
     //https://github.com/hzy3774/AndroidP7zip
     implementation 'com.github.topjohnwu:libsu:2.0.2'
     //https://github.com/topjohnwu/libsu
-    implementation('com.daimajia.slider:library:1.1.5')
-    //https://github.com/daimajia/AndroidImageSlider
+    implementation('com.daimajia.slider:library:1.1.5') {
+        //https://github.com/daimajia/AndroidImageSlider
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude group: 'com.android.support', module: 'appcompat-v7'
+    }
     implementation 'com.github.medyo:android-about-page:1.2.5'
     //https://github.com/medyo/android-about-page
     implementation 'com.github.xausky:VirtualXposed:12332ab93b'
