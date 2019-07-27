@@ -1,4 +1,5 @@
 language: android
+dist: trusty
 android:
   components:
   - tools
@@ -18,5 +19,3 @@ deploy:
   on:
     tags: true
     repo: xausky/UnityModManager
-after_success:
-- curl -u xausky:$SYSKILLER_TOKEN -T app/build/outputs/apk/release/app-release.apk https://syskiller.org/remote.php/webdav/模组管理器/模组管理器-$TRAVIS_BRANCH.apk
