@@ -1,21 +1,27 @@
 package io.github.xausky.unitymodmanager;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import androidx.annotation.NonNull;
+import com.google.android.material.navigation.NavigationView;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,13 +32,13 @@ import com.lody.virtual.client.ipc.VActivityManager;
 
 import java.io.File;
 
-import io.github.xausky.unitymodmanager.adapter.VisibilityAdapter;
 import io.github.xausky.unitymodmanager.fragment.BaseFragment;
 import io.github.xausky.unitymodmanager.fragment.HomeFragment;
 import io.github.xausky.unitymodmanager.fragment.ModFragment;
 import io.github.xausky.unitymodmanager.utils.ModUtils;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE"};
     private DrawerLayout drawerLayout;
     private FloatingActionButton actionButton;
     private NavigationView navigationView;
@@ -56,9 +62,29 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 检查是否已被授权危险权限
+     * @param permissions
+     * @return
+     */
+    public boolean checkDangerousPermissions(Activity ac, String[] permissions) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED || ActivityCompat.shouldShowRequestPermissionRationale(ac, permission)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!checkDangerousPermissions(this, REQUIRED_PERMISSIONS) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            this.requestPermissions(REQUIRED_PERMISSIONS, 0);
+        }
         setContentView(R.layout.activity_main);
         SharedPreferences preferences = this.getSharedPreferences("default", MODE_PRIVATE);
         BaseFragment.initialize(this);

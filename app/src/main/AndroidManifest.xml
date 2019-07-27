@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
     <application
+        tools:replace="android:allowBackup"
+        android:allowBackup="false"
         android:name=".MainApplication"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -34,9 +36,6 @@
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="0b5f5d8b7175354de10b85bb209dee947ff08cf6" />
         <meta-data
             android:name="android.max_aspect"
             android:value="2.1" />

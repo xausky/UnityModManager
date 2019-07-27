@@ -6,12 +6,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 
-import com.crashlytics.android.Crashlytics;
 import com.lody.virtual.client.NativeEngine;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.stub.VASettings;
 
-import io.fabric.sdk.android.Fabric;
 import io.github.xausky.unitymodmanager.fragment.HomeFragment;
 import io.github.xausky.unitymodmanager.fragment.SettingFragment;
 
@@ -43,6 +41,5 @@ public class MainApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics());
     }
 }

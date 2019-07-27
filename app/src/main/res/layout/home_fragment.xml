@@ -10,7 +10,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp">
@@ -40,9 +40,9 @@
                 android:layout_margin="8dp"
                 android:text="@string/home_current_version" />
         </LinearLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/home_client_state_card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -60,8 +60,8 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:text="@string/home_client_uninstalled" />
-    </android.support.v7.widget.CardView>
-    <android.support.v7.widget.CardView
+    </androidx.cardview.widget.CardView>
+    <androidx.cardview.widget.CardView
         android:id="@+id/home_map_file_card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -78,9 +78,9 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:text="@string/home_map_file" />
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp">
@@ -90,7 +90,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:text="@android:string/unknownName" />
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
     </LinearLayout>
 </ScrollView>
 </LinearLayout>

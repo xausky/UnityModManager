@@ -2,16 +2,13 @@ package io.github.xausky.unitymodmanager.utils;
 
 import android.animation.Animator;
 import android.content.Context;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.animation.FastOutSlowInInterpolator;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.view.ViewCompat;
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
 import android.view.animation.Interpolator;
-
-import io.github.xausky.unitymodmanager.MainApplication;
 
 public class FabBehavior extends CoordinatorLayout.Behavior<View> {
 

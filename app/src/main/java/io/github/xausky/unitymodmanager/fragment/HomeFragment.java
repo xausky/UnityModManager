@@ -1,28 +1,23 @@
 package io.github.xausky.unitymodmanager.fragment;
 
 import android.app.Activity;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.pm.PackageParser;
-import android.content.pm.ShortcutManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.sip.SipRegistrationListener;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.pm.ShortcutInfoCompat;
-import android.support.v4.content.pm.ShortcutManagerCompat;
-import android.support.v4.graphics.drawable.IconCompat;
-import android.support.v7.widget.CardView;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.pm.ShortcutInfoCompat;
+import androidx.core.content.pm.ShortcutManagerCompat;
+import androidx.core.graphics.drawable.IconCompat;
+import androidx.cardview.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,28 +33,18 @@ import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.remote.InstallResult;
 import com.lody.virtual.remote.InstalledAppInfo;
 
-import io.github.xausky.unitymodmanager.MainActivity;
 import io.github.xausky.unitymodmanager.dialog.ConfirmDialog;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
 import java.util.HashSet;
-
-import javax.net.ssl.HttpsURLConnection;
 
 import io.github.xausky.unitymodmanager.MainApplication;
 import io.github.xausky.unitymodmanager.R;
@@ -67,7 +52,6 @@ import io.github.xausky.unitymodmanager.ShortcutActivity;
 import io.github.xausky.unitymodmanager.dialog.ApplicationChooseDialog;
 import io.github.xausky.unitymodmanager.utils.ModUtils;
 import io.github.xausky.unitymodmanager.utils.NativeUtils;
-import ru.bartwell.exfilepicker.utils.Utils;
 
 /**
  * Created by xausky on 18-3-3.
@@ -165,7 +149,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         AllenVersionChecker
                 .getInstance()
                 .requestVersion()
-                .setRequestUrl("http://umms.xausky.cn/releases/api")
+                .setRequestUrl("https://api.github.com/repos/xausky/UnityModManager/releases")
                 .request(new RequestVersionListener() {
                     @Nullable
                     @Override
@@ -191,7 +175,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                                     UIData data = UIData.create();
                                     data.setTitle(getString(R.string.new_version_release, latestVersion));
                                     data.setContent(getString(R.string.update_logs, latestRelease.getString("body")));
-                                    data.setDownloadUrl(String.format("http://umms.xausky.cn/releases/download/%s/app-release.apk", latestVersion));
+                                    data.setDownloadUrl(latestRelease.getJSONArray("assets").getJSONObject(0).getString("browser_download_url"));
                                     return data;
                                 } else {
                                     Drawable check = context.getResources().getDrawable(R.drawable.ic_check_circle);
@@ -478,7 +462,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                         if (modFragment.getEnableItemCount() > 0) {
                             modFragment.setNeedPatch(true);
                         }
-                        if (modFragment.getItemCount() > 0 && !HomeFragment.this.getActivity().isFinishing()) {
+                        if (modFragment.getItemCount() > 0 && !((Activity)confirmDialog.getContext()).isFinishing()) {
                             confirmDialog.show();
                         }
                     }

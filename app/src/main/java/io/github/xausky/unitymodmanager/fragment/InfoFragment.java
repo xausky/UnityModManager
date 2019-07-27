@@ -1,14 +1,13 @@
 package io.github.xausky.unitymodmanager.fragment;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import io.github.xausky.unitymodmanager.R;
 import mehdi.sakout.aboutpage.AboutPage;
-import mehdi.sakout.aboutpage.Element;
 
 /**
  * Created by xausky on 18-3-3.

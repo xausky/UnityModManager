@@ -6,13 +6,13 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.JsonWriter;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,7 +36,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -52,9 +51,7 @@ import io.github.xausky.unitymodmanager.dialog.ModInfoDialog;
 import io.github.xausky.unitymodmanager.dialog.PasswordDialog;
 import io.github.xausky.unitymodmanager.domain.Mod;
 import io.github.xausky.unitymodmanager.utils.ModUtils;
-import io.github.xausky.unitymodmanager.utils.NativeUtils;
 
-import static io.github.xausky.unitymodmanager.utils.NativeUtils.PatchApk;
 import static io.github.xausky.unitymodmanager.utils.NativeUtils.RESULT_STATE_INTERNAL_ERROR;
 
 /**

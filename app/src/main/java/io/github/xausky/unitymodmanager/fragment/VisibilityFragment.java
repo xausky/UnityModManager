@@ -3,22 +3,17 @@ package io.github.xausky.unitymodmanager.fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.lody.virtual.client.core.InstallStrategy;
 import com.lody.virtual.client.core.VirtualCore;
-import com.lody.virtual.remote.InstallResult;
 
-import io.github.xausky.unitymodmanager.MainApplication;
 import io.github.xausky.unitymodmanager.R;
-import io.github.xausky.unitymodmanager.adapter.AttachesAdapter;
 import io.github.xausky.unitymodmanager.adapter.VisibilityAdapter;
 import io.github.xausky.unitymodmanager.dialog.ApplicationChooseDialog;
 
