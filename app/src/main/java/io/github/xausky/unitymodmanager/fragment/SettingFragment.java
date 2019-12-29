@@ -58,7 +58,7 @@ public class SettingFragment extends PreferenceFragment implements SharedPrefere
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
         if(preference.getKey().equals("setting_export_apk")){
             HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home, this.getActivity().getApplication());
-            if(homeFragment.apkModifyModel == HomeFragment.APK_MODIFY_MODEL_NONE){
+            if(homeFragment.apkModifyModel == HomeFragment.APK_MODIFY_MODEL_NONE || homeFragment.apkModifyModel == HomeFragment.APK_MODIFY_MODEL_HOOK){
                 Toast.makeText(this.getActivity(), R.string.none_modify_export, Toast.LENGTH_LONG).show();
                 return super.onPreferenceTreeClick(preferenceScreen, preference);
             }

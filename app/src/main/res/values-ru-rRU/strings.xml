@@ -95,11 +95,13 @@
         <item>Без модификации</item>
         <item>VirtualApp</item>
         <item>Root права (осторожно)</item>
+     <item>Hook Model</item>
     </string-array>
     <string-array name="apk_modify_model_values">
         <item>0</item>
         <item>1</item>
         <item>2</item>
+     <item>3</item>
     </string-array>
     <string name="obb_support_title">Поддержка патча OBB файла</string>
     <string name="obb_support_summary">Поддержка патча OBB файла для Honkai Impact 3 JP SEA и global серверов.</string>

@@ -95,11 +95,13 @@
         <item>변경 없음</item>
         <item>가상어플 방식</item>
         <item>루트 권한 방식 (주의)</item>
+        <item>Hook Model</item>
     </string-array>
     <string-array name="apk_modify_model_values">
         <item>0</item>
         <item>1</item>
         <item>2</item>
+        <item>3</item>
     </string-array>
     <string name="obb_support_title">안드로이드 OBB 리소스 파일 패치 지원</string>
     <string name="obb_support_summary">안드로이드 OBB 리소스 파일 패치 지원 기능. 붕괴3 일본서버, 동남아시아 서버, 혹은 글로벌 서버를 위한 기능입니다.</string>

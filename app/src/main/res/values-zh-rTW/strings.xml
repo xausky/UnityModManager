@@ -95,11 +95,13 @@
         <item>不修改</item>
         <item>虛擬環境模式</item>
         <item>Root權限模式(慎用)</item>
+        <item>Hook模式</item>
     </string-array>
     <string-array name="apk_modify_model_values">
         <item>0</item>
         <item>1</item>
         <item>2</item>
+        <item>3</item>
     </string-array>
     <string name="obb_support_title">安卓OBB資源文件補丁支持</string>
     <string name="obb_support_summary">安卓OBB資源文件補丁支持，比如《崩壞3》的日服，東南亞服，全球服。</string>

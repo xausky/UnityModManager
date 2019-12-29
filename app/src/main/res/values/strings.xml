@@ -96,11 +96,13 @@
         <item>No Modification</item>
         <item>VirtualApp Model</item>
         <item>Root Privilege Mode (Proceed with caution)</item>
+        <item>Hook Model</item>
     </string-array>
     <string-array name="apk_modify_model_values">
         <item>0</item>
         <item>1</item>
         <item>2</item>
+        <item>3</item>
     </string-array>
     <string name="obb_support_title">Android OBB patch resource file support</string>
     <string name="obb_support_summary">ONLY toggle on if your app supports OBB file patching, such as \"Honkai Impact 3\" JP server, SEA server and global server.</string>

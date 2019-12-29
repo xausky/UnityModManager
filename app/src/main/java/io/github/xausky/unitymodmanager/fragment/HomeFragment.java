@@ -66,6 +66,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     public static final int APK_MODIFY_MODEL_NONE = 0;
     public static final int APK_MODIFY_MODEL_VIRTUAL = 1;
     public static final int APK_MODIFY_MODEL_ROOT = 2;
+    public static final int APK_MODIFY_MODEL_HOOK = 3;
     public String packageName;
     public String apkPath;
     public String baseApkPath;
@@ -314,7 +315,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     private void clientUpdate() {
         String versionName = null;
         int versionCode = 0;
-        if (apkModifyModel == APK_MODIFY_MODEL_ROOT || apkModifyModel == APK_MODIFY_MODEL_NONE) {
+        if (apkModifyModel == APK_MODIFY_MODEL_ROOT || apkModifyModel == APK_MODIFY_MODEL_NONE || apkModifyModel == APK_MODIFY_MODEL_HOOK) {
             try {
                 versionName = context.getPackageManager().getPackageInfo(packageName, 0).versionName;
                 versionCode = context.getPackageManager().getPackageInfo(packageName, 0).versionCode;
@@ -414,7 +415,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 final String resultString;
                 String result = getString(R.string.install_failed);
                 int versionCode = 0;
-                if (apkModifyModel == APK_MODIFY_MODEL_ROOT || apkModifyModel == APK_MODIFY_MODEL_NONE) {
+                if (apkModifyModel == APK_MODIFY_MODEL_ROOT || apkModifyModel == APK_MODIFY_MODEL_NONE || apkModifyModel == APK_MODIFY_MODEL_HOOK) {
                     try {
                         String basePath = HomeFragment.this.context.getFilesDir().getAbsolutePath() + "/base.apk";
                         if (apkModifyModel == APK_MODIFY_MODEL_ROOT) {

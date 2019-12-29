@@ -96,11 +96,13 @@
         <item>No Modify</item>
         <item>VirtualApp Model</item>
         <item>Root Privilege Model (Caution)</item>
+        <item>Hook Model</item>
     </string-array>
     <string-array name="apk_modify_model_values">
         <item>0</item>
         <item>1</item>
         <item>2</item>
+        <item>3</item>
     </string-array>
     <string name="obb_support_title">Android OBB resource file patch support</string>
     <string name="obb_support_summary">Android OBB resource file patch support, such as \"Honkai Impact 3\" JP service, SEA service, global service.</string>

@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void launch(){
-        if(homeFragment.apkModifyModel != HomeFragment.APK_MODIFY_MODEL_NONE && (homeFragment.apkPath == null || homeFragment.baseApkPath == null || !new File(homeFragment.baseApkPath).exists())){
+        if(homeFragment.apkModifyModel != HomeFragment.APK_MODIFY_MODEL_NONE && homeFragment.apkModifyModel != HomeFragment.APK_MODIFY_MODEL_HOOK && (homeFragment.apkPath == null || homeFragment.baseApkPath == null || !new File(homeFragment.baseApkPath).exists())){
             Toast.makeText(this, R.string.install_source_not_found, Toast.LENGTH_LONG).show();
         } else {
             if(homeFragment.apkModifyModel == HomeFragment.APK_MODIFY_MODEL_NONE && homeFragment.obbSupport){

@@ -2,18 +2,14 @@ apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 apply plugin: 'com.google.firebase.firebase-perf'
 
-repositories {
-
-}
-
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "io.github.xausky.unitymodmanager"
+        applicationId "cn.xausky.umm"
         minSdkVersion 21
         targetSdkVersion 23
-        versionCode 330
-        versionName "3.3.0"
+        versionCode 400
+        versionName "4.0.0"
         ndk{
             abiFilters "armeabi-v7a","x86"
         }

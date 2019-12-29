@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:sharedUserId="cn.xausky.xmm"
     package="io.github.xausky.unitymodmanager">
     <uses-sdk tools:overrideLibrary="com.lody.virtual"/>
     <uses-permission android:name="android.permission.INTERNET" />

@@ -8,6 +8,35 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:999756837706:android:d0c619615d8f02fe4587b3",
+        "android_client_info": {
+          "package_name": "cn.xausky.umm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "999756837706-t3gfo4q8adrfknhqm52gmbu7jbnneb3h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDL7ySG-vDz4_iXaDcRC6SaeJk6rdREucc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "999756837706-t3gfo4q8adrfknhqm52gmbu7jbnneb3h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:999756837706:android:21dd3da8337e5843",
         "android_client_info": {
           "package_name": "io.github.xausky.unitymodmanager"

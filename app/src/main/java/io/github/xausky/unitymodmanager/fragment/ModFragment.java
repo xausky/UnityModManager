@@ -241,7 +241,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
         });
     }
 
-    public int patch(String apkPath, String baseApkPath, String persistentPath, String obbPath, String baseObbPath, String backupPath,  int apkModifyModel, boolean persistentSupport, boolean obbSupport){
+    public int patch(String apkPath, String baseApkPath, String persistentPath, String obbPath, String baseObbPath, String backupPath, int apkModifyModel, boolean persistentSupport, boolean obbSupport){
         if(apkModifyModel == HomeFragment.APK_MODIFY_MODEL_ROOT){
             if(!Shell.rootAccess()){
                 return ModUtils.RESULT_STATE_ROOT_ERROR;
@@ -252,7 +252,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
         try {
             Log.d(MainApplication.LOG_TAG, "patch: apkPath=" + apkPath + ", baseApkPath=" + baseApkPath + ", apkModifyModel=" + apkModifyModel);
             List<Mod> mods = adapter.getMods();
-            File fusionFile = new File(getBase().getCacheDir().getAbsolutePath() + "/fusion");
+            File fusionFile = new File(getBase().getFilesDir().getAbsolutePath() + "/fusion");
             try {
                 FileUtils.deleteDirectory(fusionFile);
             } catch (IOException e) {
@@ -300,7 +300,7 @@ public class ModFragment extends BaseFragment implements ModsAdapter.OnDataChang
                     e.printStackTrace();
                 }
             }
-            if(apkModifyModel != HomeFragment.APK_MODIFY_MODEL_NONE){
+            if(apkModifyModel == HomeFragment.APK_MODIFY_MODEL_VIRTUAL || apkModifyModel == HomeFragment.APK_MODIFY_MODEL_ROOT){
                 int result = NativeUtils.PatchApk(baseApkPath, apkPath, fusionFile.getAbsolutePath());
                 if(result != NativeUtils.RESULT_STATE_OK){
                     Log.d(MainApplication.LOG_TAG, "Patch APK File Failed: " + result + ",apkPath:" + apkPath + ",baseApkPath:" + baseApkPath);
