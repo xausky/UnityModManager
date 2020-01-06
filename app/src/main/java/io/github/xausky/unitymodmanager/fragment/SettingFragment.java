@@ -1,6 +1,9 @@
 package io.github.xausky.unitymodmanager.fragment;
 
 import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -9,6 +12,8 @@ import android.os.Environment;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
+import android.util.Base64;
+import android.util.Log;
 import androidx.annotation.Nullable;
 
 import android.view.LayoutInflater;
@@ -20,6 +25,7 @@ import com.lody.virtual.client.NativeEngine;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.stub.VASettings;
 
+import com.topjohnwu.superuser.Shell;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -27,6 +33,7 @@ import java.io.IOException;
 
 import io.github.xausky.unitymodmanager.R;
 import io.github.xausky.unitymodmanager.utils.ModUtils;
+import org.apache.commons.io.IOUtils;
 
 import static io.github.xausky.unitymodmanager.utils.ModUtils.RESULT_STATE_INTERNAL_ERROR;
 
@@ -77,6 +84,33 @@ public class SettingFragment extends PreferenceFragment implements SharedPrefere
                 Toast.makeText(this.getActivity(), R.string.install_source_not_found, Toast.LENGTH_LONG).show();
             } else {
                 homeFragment.crateShortcut(VirtualCore.get().getInstalledAppInfo(homeFragment.packageName,0));
+            }
+        } else if(preference.getKey().equals("copy_login_info")){
+            try {
+                HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home, this.getActivity().getApplication());
+                if (homeFragment.packageName.startsWith("com.kuro")){
+                    String loginFile = "/data/data/" + homeFragment.packageName + "/database/zz_sdk_db";
+                    Shell.su("setenforce 0", "chmod 666 " + loginFile).exec();
+                    ClipboardManager cm = (ClipboardManager) this.getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData mClipData = ClipData.newPlainText("XMMLogin", Base64.encodeToString(FileUtils.readFileToByteArray(new File(loginFile)), Base64.DEFAULT));
+                    cm.setPrimaryClip(mClipData);
+                    Shell.su("chmod 644 " + loginFile, "setenforce 0").exec();
+                }
+            } catch (Exception e){
+                Log.w("UMM","Copy Login Failed.", e);
+            }
+        } else if(preference.getKey().equals("import_login_info")){
+            try{
+                HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home, this.getActivity().getApplication());
+                if (homeFragment.packageName.startsWith("com.kuro")){
+                    String loginFile = this.getActivity().getFilesDir().getAbsolutePath() + "/zsxmm.login";
+                    ClipboardManager cm = (ClipboardManager) this.getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                    if(cm.getPrimaryClip() != null){
+                        FileUtils.writeByteArrayToFile(new File(loginFile), Base64.decode(cm.getPrimaryClip().getItemAt(0).getText().toString(), Base64.DEFAULT));
+                    }
+                }
+            } catch (Exception e){
+                Log.w("UMM", "Import Login Failed.",e);
             }
         }
         return super.onPreferenceTreeClick(preferenceScreen, preference);

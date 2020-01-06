@@ -117,4 +117,8 @@
     <string name="not_available_non_virtual">非虚拟模式下功能不可用</string>
     <string name="nav_online_mods">在线模组</string>
     <string name="install_client_remove_all_mod_confirm">检测到的原客户端的旧模组是否删除？</string>
+    <string name="copy_login_info_title">复制登录信息</string>
+    <string name="copy_login_info_summary">复制登录信息到剪切板以便于导入其他设备，需要Root权限。</string>
+    <string name="import_login_info_title">导入登录信息</string>
+    <string name="import_login_info_summary">将剪切板里的登录信息导入本设备。</string>
 </resources>

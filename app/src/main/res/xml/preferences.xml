@@ -30,5 +30,12 @@
         android:key="create_shortcut"
         android:title="@string/create_shortcut_title"
         android:summary="@string/create_shortcut_summary" />
-
+    <Preference
+            android:key="copy_login_info"
+            android:title="@string/copy_login_info_title"
+            android:summary="@string/copy_login_info_summary" />
+    <Preference
+            android:key="import_login_info"
+            android:title="@string/import_login_info_title"
+            android:summary="@string/import_login_info_summary" />
 </PreferenceScreen>
