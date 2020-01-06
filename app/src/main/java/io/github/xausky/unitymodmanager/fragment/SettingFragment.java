@@ -30,8 +30,10 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.zip.GZIPInputStream;
 
 import io.github.xausky.unitymodmanager.R;
+import io.github.xausky.unitymodmanager.utils.CompressUtil;
 import io.github.xausky.unitymodmanager.utils.ModUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -88,29 +90,39 @@ public class SettingFragment extends PreferenceFragment implements SharedPrefere
         } else if(preference.getKey().equals("copy_login_info")){
             try {
                 HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home, this.getActivity().getApplication());
-                if (homeFragment.packageName.startsWith("com.kuro")){
-                    String loginFile = "/data/data/" + homeFragment.packageName + "/database/zz_sdk_db";
+                if (homeFragment.packageName.startsWith("com.kurogame")){
+                    String loginFile = "/data/data/" + homeFragment.packageName + "/databases/zz_sdk_db";
                     Shell.su("setenforce 0", "chmod 666 " + loginFile).exec();
                     ClipboardManager cm = (ClipboardManager) this.getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-                    ClipData mClipData = ClipData.newPlainText("XMMLogin", Base64.encodeToString(FileUtils.readFileToByteArray(new File(loginFile)), Base64.DEFAULT));
+                    ClipData mClipData = ClipData.newPlainText("XMMLogin", Base64.encodeToString(CompressUtil.compress(FileUtils.readFileToByteArray(new File(loginFile))), Base64.DEFAULT));
                     cm.setPrimaryClip(mClipData);
                     Shell.su("chmod 644 " + loginFile, "setenforce 0").exec();
+                    Toast.makeText(this.getActivity(), R.string.copy_login_success, Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this.getActivity(), R.string.copy_login_failed_unsupported, Toast.LENGTH_LONG).show();
                 }
             } catch (Exception e){
                 Log.w("UMM","Copy Login Failed.", e);
+                Toast.makeText(this.getActivity(), R.string.copy_login_failed, Toast.LENGTH_LONG).show();
             }
         } else if(preference.getKey().equals("import_login_info")){
             try{
                 HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home, this.getActivity().getApplication());
-                if (homeFragment.packageName.startsWith("com.kuro")){
-                    String loginFile = this.getActivity().getFilesDir().getAbsolutePath() + "/zsxmm.login";
+                if (homeFragment.packageName.startsWith("com.kurogame")){
+                    String loginFile = this.getActivity().getFilesDir().getAbsolutePath() + "/com.kurogame.login";
                     ClipboardManager cm = (ClipboardManager) this.getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
                     if(cm.getPrimaryClip() != null){
-                        FileUtils.writeByteArrayToFile(new File(loginFile), Base64.decode(cm.getPrimaryClip().getItemAt(0).getText().toString(), Base64.DEFAULT));
+                        FileUtils.writeByteArrayToFile(new File(loginFile), CompressUtil.decompress(Base64.decode(cm.getPrimaryClip().getItemAt(0).getText().toString(), Base64.DEFAULT)));
+                    } else {
+                        Toast.makeText(this.getActivity(), R.string.import_login_failed_empty, Toast.LENGTH_LONG).show();
                     }
+                    Toast.makeText(this.getActivity(), R.string.import_login_success, Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this.getActivity(), R.string.import_login_failed_unsupported, Toast.LENGTH_LONG).show();
                 }
             } catch (Exception e){
                 Log.w("UMM", "Import Login Failed.",e);
+                Toast.makeText(this.getActivity(), R.string.import_login_failed, Toast.LENGTH_LONG).show();
             }
         }
         return super.onPreferenceTreeClick(preferenceScreen, preference);

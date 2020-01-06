@@ -121,4 +121,11 @@
     <string name="copy_login_info_summary">Copy login information to clipboard to import other devices. Root permission is required.</string>
     <string name="import_login_info_title">Import Login Information</string>
     <string name="import_login_info_summary">Import the login information from the clipboard into the device.</string>
+    <string name="copy_login_success">Copying login information succeeded!</string>
+    <string name="copy_login_failed_unsupported">Copying login information failed, unsupported game!</string>
+    <string name="copy_login_failed">Failed to copy login information, make sure Root permissions and game are logged in!</string>
+    <string name="import_login_failed_empty">Failed to import login information, it seems that there is no login information in Clipboard!</string>
+    <string name="import_login_success">Importing login information succeeded!</string>
+    <string name="import_login_failed_unsupported">Failed to import login information, unsupported games!</string>
+    <string name="import_login_failed">Failed to import login information!</string>
 </resources>

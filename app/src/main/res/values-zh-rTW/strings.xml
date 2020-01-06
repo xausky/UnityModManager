@@ -121,4 +121,11 @@
     <string name="copy_login_info_summary">复制登录信息到剪切板以便于导入其他设备，需要Root权限。</string>
     <string name="import_login_info_title">导入登录信息</string>
     <string name="import_login_info_summary">将剪切板里的登录信息导入本设备。</string>
+    <string name="copy_login_success">复制登录信息成功！</string>
+    <string name="copy_login_failed_unsupported">复制登录信息失败，不支持的游戏！</string>
+    <string name="copy_login_failed">复制登录信息失败，确保Root权限和游戏已经登录！</string>
+    <string name="import_login_failed_empty">导入登录信息失败，好像剪切板没有登录信息哦！</string>
+    <string name="import_login_success">导入登录信息成功！</string>
+    <string name="import_login_failed_unsupported">导入登录信息失败，不支持的游戏！</string>
+    <string name="import_login_failed">导入登录信息失败！</string>
 </resources>
