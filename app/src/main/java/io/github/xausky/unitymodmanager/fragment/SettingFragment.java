@@ -5,6 +5,8 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -94,7 +96,7 @@ public class SettingFragment extends PreferenceFragment implements SharedPrefere
                     String loginFile = "/data/data/" + homeFragment.packageName + "/databases/zz_sdk_db";
                     Shell.su("setenforce 0", "chmod 666 " + loginFile).exec();
                     ClipboardManager cm = (ClipboardManager) this.getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-                    ClipData mClipData = ClipData.newPlainText("XMMLogin", Base64.encodeToString(CompressUtil.compress(FileUtils.readFileToByteArray(new File(loginFile))), Base64.DEFAULT));
+                    ClipData mClipData = ClipData.newPlainText("XMMLogin", Base64.encodeToString(CompressUtil.backupKuroGame(loginFile), Base64.DEFAULT));
                     cm.setPrimaryClip(mClipData);
                     Shell.su("chmod 644 " + loginFile, "setenforce 0").exec();
                     Toast.makeText(this.getActivity(), R.string.copy_login_success, Toast.LENGTH_LONG).show();
@@ -109,13 +111,15 @@ public class SettingFragment extends PreferenceFragment implements SharedPrefere
             try{
                 HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home, this.getActivity().getApplication());
                 if (homeFragment.packageName.startsWith("com.kurogame")){
-                    String loginFile = this.getActivity().getFilesDir().getAbsolutePath() + "/com.kurogame.login";
+                    String loginFile = "/data/data/" + homeFragment.packageName + "/databases/zz_sdk_db";
+                    Shell.su("setenforce 0", "chmod 666 " + loginFile).exec();
                     ClipboardManager cm = (ClipboardManager) this.getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
                     if(cm.getPrimaryClip() != null){
-                        FileUtils.writeByteArrayToFile(new File(loginFile), CompressUtil.decompress(Base64.decode(cm.getPrimaryClip().getItemAt(0).getText().toString(), Base64.DEFAULT)));
+                        CompressUtil.restoreKuroGame(loginFile, Base64.decode(cm.getPrimaryClip().getItemAt(0).getText().toString(), Base64.DEFAULT));
                     } else {
                         Toast.makeText(this.getActivity(), R.string.import_login_failed_empty, Toast.LENGTH_LONG).show();
                     }
+                    Shell.su("chmod 644 " + loginFile, "setenforce 0").exec();
                     Toast.makeText(this.getActivity(), R.string.import_login_success, Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(this.getActivity(), R.string.import_login_failed_unsupported, Toast.LENGTH_LONG).show();

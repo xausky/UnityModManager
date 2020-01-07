@@ -14,17 +14,20 @@ android {
             abiFilters "armeabi-v7a","x86"
         }
     }
+
+
+
     externalNativeBuild {
         ndkBuild {
             path file("src/main/cpp/Android.mk")
         }
-    }
+    }pnp
     signingConfigs {
         releaseConfig {
             storeFile file("../xausky.jks")
-            storePassword project.hasProperty("KEYSTORE_PASS") ? KEYSTORE_PASS : System.getenv("KEYSTORE_PASS")
-            keyAlias project.hasProperty("ALIAS_NAME") ? ALIAS_NAME : System.getenv("ALIAS_NAME")
-            keyPassword project.hasProperty("ALIAS_PASS") ? ALIAS_PASS : System.getenv("ALIAS_PASS")
+            storePassword 'a7523003'
+            keyAlias = 'default'
+            keyPassword 'a7523003'
         }
     }
     buildTypes {
@@ -32,7 +35,9 @@ android {
             signingConfig signingConfigs.releaseConfig
         }
         debug {
+            debuggable true
             jniDebuggable true
+            signingConfig signingConfigs.releaseConfig
         }
     }
     lintOptions {

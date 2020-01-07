@@ -1,8 +1,16 @@
 package io.github.xausky.unitymodmanager.utils;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.Inflater;
@@ -65,5 +73,33 @@ public class CompressUtil {
 
         decompresser.end();
         return output;
+    }
+
+    public static byte[] backupKuroGame(String file) {
+        StringBuilder builder = new StringBuilder();
+        try (SQLiteDatabase db = SQLiteDatabase.openDatabase(file, null, SQLiteDatabase.OPEN_READONLY);
+             Cursor cursor = db.rawQuery("SELECT user_id,login_id,login_name,password,auto_login,last_login_time,login_type,local_login_count,user_type FROM sdkuser;", null)) {
+            while (cursor.moveToNext()) {
+                for (int i = 0; i < cursor.getColumnCount(); i++) {
+                    builder.append(cursor.getString(i));
+                    if(i + 1 < cursor.getColumnCount()){
+                        builder.append(',');
+                    }
+                }
+                while (!cursor.isLast()){
+                    builder.append('\n');
+                }
+            }
+        }
+        return builder.toString().getBytes();
+    }
+
+    public static void restoreKuroGame(String file, byte[] data) {
+        String accounts = new String(data);
+        try (SQLiteDatabase db = SQLiteDatabase.openDatabase(file, null, SQLiteDatabase.OPEN_READWRITE)) {
+            for (String account : accounts.split("\n")){
+                db.execSQL("INSERT INTO sdkuser(user_id,login_id,login_name,password,auto_login,last_login_time,login_type,local_login_count,user_type) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", account.split(","));
+            }
+        }
     }
 }
