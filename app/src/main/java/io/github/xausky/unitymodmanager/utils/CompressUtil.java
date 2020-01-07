@@ -3,6 +3,13 @@ package io.github.xausky.unitymodmanager.utils;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.topjohnwu.superuser.Shell;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +18,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.Inflater;
@@ -75,31 +83,76 @@ public class CompressUtil {
         return output;
     }
 
-    public static byte[] backupKuroGame(String file) {
-        StringBuilder builder = new StringBuilder();
-        try (SQLiteDatabase db = SQLiteDatabase.openDatabase(file, null, SQLiteDatabase.OPEN_READONLY);
-             Cursor cursor = db.rawQuery("SELECT user_id,login_id,login_name,password,auto_login,last_login_time,login_type,local_login_count,user_type FROM sdkuser;", null)) {
-            while (cursor.moveToNext()) {
-                for (int i = 0; i < cursor.getColumnCount(); i++) {
-                    builder.append(cursor.getString(i));
-                    if(i + 1 < cursor.getColumnCount()){
-                        builder.append(',');
+    public static byte[] backupKuroGame(String packageName) {
+        String accountsDatabaseFile = "/data/data/" + packageName + "/databases/zz_sdk_db";
+        String deviceIdFile = "/data/data/" + packageName + "/shared_prefs/devicesyn.xml";
+        try {
+            unprotectFilesWithRoot(accountsDatabaseFile, deviceIdFile);
+            JSONObject root = new JSONObject();
+            StringBuilder builder = new StringBuilder();
+            try (SQLiteDatabase db = SQLiteDatabase.openDatabase(accountsDatabaseFile, null, SQLiteDatabase.OPEN_READONLY);
+                 Cursor cursor = db.rawQuery("SELECT user_id,login_id,login_name,password,auto_login,last_login_time,login_type,local_login_count,user_type FROM sdkuser;", null)) {
+                while (cursor.moveToNext()) {
+                    for (int i = 0; i < cursor.getColumnCount(); i++) {
+                        builder.append(cursor.getString(i));
+                        if (i + 1 < cursor.getColumnCount()) {
+                            builder.append(',');
+                        }
+                    }
+                    if (!cursor.isLast()) {
+                        builder.append('\n');
                     }
                 }
-                while (!cursor.isLast()){
-                    builder.append('\n');
-                }
             }
+            root.put("accounts", builder.toString());
+            root.put("device", FileUtils.readFileToString(new File(deviceIdFile)));
+            return root.toString().getBytes();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            protectFilesWithRoot(accountsDatabaseFile, deviceIdFile);
         }
-        return builder.toString().getBytes();
     }
 
-    public static void restoreKuroGame(String file, byte[] data) {
-        String accounts = new String(data);
-        try (SQLiteDatabase db = SQLiteDatabase.openDatabase(file, null, SQLiteDatabase.OPEN_READWRITE)) {
-            for (String account : accounts.split("\n")){
-                db.execSQL("INSERT INTO sdkuser(user_id,login_id,login_name,password,auto_login,last_login_time,login_type,local_login_count,user_type) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", account.split(","));
+    public static void restoreKuroGame(String packageName, byte[] data) {
+        String accountsDatabaseFile = "/data/data/" + packageName + "/databases/zz_sdk_db";
+        String deviceIdFile = "/data/data/" + packageName + "/shared_prefs/devicesyn.xml";
+        try {
+            unprotectFilesWithRoot(accountsDatabaseFile, deviceIdFile);
+            JSONObject root = new JSONObject(new String(data));
+            String accounts = root.getString("accounts");
+            try (SQLiteDatabase db = SQLiteDatabase.openDatabase(accountsDatabaseFile, null, SQLiteDatabase.OPEN_READWRITE)) {
+                for (String account : accounts.split("\n")){
+                    db.execSQL("INSERT INTO sdkuser(user_id,login_id,login_name,password,auto_login,last_login_time,login_type,local_login_count,user_type) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", account.split(","));
+                }
+            }
+            FileUtils.writeStringToFile(new File(deviceIdFile), root.getString("device"));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            protectFilesWithRoot(accountsDatabaseFile, deviceIdFile);
+        }
+    }
+
+    public static void unprotectFilesWithRoot(String ...files){
+        StringBuilder builder = new StringBuilder();
+        for (int i = 1; i <= files.length; i++){
+            builder.append(files[i - 1]);
+            if (i < files.length){
+                builder.append(" ");
             }
         }
+        Shell.su("setenforce 0", "chmod 666 " + builder.toString()).exec();
+    }
+
+    public static void protectFilesWithRoot(String ...files){
+        StringBuilder builder = new StringBuilder();
+        for (int i = 1; i <= files.length; i++){
+            builder.append(files[i - 1]);
+            if (i < files.length){
+                builder.append(" ");
+            }
+        }
+        Shell.su("setenforce 1", "chmod 644 " + builder.toString()).exec();
     }
 }

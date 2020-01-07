@@ -14,14 +14,11 @@ android {
             abiFilters "armeabi-v7a","x86"
         }
     }
-
-
-
     externalNativeBuild {
         ndkBuild {
             path file("src/main/cpp/Android.mk")
         }
-    }pnp
+    }
     signingConfigs {
         releaseConfig {
             storeFile file("../xausky.jks")
