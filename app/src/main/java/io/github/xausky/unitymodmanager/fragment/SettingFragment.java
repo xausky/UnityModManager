@@ -5,8 +5,6 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,18 +25,16 @@ import com.lody.virtual.client.NativeEngine;
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.stub.VASettings;
 
-import com.topjohnwu.superuser.Shell;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.zip.GZIPInputStream;
 
 import io.github.xausky.unitymodmanager.R;
-import io.github.xausky.unitymodmanager.utils.CompressUtil;
+import io.github.xausky.unitymodmanager.utils.BackupUtil;
 import io.github.xausky.unitymodmanager.utils.ModUtils;
-import org.apache.commons.io.IOUtils;
 
+import static android.content.Context.CONTEXT_IGNORE_SECURITY;
 import static io.github.xausky.unitymodmanager.utils.ModUtils.RESULT_STATE_INTERNAL_ERROR;
 
 /**
@@ -94,7 +90,8 @@ public class SettingFragment extends PreferenceFragment implements SharedPrefere
                 HomeFragment homeFragment = (HomeFragment) BaseFragment.fragment(R.id.nav_home, this.getActivity().getApplication());
                 if (homeFragment.packageName.startsWith("com.kurogame")){
                     ClipboardManager cm = (ClipboardManager) this.getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-                    ClipData mClipData = ClipData.newPlainText("XMMLogin", Base64.encodeToString(CompressUtil.backupKuroGame(homeFragment.packageName), Base64.DEFAULT));
+                    Context targetContext = this.getActivity().createPackageContext(homeFragment.packageName, CONTEXT_IGNORE_SECURITY);
+                    ClipData mClipData = ClipData.newPlainText("XMMLogin", Base64.encodeToString(BackupUtil.backupKuroGame(targetContext), Base64.DEFAULT));
                     cm.setPrimaryClip(mClipData);
                     Toast.makeText(this.getActivity(), R.string.copy_login_success, Toast.LENGTH_LONG).show();
                 } else {
@@ -110,7 +107,8 @@ public class SettingFragment extends PreferenceFragment implements SharedPrefere
                 if (homeFragment.packageName.startsWith("com.kurogame")){
                     ClipboardManager cm = (ClipboardManager) this.getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
                     if(cm.getPrimaryClip() != null){
-                        CompressUtil.restoreKuroGame(homeFragment.packageName, Base64.decode(cm.getPrimaryClip().getItemAt(0).getText().toString(), Base64.DEFAULT));
+                        Context targetContext = this.getActivity().createPackageContext(homeFragment.packageName, CONTEXT_IGNORE_SECURITY);
+                        BackupUtil.restoreKuroGame(targetContext, Base64.decode(cm.getPrimaryClip().getItemAt(0).getText().toString(), Base64.DEFAULT));
                         Toast.makeText(this.getActivity(), R.string.import_login_success, Toast.LENGTH_LONG).show();
                     } else {
                         Toast.makeText(this.getActivity(), R.string.import_login_failed_empty, Toast.LENGTH_LONG).show();

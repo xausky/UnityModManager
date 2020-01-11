@@ -1,91 +1,26 @@
 package io.github.xausky.unitymodmanager.utils;
 
+import android.app.backup.SharedPreferencesBackupHelper;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.google.android.gms.common.util.SharedPreferencesUtils;
 import com.topjohnwu.superuser.Shell;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringJoiner;
-import java.util.zip.Deflater;
-import java.util.zip.DeflaterOutputStream;
-import java.util.zip.Inflater;
 
-public class CompressUtil {
-    public static byte[] compress(byte[] data) {
-        byte[] output = new byte[0];
-        Deflater compresser = new Deflater();
-        compresser.reset();
-        compresser.setInput(data);
-        compresser.finish();
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(data.length);
-        try {
-            byte[] buf = new byte[1024];
-            while (!compresser.finished()) {
-                int i = compresser.deflate(buf);
-                bos.write(buf, 0, i);
-            }
-            output = bos.toByteArray();
-        } catch (Exception e) {
-            output = data;
-            e.printStackTrace();
-        } finally {
-            try {
-                bos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        compresser.end();
-        return output;
-    }
+import static android.content.Context.MODE_PRIVATE;
 
-    //解压缩 字节数组
-    public static byte[] decompress(byte[] data) {
-        byte[] output = new byte[0];
+public class BackupUtil {
 
-        Inflater decompresser = new Inflater();
-        decompresser.reset();
-        decompresser.setInput(data);
-
-        ByteArrayOutputStream o = new ByteArrayOutputStream(data.length);
-        try {
-            byte[] buf = new byte[1024];
-            while (!decompresser.finished()) {
-                int i = decompresser.inflate(buf);
-                o.write(buf, 0, i);
-            }
-            output = o.toByteArray();
-        } catch (Exception e) {
-            output = data;
-            e.printStackTrace();
-        } finally {
-            try {
-                o.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        decompresser.end();
-        return output;
-    }
-
-    public static byte[] backupKuroGame(String packageName) {
-        String accountsDatabaseFile = "/data/data/" + packageName + "/databases/zz_sdk_db";
-        String deviceIdFile = "/data/data/" + packageName + "/shared_prefs/devicesyn.xml";
+    public static byte[] backupKuroGame(Context context) {
+        String accountsDatabaseFile = context.getDatabasePath("zz_sdk_db").getAbsolutePath();
+        String deviceIdFile = context.getFilesDir().getAbsolutePath() + "/shared_prefs/devicesyn.xml";
         try {
             unprotectFilesWithRoot(accountsDatabaseFile, deviceIdFile);
             JSONObject root = new JSONObject();
@@ -105,7 +40,9 @@ public class CompressUtil {
                 }
             }
             root.put("accounts", builder.toString());
-            root.put("device", FileUtils.readFileToString(new File(deviceIdFile)));
+            SharedPreferences sharedPreferences = context.getSharedPreferences("devicesyn", MODE_PRIVATE);
+            String deviceId = sharedPreferences.getString("device_id", null);
+            root.put("device_id", deviceId);
             return root.toString().getBytes();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -114,9 +51,9 @@ public class CompressUtil {
         }
     }
 
-    public static void restoreKuroGame(String packageName, byte[] data) {
-        String accountsDatabaseFile = "/data/data/" + packageName + "/databases/zz_sdk_db";
-        String deviceIdFile = "/data/data/" + packageName + "/shared_prefs/devicesyn.xml";
+    public static void restoreKuroGame(Context context, byte[] data) {
+        String accountsDatabaseFile = context.getDatabasePath("zz_sdk_db").getAbsolutePath();
+        String deviceIdFile = context.getFilesDir().getAbsolutePath() + "/shared_prefs/devicesyn.xml";
         try {
             unprotectFilesWithRoot(accountsDatabaseFile, deviceIdFile);
             JSONObject root = new JSONObject(new String(data));
@@ -126,7 +63,8 @@ public class CompressUtil {
                     db.execSQL("INSERT INTO sdkuser(user_id,login_id,login_name,password,auto_login,last_login_time,login_type,local_login_count,user_type) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", account.split(","));
                 }
             }
-            FileUtils.writeStringToFile(new File(deviceIdFile), root.getString("device"));
+            SharedPreferences sharedPreferences = context.getSharedPreferences("devicesyn", MODE_PRIVATE);
+            sharedPreferences.edit().putString("fake_device_id", root.getString("device_id")).commit();
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -134,7 +72,7 @@ public class CompressUtil {
         }
     }
 
-    public static void unprotectFilesWithRoot(String ...files){
+    private static void unprotectFilesWithRoot(String ...files){
         StringBuilder builder = new StringBuilder();
         for (int i = 1; i <= files.length; i++){
             builder.append(files[i - 1]);
@@ -145,7 +83,7 @@ public class CompressUtil {
         Shell.su("setenforce 0", "chmod 666 " + builder.toString()).exec();
     }
 
-    public static void protectFilesWithRoot(String ...files){
+    private static void protectFilesWithRoot(String ...files){
         StringBuilder builder = new StringBuilder();
         for (int i = 1; i <= files.length; i++){
             builder.append(files[i - 1]);
