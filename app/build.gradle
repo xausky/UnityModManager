@@ -8,8 +8,8 @@ android {
         applicationId "cn.xausky.umm"
         minSdkVersion 21
         targetSdkVersion 23
-        versionCode 400
-        versionName "4.0.0"
+        versionCode 410
+        versionName "4.1.0"
         ndk{
             abiFilters "armeabi-v7a","x86"
         }
