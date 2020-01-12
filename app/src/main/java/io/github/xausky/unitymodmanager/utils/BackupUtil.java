@@ -17,7 +17,7 @@ public class BackupUtil {
         String accountsDatabaseFile = context.getDatabasePath("zz_sdk_db").getAbsolutePath();
         String deviceIdFile = context.getFilesDir().getAbsolutePath() + "/shared_prefs/devicesyn.xml";
         try {
-            unprotectFilesWithRoot(accountsDatabaseFile, deviceIdFile);
+            unprotectFilesWithRoot(accountsDatabaseFile + "*", deviceIdFile);
             JSONObject root = new JSONObject();
             StringBuilder builder = new StringBuilder();
             try (SQLiteDatabase db = SQLiteDatabase.openDatabase(accountsDatabaseFile, null, SQLiteDatabase.OPEN_READONLY);
@@ -42,7 +42,7 @@ public class BackupUtil {
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            protectFilesWithRoot(accountsDatabaseFile, deviceIdFile);
+            protectFilesWithRoot(accountsDatabaseFile + "*", deviceIdFile);
         }
     }
 
@@ -50,7 +50,7 @@ public class BackupUtil {
         String accountsDatabaseFile = context.getDatabasePath("zz_sdk_db").getAbsolutePath();
         String deviceIdFile = context.getFilesDir().getAbsolutePath() + "/shared_prefs/devicesyn.xml";
         try {
-            unprotectFilesWithRoot(accountsDatabaseFile, deviceIdFile);
+            unprotectFilesWithRoot(accountsDatabaseFile + "*", deviceIdFile);
             JSONObject root = new JSONObject(new String(data));
             String accounts = root.getString("accounts");
             try (SQLiteDatabase db = SQLiteDatabase.openDatabase(accountsDatabaseFile, null, SQLiteDatabase.OPEN_READWRITE)) {
@@ -63,7 +63,7 @@ public class BackupUtil {
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            protectFilesWithRoot(accountsDatabaseFile, deviceIdFile);
+            protectFilesWithRoot(accountsDatabaseFile + "*", deviceIdFile);
         }
     }
 
@@ -86,6 +86,6 @@ public class BackupUtil {
                 builder.append(" ");
             }
         }
-        Shell.su("setenforce 1", "chmod 644 " + builder.toString()).exec();
+        Shell.su("setenforce 1", "chmod 600 " + builder.toString()).exec();
     }
 }
