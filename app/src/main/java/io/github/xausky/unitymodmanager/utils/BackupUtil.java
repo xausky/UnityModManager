@@ -1,18 +1,13 @@
 package io.github.xausky.unitymodmanager.utils;
 
-import android.app.backup.SharedPreferencesBackupHelper;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.google.android.gms.common.util.SharedPreferencesUtils;
 import com.topjohnwu.superuser.Shell;
 
-import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
-
-import java.io.File;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -64,7 +59,7 @@ public class BackupUtil {
                 }
             }
             SharedPreferences sharedPreferences = context.getSharedPreferences("devicesyn", MODE_PRIVATE);
-            sharedPreferences.edit().putString("fake_device_id", root.getString("device_id")).commit();
+            sharedPreferences.edit().putString("device_id", root.getString("device_id")).commit();
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
